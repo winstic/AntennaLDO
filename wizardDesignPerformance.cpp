@@ -7,13 +7,14 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject obj, QWidget *paren
     this->freNumberLabel = new QLabel("频点个数:");
     this->sweepTypeLabel = new QLabel("扫频方式:");
     this->PMLabel = new QLabel("极化方式:");
-    this->unitLabel = new QLabel("MHz");
     this->freStartEdit = new QLineEdit;
     this->freEndEdit = new QLineEdit;
     this->freNumberEdit = new QLineEdit;
     this->sweeptypeComb = new QComboBox;
     this->PMComb = new QComboBox;
     initComBoBox();
+    wizardDialog();
+    initLayout();
 }
 
 void wizardDesignPerformance::wizardDialog(){
@@ -22,18 +23,21 @@ void wizardDesignPerformance::wizardDialog(){
     QStringList strList;
     if(this->obj.contains("FreSetting")){
         QJsonValue freValue = obj.value("FreSetting");
-        if(freValue.isObject())
+        if(freValue.isObject()){
             freObj = freValue.toObject();
-        strList = singleListRegularStr(freObj.value("FreStart").toString().trimmed());
-        freStartEdit->setText(strList[0]);
-        strList = singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
-        freEndEdit->setText(strList[0]);
-        strList = singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
-        freNumberEdit->setText(strList[0]);
-        strList = singleListRegularStr(freObj.value("SweepType").toString().trimmed());
-        sweeptypeComb->setCurrentIndex(QString(strList[0]).toInt());
-        strList = singleListRegularStr(freObj.value("PM").toString().trimmed());
-        PMComb->setCurrentIndex(QString(strList[0]).toInt());
+            strList = singleListRegularStr(freObj.value("FreStart").toString().trimmed());
+            freStartEdit->setText(strList[0]);
+            strList = singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
+            freEndEdit->setText(strList[0]);
+            strList = singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
+            freNumberEdit->setText(strList[0]);
+            strList = singleListRegularStr(freObj.value("SweepType").toString().trimmed());
+            sweeptypeComb->setCurrentIndex(QString(strList[0]).toInt());
+            strList = singleListRegularStr(freObj.value("PM").toString().trimmed());
+            PMComb->setCurrentIndex(QString(strList[0]).toInt());
+        }
+        else
+            QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
     }
 }
 
@@ -49,33 +53,34 @@ void wizardDesignPerformance::initComBoBox(){
 }
 
 void wizardDesignPerformance::initLayout(){
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QVBoxLayout *vbox = new QVBoxLayout;
+    QGridLayout *gridLayout = new QGridLayout;
 
-    hbox->addWidget(freStartLabel);
-    hbox->addWidget(freStartEdit);
-    hbox->addWidget(unitLabel);
-    vbox->addLayout(hbox);
+    freStartLabel->setAlignment(Qt::AlignRight);
+    gridLayout->addWidget(freStartLabel, 0, 0);
+    freStartEdit->setFixedWidth(240);
+    gridLayout->addWidget(freStartEdit, 0, 1);
+    gridLayout->addWidget(new QLabel("MHz"), 0, 2);
 
-    hbox->addWidget(freEndLabel);
-    hbox->addWidget(freEndEdit);
-    hbox->addWidget(unitLabel);
-    vbox->addLayout(hbox);
+    freEndLabel->setAlignment(Qt::AlignRight);
+    gridLayout->addWidget(freEndLabel, 1, 0);
+    freEndEdit->setFixedWidth(240);
+    gridLayout->addWidget(freEndEdit, 1, 1);
+    gridLayout->addWidget(new QLabel("MHz"), 1, 2);
 
-    hbox->addWidget(freNumberLabel);
-    hbox->addWidget(freNumberEdit);
-    hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    vbox->addLayout(hbox);
+    freNumberLabel->setAlignment(Qt::AlignRight);
+    gridLayout->addWidget(freNumberLabel, 2, 0);
+    freNumberEdit->setFixedWidth(240);
+    gridLayout->addWidget(freNumberEdit, 2, 1);
 
-    hbox->addWidget(sweepTypeLabel);
-    hbox->addWidget(sweeptypeComb);
-    hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    vbox->addLayout(hbox);
+    sweepTypeLabel->setAlignment(Qt::AlignRight);
+    gridLayout->addWidget(sweepTypeLabel, 3, 0);
+    sweeptypeComb->setFixedWidth(240);
+    gridLayout->addWidget(sweeptypeComb, 3, 1);
 
-    hbox->addWidget(PMLabel);
-    hbox->addWidget(PMComb);
-    hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    vbox->addLayout(hbox);
+    PMLabel->setAlignment(Qt::AlignRight);
+    gridLayout->addWidget(PMLabel, 4, 0);
+    PMComb->setFixedWidth(240);
+    gridLayout->addWidget(PMComb, 4, 1);
 
-    setLayout(vbox);
+    setLayout(gridLayout);
 }

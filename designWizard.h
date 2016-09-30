@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "global.h"
 #include "wizardDesignPerformance.h"
+#include "wizardDesignVariables.h"
 
 class designWizard : public QWizard{
     Q_OBJECT
@@ -21,6 +22,7 @@ private:
     bool writeJsonFile(const QJsonObject &obj);
 
     wizardDesignPerformance *designPerformance;
+    wizardDesignVariables *designVariables;
     QMap<QString, QString> modeVariables;
     QMap<QString, QString> freVariables;
     QString jsonPath;

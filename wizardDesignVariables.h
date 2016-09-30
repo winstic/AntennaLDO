@@ -2,13 +2,20 @@
 #define WIZARDDESIGNVARIABLES_H
 
 #include <QWizardPage>
+#include "global.h"
 
-class wizardDesignVariables : QWizardPage{
+class wizardDesignVariables : public QWizardPage{
     Q_OBJECT
 
 public:
-    wizardDesignVariables();
+    wizardDesignVariables(QJsonObject obj, QWidget *parent = 0);
     ~wizardDesignVariables(){}
+
+private:
+    QJsonObject obj;
+
+    void wizardDialog();
+    void initLayout();
 };
 
 #endif // WIZARDDESIGNMODELPARAMETER_H

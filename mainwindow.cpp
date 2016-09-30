@@ -5,11 +5,11 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), isClosedSubmdi(false){
     ui->setupUi(this);
     //list all file in current work dir
-    QDir dir(QDir::currentPath());
+    /*QDir dir(QDir::currentPath());
     qDebug() << "dir start " << dir.path() << " dir end";
     QStringList infolist = dir.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
     for(int i=0; i<infolist.size(); i++)
-        qDebug() << infolist.at(i);
+        qDebug() << infolist.at(i);*/
     //xmlDomDocument *xmlManage = new xmlDomDocument("./projectManage.xml");
     //xmlManage->readXml();
     sqliteManage* mSqlManage = new sqliteManage();

@@ -3,12 +3,14 @@
 designWizard::designWizard(const QString &path, QWidget *parent) : QWizard(parent){
     this->jsonPath = path;
     this->obj = QJsonObject();
+    setWindowTitle("设计向导");
+    //setButtonText(QWizard::BackButton, "<上一步");
+    //setButtonText(QWizard::NextButton, "下一步>");
     if(readJsonFile()){
         this->designPerformance = new wizardDesignPerformance(this->obj, this);
-        setWindowTitle("设计向导");
-        setButtonText(QWizard::NextButton, "下一步>");
-
         addPage(designPerformance);
+        this->designVariables = new wizardDesignVariables(this->obj, this);
+        addPage(designVariables);
     }
 }
 
@@ -18,15 +20,14 @@ bool designWizard::readJsonFile(){
         QMessageBox::critical(this, tr("Error"), tr("Cannot read file %1").arg(jsonPath));
         return false;
     }
-    else{
-        QByteArray byteArray = file.readAll();
-        file.close();
-        QJsonParseError jsonError;
-        QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArray, &jsonError);
-        if(jsonError.error == QJsonParseError::NoError){
-            if(jsonDocument.isObject()){
-                obj = jsonDocument.object();
-            }
+
+    QByteArray byteArray = file.readAll();
+    file.close();
+    QJsonParseError jsonError;
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArray, &jsonError);
+    if(jsonError.error == QJsonParseError::NoError){
+        if(jsonDocument.isObject()){
+            obj = jsonDocument.object();
         }
     }
     return true;

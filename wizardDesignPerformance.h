@@ -21,8 +21,7 @@ private:
     QLabel *freEndLabel;
     QLabel *freNumberLabel;
     QLabel *sweepTypeLabel;
-    QLabel *PMLabel;
-    QLabel *unitLabel;
+    QLabel *PMLabel;    
     QLineEdit *freStartEdit;
     QLineEdit *freEndEdit;
     QLineEdit *freNumberEdit;

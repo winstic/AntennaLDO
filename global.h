@@ -43,7 +43,7 @@ enum pyFlag{proPy = 0, algPy};
 enum SWEEPTYPES{linearly = 0, logarithmically};
 
 inline QStringList singleListRegularStr(QString str){
-    QRegExp re("[,]");
+    QRegExp re("[\\[,\\]]");
     QStringList strList = str.split(re, QString::SkipEmptyParts);
     return strList;
 }
