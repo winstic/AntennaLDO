@@ -10,8 +10,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QStringList infolist = dir.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
     for(int i=0; i<infolist.size(); i++)
         qDebug() << infolist.at(i);*/
-    //xmlDomDocument *xmlManage = new xmlDomDocument("./projectManage.xml");
-    //xmlManage->readXml();
     sqliteManage* mSqlManage = new sqliteManage();
     //delete centralWidget
     QWidget *p = takeCentralWidget();

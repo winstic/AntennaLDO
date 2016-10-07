@@ -43,10 +43,11 @@ bool treeModel::readFile(const QString &fileName){
     }
 
     tModel = new QStandardItemModel(mTree);
-    QStringList header;
-    QString projectName = fileName.split(".").at(0);
-    header << projectName;
+    QStringList header;    
+    header << xmlRoot.attribute("name");
     tModel->setHorizontalHeaderLabels(header);
+
+    QString projectName = fileName.split(".").at(0);
     treeRoot = new QStandardItem(IconMap[QStringLiteral("treeNode")], projectName);
     treeRoot->setData(MARK_PROJECT, ROLE_MARK);
     tModel->appendRow(treeRoot);
@@ -59,15 +60,46 @@ bool treeModel::readFile(const QString &fileName){
     return true;
 }
 
-bool treeModel::writeFile(const QString &fileName){
+bool treeModel::writeFile(const QString &fileName, const QString &atnName){
     QFile file(fileName);
-    if(! file.open(QIODevice::WriteOnly)){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot open file %1").arg(fileName));
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
-    }
     QTextStream out(&file);
-    //out << str;
-    file.close();
+    QDomDocument doc;
+    QDomElement root, element;
+    QDomText text;
+    QDomProcessingInstruction instruction = doc.createProcessingInstruction("xml", "version = \'1.0\' encoding = \'UTF-8\'");
+    doc.appendChild(instruction);
+
+    //project
+    root = doc.createElement("project");
+    root.setAttribute("name", atnName);
+    doc.appendChild(root);
+
+    element = doc.createElement("item");
+    text = doc.createTextNode("模型简介");
+    element.appendChild(text);
+    element.setAttribute("flag", "viewOnly");
+    root.appendChild(element);
+
+    element = doc.createElement("node");
+    element.setAttribute("name", "设计");
+    element.setAttribute("flag", "design");
+    root.appendChild(element);
+
+    element = doc.createElement("node");
+    element.setAttribute("name", "优化");
+    element.setAttribute("flag", "optimization");
+    root.appendChild(element);
+
+    element = doc.createElement("node");
+    element.setAttribute("name", "结果查看");
+    element.setAttribute("flag", "result");
+    root.appendChild(element);
+
+    // /group
+    // /designs /data   /project
+    doc.save(out, 4);   //4 spaces
     return true;
 }
 

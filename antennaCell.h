@@ -24,7 +24,8 @@ private slots:
 
 private:
     QLabel *atnPhoto;
-    QLabel *atnName;
+    QLabel *atnNameLabel;
+    QString atnName;
 
 };
 

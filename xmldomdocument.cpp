@@ -1,11 +1,11 @@
 ﻿#include <QDebug>
 #include "xmldomdocument.h"
 
-xmlDomDocument::xmlDomDocument(QString fileName){
-    this->fileName = fileName;
+xmlDomDocument::xmlDomDocument(){
+
 }
 
-int xmlDomDocument::writeXml(){
+int xmlDomDocument::writeXml(const QString &fileName){
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return -2;
@@ -20,51 +20,34 @@ int xmlDomDocument::writeXml(){
     root = doc.createElement("project");
     doc.appendChild(root);
 
-    element = doc.createElement("projectName");
-    text = doc.createTextNode(fileName);
-    element.appendChild(text);
-    root.appendChild(element);
-
-    //data
-    QDomElement dataElement = doc.createElement("data");
-    root.appendChild(dataElement);
-
-    element = doc.createElement("info");
+    element = doc.createElement("item");
     text = doc.createTextNode("模型简介");
     element.appendChild(text);
-    dataElement.appendChild(element);
+    element.setAttribute("flag", "viewOnly");
+    root.appendChild(element);
 
-    //designs
-    QDomElement designsElement = doc.createElement("designs");
-    dataElement.appendChild(designsElement);
-    designsElement.setAttribute("id", "01");
+    element = doc.createElement("node");
+    element.setAttribute("name", "设计");
+    element.setAttribute("flag", "design");
+    root.appendChild(element);
 
-    element = doc.createElement("performance");
-    text = doc.createTextNode("性能指标");
-    element.appendChild(text);
-    designsElement.appendChild(element);
+    element = doc.createElement("node");
+    element.setAttribute("name", "优化");
+    element.setAttribute("flag", "optimization");
+    root.appendChild(element);
 
-    //group
-    QDomElement groupElement = doc.createElement("group");
-    designsElement.appendChild(groupElement);
+    element = doc.createElement("node");
+    element.setAttribute("name", "结果查看");
+    element.setAttribute("flag", "result");
+    root.appendChild(element);
 
-    QDomElement designElement = doc.createElement("design");
-    text = doc.createTextNode("设计1");
-    designElement.appendChild(text);
-    groupElement.appendChild(designElement);
-    designElement.setAttribute("id", "01-01");
-
-    element = doc.createElement("result");
-    text = doc.createTextNode("结果查看");
-    element.appendChild(text);
-    designsElement.appendChild(element);
     // /group
     // /designs /data   /project
     doc.save(out, 4);   //4 spaces
     return 0;
 }
 
-int xmlDomDocument::readXml(){
+int xmlDomDocument::readXml(const QString &fileName){
     QDomDocument doc;
     QFile file(fileName);
     QString error = "";

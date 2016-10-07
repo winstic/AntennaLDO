@@ -1,14 +1,15 @@
 ﻿#include "antennaCell.h"
 antennaCell::antennaCell(QString path, QString name, QWidget* parent):QWidget(parent)
 {
+    atnName = name;
     QHBoxLayout *hLayout = new QHBoxLayout();
     QVBoxLayout *vLayout = new QVBoxLayout();
-    atnName = new QLabel(name);
+    atnNameLabel = new QLabel(QString("%1 Antenna").arg(name));
     atnPhoto = new QLabel;
     atnPhoto->setPixmap(QPixmap(path));
 	//hLayout->addWidget((QWidget *)m_icon);
     vLayout->addWidget(atnPhoto);
-    vLayout->addWidget(atnName);
+    vLayout->addWidget(atnNameLabel);
 	vLayout->setStretch(0,2);
 	vLayout->setStretch(1,1);
     hLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -20,7 +21,7 @@ antennaCell::antennaCell(QString path, QString name, QWidget* parent):QWidget(pa
 }
 
 QString antennaCell::getAtnName() const{
-    return atnName->text();
+    return atnName;
 }
 
 QLabel* antennaCell::getAtnPhoto() const{

@@ -33,7 +33,7 @@ wizardSelectPy::wizardSelectPy(QString antennaName, QWidget *parent) : QWizardPa
         proCombo->setCurrentIndex(proCombo->findText(atnName));
         proCombo->setEnabled(false);
         setAlgComBoItem(atnName);
-        //pro_py_path = setPyPath(atnName, proPy);
+        //proPath = setPath(atnName, proPy);
 	}
     else{
         proCombo->setCurrentIndex(-1);
@@ -71,17 +71,17 @@ void wizardSelectPy::initProCombo(){
 }
 
 //flag==0 means return problem pyPath, flag==1 means return algorithm pyPath
-QString wizardSelectPy::setPyPath(QString name, bool flag){
+QString wizardSelectPy::setPath(QString name, bool flag){
     QString pyPath;
     QString getPySql;
     QString pyFlag;
     if(flag == 0){
-        getPySql = QString("select pPyPath from antennaProblem where pName = '%1';").arg(name);
-        pyFlag = "pPyPath";
+        getPySql = QString("select proPath from antennaProblem where pName = '%1';").arg(name);
+        pyFlag = "proPath";
     }
     else{
-        getPySql = QString("select aPyPath from algorithm where aName = '%1';").arg(name);
-        pyFlag = "aPyPath";
+        getPySql = QString("select algPath from algorithm where aName = '%1';").arg(name);
+        pyFlag = "algPath";
     }
     QSqlQuery sqlQuery;
     sqlQuery.prepare(getPySql);
@@ -97,7 +97,7 @@ QString wizardSelectPy::setPyPath(QString name, bool flag){
 }
 
 void wizardSelectPy::setAlgComBoItem(QString name){
-    QString selectProSql = QString(" select a.aId, a.aName, c.pPyPath "
+    QString selectProSql = QString(" select a.aId, a.aName, c.proPath "
             " from algorithm as a "
             " inner join algtopro as b on a.aId = b.aId and b.pId = c.pId "
             " inner join antennaProblem as c on c.pName = '%1'; ").arg(name);
@@ -109,18 +109,18 @@ void wizardSelectPy::setAlgComBoItem(QString name){
     else{
         while(sqlQuery.next()){
             algCombo->addItem(sqlQuery.value("aName").toString());
-            //resigned pro_py_path many times need to improved
-            pro_py_path = sqlQuery.value("pPyPath").toString();
+            //resigned proPath many times need to improved
+            proPath = sqlQuery.value("proPath").toString();
         }
     }
 }
 
-QString wizardSelectPy::getProPyPath() const{
-    return pro_py_path;
+QString wizardSelectPy::getProPath() const{
+    return proPath;
 }
 
-QString wizardSelectPy::getAlgPyPath() const{
-    return alg_py_path;
+QString wizardSelectPy::getAlgPath() const{
+    return algPath;
 }
 
 //slots function
@@ -132,7 +132,7 @@ void wizardSelectPy::slot_proName(int index){
 
 void wizardSelectPy::slot_algName(int index){
     QString algName = algCombo->itemText(index);
-    alg_py_path = setPyPath(algName, algPy);
+    algPath = setPath(algName, algPy);
     hint->setText("所选算法为" + algName);
 }
 

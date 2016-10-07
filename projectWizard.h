@@ -10,6 +10,7 @@
 #include "sqliteManage.h"
 #include "wizardAddSetting.h"
 #include "wizardSelectPy.h"
+#include "config.h"
 
 class projectWizard :public QWizard{
     Q_OBJECT
@@ -26,9 +27,11 @@ private:
     wizardSelectPy* selectPy;
     QString atnName;
     QString projectName;
+    QString projectPath;
+    QString projectFullPath;
 
 	void createProject();
-    bool copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist = 1);
+    bool copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist = true);
 };
 
 #endif

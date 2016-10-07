@@ -16,7 +16,6 @@ public:
 
     bool validatePage();
 	QString readDefaultPath();
-	void writeDefaultPath(QString path);
     bool isSettingDefaultPath() const;
     QString getProjectPath() const;
     QString getProjectName() const;

@@ -7,13 +7,12 @@
 
 class xmlDomDocument{
 public:
-    xmlDomDocument(QString fileName);
+    xmlDomDocument();
     ~xmlDomDocument(){}
-    int writeXml();
-    int readXml();    
+    int writeXml(const QString &fileName);
+    int readXml(const QString &fileName);
 
 private:
-    QString fileName;
 };
 
 #endif // XMLDOMDOCUMENT_H

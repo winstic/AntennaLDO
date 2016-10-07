@@ -4,43 +4,57 @@ projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(par
     atnName = antennaName;
     setWindowTitle(atnName + " 工程向导");
     setButtonText(QWizard::NextButton, "下一步>");
+    introduce = new wizardIntroduce(atnName, this);
+    addSetting = new wizardAddSetting(atnName, this);
+    // need improve
+    selectPy = new wizardSelectPy(atnName);
+
     if (atnName != NULL){
-        introduce = new wizardIntroduce(atnName, this);
-        addSetting = new wizardAddSetting(atnName, this);
         addPage(introduce);
-        addPage(addSetting);
+        addPage(addSetting);        
     }
     else{
-        addSetting = new wizardAddSetting(atnName, this);
-        selectPy = new wizardSelectPy(atnName, this);
         addPage(addSetting);
         addPage(selectPy);
     }
-    projectName = addSetting->getProjectName();
 }
 
 bool projectWizard::validateCurrentPage(){
     if (this->currentPage()->nextId() == -1){
-        bool finish=selectPy->validatePage();
+            bool finish = addSetting->validatePage();
+            config *confManage = new config();
+            if (finish==true){
+                //addSetting->writeDefaultPath();
+                createProject();
+                if(addSetting->isSettingDefaultPath())
+                    confManage->writeConfigInfo("PROJECTPATH", projectPath);
+                else
+                    confManage->writeConfigInfo("PROJECTPATH", "");
+                confManage->writeConfigInfo("WORKINGPATH", projectPath);
+            }
+            return finish;
+        }
+    /*if (this->currentPage()->nextId() == -1){
+        bool finish = selectPy->validatePage();
         if (finish==true && addSetting->isSettingDefaultPath())
-            addSetting->writeDefaultPath(addSetting->getProjectPath());
+            addSetting->writeDefaultPath();
         if (finish == true){
 			createProject();
 		}
         return selectPy->validatePage();
-	}
+    }
 	if (this->currentPage()->nextId() == 2)	{
         return addSetting->validatePage();
-	}
+    }*/
 	return true;
 }
 
 void projectWizard::createProject(){
-    QString projectPath = addSetting->getProjectPath();
-    QString projectName = addSetting->getProjectName();
-    QString projectFullPath = projectPath + "/" + projectName;
-    QString proPyPath = selectPy->getProPyPath();
-    QString algPyPath= selectPy->getAlgPyPath();
+    this->projectName = addSetting->getProjectName();
+    this->projectPath = addSetting->getProjectPath();
+    this->projectFullPath = projectPath + "/" + projectName;
+    QString proPath = selectPy->getProPath();
+    QString algPath= selectPy->getAlgPath();
     QString relFile = projectName + ".rel";
 
     //create project dir
@@ -48,26 +62,26 @@ void projectWizard::createProject(){
     dir->mkdir(projectFullPath);
 
     //copy antenna problem
-    QString projectProPath = projectFullPath + "/" + QFileInfo(proPyPath).fileName();
-    if(! copyFile(proPyPath, projectProPath)){
+    QString projectProPath = projectFullPath + "/" + QString("%1_conf.json").arg(atnName);
+    if(! copyFile(proPath + "/" + QString("%1_conf.json").arg(atnName), projectProPath)){
         QMessageBox::warning(this, "警告！", "问题文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
-        dir->remove(projectFullPath);
+        dir->rmdir(projectFullPath);
         return;
     }
     //copy algorithm
-    QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPyPath).fileName();
-    if(! copyFile(algPyPath, projectAlgPath)){
+    /*QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPath).fileName();
+    if(! copyFile(algPath, projectAlgPath)){
         QMessageBox::warning(this, "警告！", "算法文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
         dir->remove(projectFullPath);
         return;
-    }
+    }*/
 
     //writen project file(.rel)
     QFile inFile(projectFullPath + "/" + relFile);
     inFile.open(QIODevice::WriteOnly);
     QTextStream out(&inFile);
     out << projectProPath << endl;
-    out << projectAlgPath << endl;
+    //out << projectAlgPath << endl;
     inFile.close();
 }
 

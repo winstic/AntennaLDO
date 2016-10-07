@@ -12,10 +12,12 @@ public:
     ~wizardDesignVariables(){}
 
 private:
-    QJsonObject obj;
-
+    QComboBox* initUnitComBo();
     void wizardDialog();
     void initLayout();
+    QString getSliderSheet();
+
+    QJsonObject obj;
 };
 
 #endif // WIZARDDESIGNMODELPARAMETER_H

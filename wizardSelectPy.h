@@ -12,9 +12,9 @@ class wizardSelectPy :public QWizardPage
 public:
     wizardSelectPy(QString antennaName, QWidget *parent = 0);
 	bool validatePage();
-    QString setPyPath(QString name, bool flag = 0);
-    QString getProPyPath() const;
-    QString getAlgPyPath() const;
+    QString setPath(QString name, bool flag = 0);
+    QString getProPath() const;
+    QString getAlgPath() const;
     void setAlgComBoItem(QString name);
 
 private:
@@ -24,8 +24,8 @@ private:
     QLabel *hint;
     QComboBox *proCombo;
     QComboBox *algCombo;
-	QString pro_py_path;
-	QString alg_py_path;
+    QString proPath;
+    QString algPath;
 
     void initProCombo();
 

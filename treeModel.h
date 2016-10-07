@@ -24,7 +24,7 @@ public:
     void initIcon();
     //void showTree();
     bool readFile(const QString &fileName);
-    bool writeFile(const QString &fileName);
+    bool writeFile(const QString &fileName, const QString &atnName);
 
     inline QMenu* getProjectMenu() {return mProjectMenu;}
     inline QMenu* getAtnDesignMenu() {return mAtnDesignMenu;}

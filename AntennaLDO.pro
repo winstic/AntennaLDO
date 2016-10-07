@@ -46,6 +46,7 @@ HEADERS  += mainwindow.h \
     searchAction.h \
     mybtn.h \
     mdichild.h \
-    sqliteManage.h
+    sqliteManage.h \
+    config.h
 
 FORMS    += mainwindow.ui

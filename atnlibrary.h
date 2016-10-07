@@ -9,6 +9,7 @@
 #include "antennaCell.h"
 #include "projectWizard.h"
 #include "treeModel.h"
+#include "config.h"
 
 class atnLibrary : public QWidget{
     Q_OBJECT
