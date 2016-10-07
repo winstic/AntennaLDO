@@ -44,7 +44,7 @@ public:
             out << QString("%1 = %2\n").arg(key).arg(value);
         outfile.close();
     }
-    QString readWorkingPath(){
+    QString readPath(const QString &key){
         QFile infile(fileName);
         if (!infile.open(QFile::Text|QFile::ReadOnly)){
             QMessageBox::warning(new QWidget, "警告！", "Config.ini文件缺失", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -56,7 +56,7 @@ public:
 
         QStringList strList = str.split("\n", QString::SkipEmptyParts);
         for(int i = 0 ; i < strList.count(); ++ i){
-            if(strList.at(i).contains("WORKINGPATH")){
+            if(strList.at(i).contains(key)){
                 QStringList tempList = QString(strList.at(i)).split("=");
                 return tempList.at(1).trimmed();
             }

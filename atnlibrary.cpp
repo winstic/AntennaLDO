@@ -131,7 +131,7 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
         projectWizard* wizard = new projectWizard(atnName);
         if(wizard->exec() == 1){
             config *confManage = new config();
-            QString workingPath = confManage->readWorkingPath();
+            QString workingPath = confManage->readPath("WORKINGPATH");
             QString projectName = wizard->getProjectName();
             mTreeModel->writeFile(QString("%1/%2/%3.xml").arg(workingPath).arg(projectName).arg(projectName), atnName);
             mTreeModel->readFile(QString("%1/%2/%3.xml").arg(workingPath).arg(projectName).arg(projectName));

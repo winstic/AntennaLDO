@@ -8,6 +8,7 @@ projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(par
     addSetting = new wizardAddSetting(atnName, this);
     // need improve
     selectPy = new wizardSelectPy(atnName);
+    confManage = new config();
 
     if (atnName != NULL){
         addPage(introduce);
@@ -21,8 +22,7 @@ projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(par
 
 bool projectWizard::validateCurrentPage(){
     if (this->currentPage()->nextId() == -1){
-            bool finish = addSetting->validatePage();
-            config *confManage = new config();
+            bool finish = addSetting->validatePage();            
             if (finish==true){
                 //addSetting->writeDefaultPath();
                 createProject();
@@ -62,12 +62,16 @@ void projectWizard::createProject(){
     dir->mkdir(projectFullPath);
 
     //copy antenna problem
-    QString projectProPath = projectFullPath + "/" + QString("%1_conf.json").arg(atnName);
-    if(! copyFile(proPath + "/" + QString("%1_conf.json").arg(atnName), projectProPath)){
+    QString projectProPath = QString("%1/%2_conf.json").arg(projectFullPath).arg(atnName);
+    QString projectModelPath = QString("%1/%2.hfss").arg(projectFullPath).arg(atnName);
+    if(! copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
+           ! copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ){
         QMessageBox::warning(this, "警告！", "问题文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
         dir->rmdir(projectFullPath);
         return;
     }
+    confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
+    confManage->writeConfigInfo("MODELFILE", projectModelPath);
     //copy algorithm
     /*QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPath).fileName();
     if(! copyFile(algPath, projectAlgPath)){

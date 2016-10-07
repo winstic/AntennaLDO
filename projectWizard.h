@@ -25,6 +25,7 @@ private:
     wizardIntroduce* introduce;
     wizardAddSetting* addSetting;
     wizardSelectPy* selectPy;
+    config* confManage;
     QString atnName;
     QString projectName;
     QString projectPath;

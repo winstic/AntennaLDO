@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "global.h"
 #include "designWizard.h"
+#include "config.h"
 
 class treeModel : public QTreeView{
 
@@ -37,6 +38,7 @@ private slots:
     void slot_showAll();
     void slot_hideAll();
     void slot_add();
+    void slot_run();
     void slot_del();
 
     //mouse right click
@@ -48,6 +50,7 @@ private:
     void parseItemElement(const QDomElement &element, QStandardItem *parent);
 
     QMap<QString, QIcon> IconMap;
+    config *confManage;
     QTreeView *mTree;
     QStandardItemModel* tModel;
     QStandardItem *treeRoot;

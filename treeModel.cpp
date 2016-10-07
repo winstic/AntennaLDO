@@ -3,6 +3,7 @@
 
 treeModel::treeModel(QTreeView* m_tree){
     //QStandardItemModel* tModel = new QStandardItemModel(mTree);
+    confManage = new config();
     mTree = m_tree;
     mProjectMenu = new QMenu;
     mAtnDesignMenu = new QMenu;
@@ -47,7 +48,7 @@ bool treeModel::readFile(const QString &fileName){
     header << xmlRoot.attribute("name");
     tModel->setHorizontalHeaderLabels(header);
 
-    QString projectName = fileName.split(".").at(0);
+    QString projectName = QFileInfo(fileName).fileName().split(".").at(0);
     treeRoot = new QStandardItem(IconMap[QStringLiteral("treeNode")], projectName);
     treeRoot->setData(MARK_PROJECT, ROLE_MARK);
     tModel->appendRow(treeRoot);
@@ -216,6 +217,7 @@ void treeModel::initMenu(){
     QAction* actAdd = new QAction(QStringLiteral("新增"), mTree);
     connect(actAdd, &QAction::triggered, this, &treeModel::slot_add);
     QAction* actRun = new QAction(QStringLiteral("运行"), mTree);
+    connect(actRun, &QAction::triggered, this, &treeModel::slot_run);
     QAction* actOpenFile = new QAction(QStringLiteral("打开文件"), mTree);
 
     mProjectMenu->addAction(actClose);
@@ -324,8 +326,8 @@ void treeModel::slot_add(){
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
     if(varNode.isValid()){
-        if(MARK_NODE_DESIGN == varNode.toInt()){
-            designWizard *wizard = new designWizard("wifiAntenna_conf.json");
+        if(MARK_NODE_DESIGN == varNode.toInt()){            
+            designWizard *wizard = new designWizard(confManage->readPath("MODELVARIABLES"));
             if(wizard->exec() == 1){
                 QStandardItem *child = new QStandardItem(
                             IconMap[QStringLiteral("treeItem")], QString("设计%1").arg(item->rowCount()+1));
@@ -336,6 +338,15 @@ void treeModel::slot_add(){
         }
         else if(MARK_NODE_OPTIMIZATION == varNode.toInt()){}
     }
+}
+
+void treeModel::slot_run(){
+    QString modelPath = confManage->readPath("MODELFILE");
+    QProcess p(0);
+    //p.start("cmd", QStringList() << "hfss" << modelPath);
+    p.execute("hfss", QStringList() << modelPath);
+    p.waitForFinished();
+    qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
 }
 
 void treeModel::slot_del(){
