@@ -26,9 +26,8 @@ SOURCES += main.cpp\
     wizardSelectPy.cpp \
     antennaCell.cpp \
     searchAction.cpp \
-    mybtn.cpp \
-    mdichild.cpp \
-    sqliteManage.cpp
+    sqliteManage.cpp \
+    global.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -44,9 +43,8 @@ HEADERS  += mainwindow.h \
     wizardSelectPy.h \
     antennaCell.h \
     searchAction.h \
-    mybtn.h \
-    mdichild.h \
     sqliteManage.h \
-    config.h
+    config.h \
+    macrodefined.h
 
 FORMS    += mainwindow.ui

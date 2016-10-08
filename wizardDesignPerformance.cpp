@@ -1,4 +1,5 @@
 ﻿#include "wizardDesignPerformance.h"
+#include "global.h"
 
 wizardDesignPerformance::wizardDesignPerformance(QJsonObject obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
@@ -25,15 +26,15 @@ void wizardDesignPerformance::wizardDialog(){
         QJsonValue freValue = obj.value("FreSetting");
         if(freValue.isObject()){
             freObj = freValue.toObject();
-            strList = singleListRegularStr(freObj.value("FreStart").toString().trimmed());
+            strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
             freStartEdit->setText(strList[0]);
-            strList = singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
+            strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
             freEndEdit->setText(strList[0]);
-            strList = singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
+            strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
             freNumberEdit->setText(strList[0]);
-            strList = singleListRegularStr(freObj.value("SweepType").toString().trimmed());
+            strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
             sweeptypeComb->setCurrentIndex(QString(strList[0]).toInt());
-            strList = singleListRegularStr(freObj.value("PM").toString().trimmed());
+            strList = global::singleListRegularStr(freObj.value("PM").toString().trimmed());
             PMComb->setCurrentIndex(QString(strList[0]).toInt());
         }
         else

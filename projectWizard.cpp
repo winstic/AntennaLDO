@@ -1,4 +1,5 @@
 ﻿#include "projectWizard.h"
+#include "global.h"
 
 projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(parent){
     atnName = antennaName;
@@ -8,7 +9,7 @@ projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(par
     addSetting = new wizardAddSetting(atnName, this);
     // need improve
     selectPy = new wizardSelectPy(atnName);
-    confManage = new config();
+    //confManage = new config();
 
     if (atnName != NULL){
         addPage(introduce);
@@ -27,10 +28,13 @@ bool projectWizard::validateCurrentPage(){
                 //addSetting->writeDefaultPath();
                 createProject();
                 if(addSetting->isSettingDefaultPath())
-                    confManage->writeConfigInfo("PROJECTPATH", projectPath);
+                    global::sysParam["PROJECTPATH"] = projectPath;
+                    //confManage->writeConfigInfo("PROJECTPATH", projectPath);
                 else
-                    confManage->writeConfigInfo("PROJECTPATH", "");
-                confManage->writeConfigInfo("WORKINGPATH", projectPath);
+                    global::sysParam["PROJECTPATH"] = "";
+                    //confManage->writeConfigInfo("PROJECTPATH", "");
+                global::sysParam["WORKINGPATH"] = projectPath;
+                //confManage->writeConfigInfo("WORKINGPATH", projectPath);
             }
             return finish;
         }
@@ -70,8 +74,10 @@ void projectWizard::createProject(){
         dir->rmdir(projectFullPath);
         return;
     }
-    confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
-    confManage->writeConfigInfo("MODELFILE", projectModelPath);
+    global::sysParam["MODELVARIABLES"] = projectProPath;
+    global::sysParam["MODELFILE"] = projectModelPath;
+    //confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
+    //confManage->writeConfigInfo("MODELFILE", projectModelPath);
     //copy algorithm
     /*QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPath).fileName();
     if(! copyFile(algPath, projectAlgPath)){

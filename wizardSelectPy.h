@@ -4,7 +4,7 @@
 #include <QWizardPage>
 #include <QtWidgets>
 #include "sqliteManage.h"
-#include "global.h"
+#include "macrodefined.h"
 
 class wizardSelectPy :public QWizardPage
 {

@@ -1,8 +1,9 @@
 ﻿#ifndef WIZARDDESIGNVARIABLES_H
 #define WIZARDDESIGNVARIABLES_H
 
+#include <QtWidgets>
 #include <QWizardPage>
-#include "global.h"
+#include "macrodefined.h"
 
 class wizardDesignVariables : public QWizardPage{
     Q_OBJECT

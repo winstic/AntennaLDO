@@ -5,7 +5,7 @@
 #include <QWizardPage>
 #include <QFile>
 #include <QTextStream>
-#include "global.h"
+#include "macrodefined.h"
 #include "wizardDesignPerformance.h"
 #include "wizardDesignVariables.h"
 

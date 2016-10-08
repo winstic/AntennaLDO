@@ -2,11 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMdiArea>
-#include "mdichild.h"
-#include "global.h"
+#include "macrodefined.h"
 #include "atnlibrary.h"
-#include "mybtn.h"
 #include "treeModel.h"
 #include "searchAction.h"
 #include "wizardAddSetting.h"

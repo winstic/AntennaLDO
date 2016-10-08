@@ -5,9 +5,9 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QTextStream>
-#include "global.h"
+#include "macrodefined.h"
 #include "designWizard.h"
-#include "config.h"
+//#include "config.h"
 
 class treeModel : public QTreeView{
 
@@ -50,7 +50,7 @@ private:
     void parseItemElement(const QDomElement &element, QStandardItem *parent);
 
     QMap<QString, QIcon> IconMap;
-    config *confManage;
+    //config *confManage;
     QTreeView *mTree;
     QStandardItemModel* tModel;
     QStandardItem *treeRoot;

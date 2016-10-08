@@ -1,14 +1,7 @@
 ﻿#ifndef ANTENNACELL_H
 #define ANTENNACELL_H
 
-#include <QWidget>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QIcon>
-#include <QPixmap>
-#include <QPushButton>
-#include <QToolTip>
+#include <QtWidgets>
 #include "sqliteManage.h"
 class antennaCell :public QWidget
 {

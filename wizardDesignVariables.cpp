@@ -1,4 +1,5 @@
 ﻿#include "wizardDesignVariables.h"
+#include "global.h"
 
 wizardDesignVariables::wizardDesignVariables(QJsonObject obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
@@ -35,7 +36,7 @@ void wizardDesignVariables::wizardDialog(){
         gridLayout->addWidget(keyLabel, posx, 0);
 
         // init line edit and layout
-        varValue = singleListRegularStr(varObj.value(varKey).toString().trimmed());
+        varValue = global::singleListRegularStr(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
         if(valueListLength == 1){
             QLineEdit *valueEdit = new QLineEdit(varValue[0]);

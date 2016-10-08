@@ -1,13 +1,7 @@
 ﻿#ifndef SEARCHACTION_H
 #define SEARCHACTION_H
 
-#include <QWidgetAction>
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QWidget>
-#include <QSpacerItem>
+#include <QtWidgets>
 
 class  searchAction :public QWidgetAction
 {

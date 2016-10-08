@@ -10,7 +10,7 @@
 #include "sqliteManage.h"
 #include "wizardAddSetting.h"
 #include "wizardSelectPy.h"
-#include "config.h"
+//#include "config.h"
 
 class projectWizard :public QWizard{
     Q_OBJECT
@@ -25,7 +25,7 @@ private:
     wizardIntroduce* introduce;
     wizardAddSetting* addSetting;
     wizardSelectPy* selectPy;
-    config* confManage;
+    //config* confManage;
     QString atnName;
     QString projectName;
     QString projectPath;

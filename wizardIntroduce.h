@@ -1,8 +1,9 @@
 ﻿#ifndef WIZARDINTRODUCE_H
 #define WIZARDINTRODUCE_H
 
+#include <QtWidgets>
 #include <QWizardPage>
-#include "global.h"
+#include "macrodefined.h"
 #include "sqliteManage.h"
 
 class wizardIntroduce :public QWizardPage{

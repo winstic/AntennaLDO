@@ -1,9 +1,10 @@
 ﻿#ifndef WIZARDDESIGNPERFORMANCE_H
 #define WIZARDDESIGNPERFORMANCE_H
 
+#include <QtWidgets>
 #include <QWizardPage>
 #include <QFile>
-#include "global.h"
+#include "macrodefined.h"
 
 class wizardDesignPerformance : public QWizardPage{
     Q_OBJECT
