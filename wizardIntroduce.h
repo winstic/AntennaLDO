@@ -17,6 +17,8 @@ private:
     QTextEdit *atnInfo;
     QLabel *atnPhoto;
     QString atnName;
+    QString info;
+    QString photo;
 };
 
 #endif

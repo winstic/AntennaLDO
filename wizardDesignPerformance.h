@@ -13,11 +13,13 @@ public:
     wizardDesignPerformance(QJsonObject obj, QWidget *parent = 0);
     ~wizardDesignPerformance(){}
 private:
-    void wizardDialog();
+    void frequencySetting();
+    void farFieldSetting();
     void initComBoBox();
     void initLayout();
 
     QJsonObject obj;
+    //frequencySetting
     QLabel *freStartLabel;
     QLabel *freEndLabel;
     QLabel *freNumberLabel;
@@ -28,7 +30,22 @@ private:
     QLineEdit *freNumberEdit;
     QComboBox *sweeptypeComb;
     QComboBox *PMComb;
+    QGroupBox *groupBoxFrequency;
 
+    //farFieldSetting
+    QLabel *thetaStartLabel;
+    QLabel *thetaEndLabel;
+    QLabel *thetaStepLabel;
+    QLabel *phiStartLabel;
+    QLabel *phiEndLabel;
+    QLabel *phiStepLabel;
+    QLineEdit *thetaStartEdit;
+    QLineEdit *thetaEndEdit;
+    QLineEdit *thetaStepEdit;
+    QLineEdit *phiStartEdit;
+    QLineEdit *phiEndEdit;
+    QLineEdit *phiStepEdit;
+    QGroupBox *groupBoxFarField;
 };
 
 #endif // WIZARDDESIGNFREQUENCY_H

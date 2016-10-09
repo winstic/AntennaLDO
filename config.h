@@ -11,7 +11,7 @@ public:
         fileName = "./Config.ini";
     }
     ~config(){}
-    void writeConfigInfo(const QString &key, const QString &value){
+    static void writeConfigInfo(const QString &key, const QString &value){
         QFile outfile(fileName);
         if (!outfile.open(QFile::Text | QFile::ReadOnly)){
             QMessageBox::warning(new QWidget, "警告！", "Config.ini文件缺失", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -44,7 +44,7 @@ public:
             out << QString("%1 = %2\n").arg(key).arg(value);
         outfile.close();
     }
-    QString readPath(const QString &key){
+    static QString readPath(const QString &key){
         QFile infile(fileName);
         if (!infile.open(QFile::Text|QFile::ReadOnly)){
             QMessageBox::warning(new QWidget, "警告！", "Config.ini文件缺失", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);

@@ -19,6 +19,7 @@ projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(par
         addPage(addSetting);
         addPage(selectPy);
     }
+    this->setMinimumSize(880, 580);
 }
 
 bool projectWizard::validateCurrentPage(){
@@ -26,15 +27,18 @@ bool projectWizard::validateCurrentPage(){
             bool finish = addSetting->validatePage();            
             if (finish==true){
                 //addSetting->writeDefaultPath();
+                //in this function init some private paramters
                 createProject();
                 if(addSetting->isSettingDefaultPath())
-                    global::sysParam["PROJECTPATH"] = projectPath;
-                    //confManage->writeConfigInfo("PROJECTPATH", projectPath);
+                    sysParam["DefaultProjectPath"] = projectPath;
+                    //confManage->writeConfigInfo("DefaultProjectPath", projectPath);
                 else
-                    global::sysParam["PROJECTPATH"] = "";
-                    //confManage->writeConfigInfo("PROJECTPATH", "");
-                global::sysParam["WORKINGPATH"] = projectPath;
+                    sysParam["DefaultProjectPath"] = "";
+                    //confManage->writeConfigInfo("DefaultProjectPath", "");
+                sysParam["WorkingProjectPath"] = projectFullPath;
                 //confManage->writeConfigInfo("WORKINGPATH", projectPath);
+                qDebug() << "DefaultProjectPath=" << sysParam["DefaultProjectPath"];
+                qDebug() << "projectWizard:WorkingProjectPath=" << sysParam["WorkingProjectPath"];
             }
             return finish;
         }
@@ -68,14 +72,15 @@ void projectWizard::createProject(){
     //copy antenna problem
     QString projectProPath = QString("%1/%2_conf.json").arg(projectFullPath).arg(atnName);
     QString projectModelPath = QString("%1/%2.hfss").arg(projectFullPath).arg(atnName);
+    QString projectScriptPath = QString("%1/%2_design.vbs").arg(projectFullPath).arg(atnName);
     if(! copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
-           ! copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ){
+           ! copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ||
+            ! copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath) ){
         QMessageBox::warning(this, "警告！", "问题文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
         dir->rmdir(projectFullPath);
         return;
     }
-    global::sysParam["MODELVARIABLES"] = projectProPath;
-    global::sysParam["MODELFILE"] = projectModelPath;
+
     //confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
     //confManage->writeConfigInfo("MODELFILE", projectModelPath);
     //copy algorithm
@@ -90,7 +95,7 @@ void projectWizard::createProject(){
     QFile inFile(projectFullPath + "/" + relFile);
     inFile.open(QIODevice::WriteOnly);
     QTextStream out(&inFile);
-    out << projectProPath << endl;
+    out << "Problem:" << atnName << endl;
     //out << projectAlgPath << endl;
     inFile.close();
 }

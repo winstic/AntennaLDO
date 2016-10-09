@@ -7,7 +7,8 @@ wizardDesignVariables::wizardDesignVariables(QJsonObject obj, QWidget *parent) :
 }
 
 void wizardDesignVariables::wizardDialog(){
-    setTitle("模型设置");
+    setTitle(tr("模型设置"));
+    setSubTitle(tr("模型设置"));
     if(!this->obj.contains("variables")){
         QMessageBox::critical(this, tr("Error"), tr("not exist key('variables') in json file"));
         return;
@@ -41,7 +42,7 @@ void wizardDesignVariables::wizardDialog(){
         if(valueListLength == 1){
             QLineEdit *valueEdit = new QLineEdit(varValue[0]);
             valueEdit->setFixedWidth(240);
-            valueEdit->setEnabled(false);
+            valueEdit->setReadOnly(true);
             gridLayout->addWidget(valueEdit, posx, 1);
             //delete valueEdit;
         }
@@ -58,7 +59,7 @@ void wizardDesignVariables::wizardDialog(){
             realValue = (varSlider->value()*1.0 / 100) *
                     (QString(varValue[1]).trimmed().toDouble() - QString(varValue[0]).trimmed().toDouble());
             varEdit->setText(QString::number(realValue));
-            varEdit->setEnabled(false);
+            varEdit->setReadOnly(true);
             varEdit->setFixedWidth(240);
 
             vLayout->addWidget(varEdit);
@@ -79,7 +80,34 @@ void wizardDesignVariables::wizardDialog(){
     gridLayout->setAlignment(Qt::AlignVCenter);
     gridLayout->setColumnStretch(3, 1);
     gridLayout->setSpacing(10);
-    setLayout(gridLayout);
+
+    //!add picture
+    QString picturePath;
+    QSqlQuery sqlQuery;
+    QString sql = QString("select pModelPath from antennaProblem where pName = '%1';")
+            .arg(global::getInfoFromRel("Problem"));
+    sqlQuery.prepare(sql);
+    if(!sqlQuery.exec(sql)){
+        qDebug() << sqlQuery.lastError();
+    }
+    else{
+        while(sqlQuery.next()){
+            picturePath = sqlQuery.value("pModelPath").toString();
+        }
+    }
+    QLabel *atnPhoto = new QLabel;
+    QPixmap pm = QPixmap(picturePath);
+    atnPhoto->setPixmap(pm.scaled(440, 400));
+    //!
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->addLayout(gridLayout);
+    hLayout->addWidget(atnPhoto);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    layout->addLayout(hLayout);
+    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    setLayout(layout);
 }
 
 QComboBox* wizardDesignVariables::initUnitComBo(){

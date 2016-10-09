@@ -130,13 +130,12 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
         antennaCell* cellTab = static_cast<antennaCell* >(currentWidget);
         QString atnName = cellTab->getAtnName();
         projectWizard* wizard = new projectWizard(atnName);
-        if(wizard->exec() == 1){
-            //config *confManage = new config();
-            //QString workingPath =  confManage->readPath("WORKINGPATH");
-            QString workingPath =  global::sysParam["WORKINGPATH"];
-            QString projectName = wizard->getProjectName();
-            mTreeModel->writeFile(QString("%1/%2/%3.xml").arg(workingPath).arg(projectName).arg(projectName), atnName);
-            mTreeModel->readFile(QString("%1/%2/%3.xml").arg(workingPath).arg(projectName).arg(projectName));
+        if(wizard->exec() == 1){           
+            QString workingPath =  sysParam["WorkingProjectPath"];
+            QString projectName = global::getProjectName();
+            qDebug() << "atnlibrary:WorkingProjectPath=" << workingPath << "pro=" << projectName;
+            mTreeModel->writeFile(QString("%1/%2.xml").arg(workingPath).arg(projectName), atnName);
+            mTreeModel->readFile(QString("%1/%2.xml").arg(workingPath).arg(projectName));
         }
     }
 }

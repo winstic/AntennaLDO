@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <QWizardPage>
 #include "macrodefined.h"
+#include "sqliteManage.h"
 
 class wizardDesignVariables : public QWizardPage{
     Q_OBJECT

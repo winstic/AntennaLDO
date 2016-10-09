@@ -6,7 +6,11 @@ wizardIntroduce::wizardIntroduce(QString antennaName, QWidget *parent) : QWizard
     atnInfo = new QTextEdit;
     atnInfo->setReadOnly(true);
     atnPhoto = new QLabel;
+
     setAtnIntroduceInfo(antennaName);
+    atnInfo->setText(info);
+    QPixmap mPixmap = QPixmap(photo);
+    atnPhoto->setPixmap(mPixmap.scaled(440, 400));
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(atnInfo);
@@ -23,8 +27,8 @@ void wizardIntroduce::setAtnIntroduceInfo(QString name){
     }
     else{
         while(sqlQuery.next()){
-            atnInfo->setText(sqlQuery.value("pInfo").toString());
-            atnPhoto->setPixmap(QPixmap(sqlQuery.value("pModelPath").toString()));
+            info = sqlQuery.value("pInfo").toString();
+            photo = sqlQuery.value("pModelPath").toString();
         }
     }
 }

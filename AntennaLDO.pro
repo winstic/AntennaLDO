@@ -45,6 +45,7 @@ HEADERS  += mainwindow.h \
     searchAction.h \
     sqliteManage.h \
     config.h \
-    macrodefined.h
+    macrodefined.h \
+    parsejson.h
 
 FORMS    += mainwindow.ui

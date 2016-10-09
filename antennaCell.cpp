@@ -6,7 +6,9 @@ antennaCell::antennaCell(QString path, QString name, QWidget* parent):QWidget(pa
     QVBoxLayout *vLayout = new QVBoxLayout();
     atnNameLabel = new QLabel(QString("%1 Antenna").arg(name));
     atnPhoto = new QLabel;
-    atnPhoto->setPixmap(QPixmap(path));
+    QPixmap mPixmap = QPixmap(path);
+    atnPhoto->setPixmap(mPixmap.scaled(CELLATNWH, CELLATNHT, Qt::KeepAspectRatio));
+
 	//hLayout->addWidget((QWidget *)m_icon);
     vLayout->addWidget(atnPhoto);
     vLayout->addWidget(atnNameLabel);

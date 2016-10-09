@@ -1,10 +1,8 @@
 ﻿#include "treeModel.h"
-#include "global.h"
 #include <QDebug>
 
 treeModel::treeModel(QTreeView* m_tree){
     //QStandardItemModel* tModel = new QStandardItemModel(mTree);
-    //confManage = new config();
     mTree = m_tree;
     mProjectMenu = new QMenu;
     mAtnDesignMenu = new QMenu;
@@ -329,7 +327,8 @@ void treeModel::slot_add(){
     if(varNode.isValid()){
         if(MARK_NODE_DESIGN == varNode.toInt()){            
             //designWizard *wizard = new designWizard(confManage->readPath("MODELVARIABLES"));
-            designWizard *wizard = new designWizard(global::sysParam["MODELVARIABLES"]);
+            designWizard *wizard = new designWizard(QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"])
+                    .arg(global::getInfoFromRel("Problem")));
             if(wizard->exec() == 1){
                 QStandardItem *child = new QStandardItem(
                             IconMap[QStringLiteral("treeItem")], QString("设计%1").arg(item->rowCount()+1));
@@ -344,7 +343,9 @@ void treeModel::slot_add(){
 
 void treeModel::slot_run(){
     //QString modelPath = confManage->readPath("MODELFILE");
-    QString modelPath = global::sysParam["MODELFILE"];
+    QString modelPath = QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+    QString scriptPath = QString("%1/%2_design.vbs").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+    qDebug() << "treeModel:hfssPath=" << modelPath;
     QProcess p(0);
     //p.start("cmd", QStringList() << "hfss" << modelPath);
     p.execute("hfss", QStringList() << modelPath);

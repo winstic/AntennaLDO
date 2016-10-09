@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include "sqliteManage.h"
+#include "macrodefined.h"
 class antennaCell :public QWidget
 {
 public:

@@ -1,6 +1,7 @@
 ﻿#include <QtWidgets>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "global.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), isClosedSubmdi(false){
     ui->setupUi(this);
@@ -233,14 +234,17 @@ void MainWindow::slot_NewProject(){
 }
 
 void MainWindow::slot_OpenProject(){
-    wizardAddSetting* wizardSet = new wizardAddSetting();
-    QString wizardDir = wizardSet->readDefaultPath();
-    QString path = QFileDialog::getOpenFileName(this, tr("打开工程"), wizardDir, tr("REL Files(*.rel)"));
-    qDebug() << path << endl;
+    QString defaultDir = sysParam["DefaultProjectPath"];
+    if(defaultDir.isNull() || defaultDir.isEmpty())
+        defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString path = QFileDialog::getOpenFileName(this, tr("打开工程"), defaultDir, tr("REL Files(*.rel)"));
     if(path.length() == 0){
+        QMessageBox::warning(0, "警告！", "rel文件打开失败", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
         return;
     }
-    mTreeModel->readFile("projectManage.xml");
+    mTreeModel->readFile(QString("%1.xml").arg(path.split(".").at(0)));
+    sysParam["WorkingProjectPath"] = QFileInfo(path).absolutePath();
+    qDebug() << "OpenProject:WorkingProjectPath=" << sysParam["WorkingProjectPath"];
     //QMessageBox::information(this, "infomation", "test my openAction");
 }
 void MainWindow::slot_Save(){}

@@ -3,17 +3,21 @@
 
 #include <QString>
 #include <QMap>
+#include <QFileInfo>
+#include <QDir>
+
+extern QMap<QString, QString> sysParam;
 
 class global{
 public:
     global();
     ~global(){}
-    //void setSysParam(const QString &key, const QString &value);
-    //QString getSysParam(const QString &key);
     static QStringList singleListRegularStr(QString str);
+    static QString getFileBySuffix(const QString &dir, const QString &suff);
     static void registerParamter();
+    static QString getInfoFromRel(const QString &key);
+    static QString getProjectName();
 public:
-    static QMap<QString, QString> sysParam;
 };
 
 #endif // GLOBAL_H

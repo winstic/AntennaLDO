@@ -1,8 +1,6 @@
 #ifndef MACRODEFINED_H
 #define MACRODEFINED_H
 
-//#include <QMap>
-
 #define MBNTICON_WH 120
 #define MBNTICON_HT 100
 #define TOOLBNTSIZE 150
@@ -36,6 +34,5 @@
 
 enum pyFlag{proPy = 0, algPy};
 enum SWEEPTYPES{linearly = 0, logarithmically};
-//QMap<QString, QString> sysParam;
 
 #endif // MACRODEFINED_H

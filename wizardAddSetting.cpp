@@ -33,7 +33,8 @@ wizardAddSetting::wizardAddSetting(QString antennaName, QWidget *parent) : QWiza
 
     alwaysPath->setChecked(true);
 	//读取默认路径
-    QString tempPath = readDefaultPath();
+    //QString tempPath = readDefaultPath();
+    QString tempPath = sysParam["DefaultProjectPath"];
     if(tempPath.isNull() || tempPath.isEmpty())
         projectPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     else
