@@ -27,7 +27,9 @@ SOURCES += main.cpp\
     antennaCell.cpp \
     searchAction.cpp \
     sqliteManage.cpp \
-    global.cpp
+    global.cpp \
+    parsejson.cpp \
+    run.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -46,6 +48,7 @@ HEADERS  += mainwindow.h \
     sqliteManage.h \
     config.h \
     macrodefined.h \
-    parsejson.h
+    parsejson.h \
+    run.h
 
 FORMS    += mainwindow.ui

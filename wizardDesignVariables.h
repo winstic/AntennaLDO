@@ -5,6 +5,7 @@
 #include <QWizardPage>
 #include "macrodefined.h"
 #include "sqliteManage.h"
+#include "parsejson.h"
 
 class wizardDesignVariables : public QWizardPage{
     Q_OBJECT
@@ -18,6 +19,7 @@ private:
     void wizardDialog();
     void initLayout();
     QString getSliderSheet();
+    void readDefaultVars();
 
     QJsonObject obj;
 };

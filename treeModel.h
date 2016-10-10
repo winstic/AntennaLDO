@@ -8,6 +8,7 @@
 #include "macrodefined.h"
 #include "designWizard.h"
 #include "global.h"
+#include "run.h"
 //#include "config.h"
 
 class treeModel : public QTreeView{

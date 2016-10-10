@@ -3,6 +3,7 @@
 #include <QTextStream>
 
 QMap<QString, QString> sysParam;
+QMap<QString, QString> vbsVariables;
 global::global(){}
 
 QStringList global::singleListRegularStr(QString str){

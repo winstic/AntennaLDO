@@ -342,15 +342,8 @@ void treeModel::slot_add(){
 }
 
 void treeModel::slot_run(){
-    //QString modelPath = confManage->readPath("MODELFILE");
-    QString modelPath = QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
-    QString scriptPath = QString("%1/%2_design.vbs").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
-    qDebug() << "treeModel:hfssPath=" << modelPath;
-    QProcess p(0);
-    //p.start("cmd", QStringList() << "hfss" << modelPath);
-    p.execute("hfss", QStringList() << modelPath);
-    p.waitForFinished();
-    qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
+    Run run;
+    run.go();
 }
 
 void treeModel::slot_del(){

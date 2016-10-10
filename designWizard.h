@@ -8,6 +8,7 @@
 #include "macrodefined.h"
 #include "wizardDesignPerformance.h"
 #include "wizardDesignVariables.h"
+#include "parsejson.h"
 
 class designWizard : public QWizard{
     Q_OBJECT
@@ -15,16 +16,11 @@ class designWizard : public QWizard{
 public:
     designWizard(const QString &path, QWidget *parent = 0);
     ~designWizard(){}
-    inline QJsonObject getJsonObj() const{return obj;}
 
 private:
-    bool readJsonFile();
-    bool writeJsonFile(const QJsonObject &obj);
 
     wizardDesignPerformance *designPerformance;
     wizardDesignVariables *designVariables;
-    QMap<QString, QString> modeVariables;
-    QMap<QString, QString> freVariables;
     QString jsonPath;
     QJsonObject obj;
 };

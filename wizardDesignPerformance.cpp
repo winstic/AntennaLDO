@@ -39,54 +39,62 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject obj, QWidget *paren
 }
 
 void wizardDesignPerformance::frequencySetting(){
-    QJsonObject freObj;
-    QStringList strList;
-    if(this->obj.contains("FreSetting")){
-        QJsonValue freValue = obj.value("FreSetting");
-        if(freValue.isObject()){
-            freObj = freValue.toObject();
-            strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
-            freStartEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
-            freEndEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
-            freNumberEdit->setText(strList[0]);
-            //strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
-            sweeptypeComb->setCurrentIndex(0);
-            sweeptypeComb->setEnabled(false);
-            //strList = global::singleListRegularStr(freObj.value("PM").toString().trimmed());
-            //PMComb->setCurrentIndex(QString(strList[0]).toInt());
-            PMComb->setCurrentIndex(0);
-            PMComb->setEnabled(false);
-        }
-        else
-            QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
+    QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
+    if(freObj.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
+        return;
     }
+    double startFre, stopFre;
+    QStringList strList;
+    strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
+    freStartEdit->setText(strList[0]);
+    vbsVariables["FreStart"] = M2GHz(strList[0]);
+    startFre = QString(strList[0]).toDouble();
+
+    strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
+    freEndEdit->setText(strList[0]);
+    vbsVariables["FreEnd"] = M2GHz(strList[0]);
+    stopFre = QString(strList[0]).toDouble();
+
+    strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
+    freNumberEdit->setText(strList[0]);
+    vbsVariables["FreNumber"] = strList[0];
+    //strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
+    sweeptypeComb->setCurrentIndex(0);
+    sweeptypeComb->setEnabled(false);
+    //strList = global::singleListRegularStr(freObj.value("PM").toString().trimmed());
+    //PMComb->setCurrentIndex(QString(strList[0]).toInt());
+    PMComb->setCurrentIndex(0);
+    PMComb->setEnabled(false);
+
+    vbsVariables["Freq"] = QString::number((startFre + stopFre) / 2000.0);
 }
 
 void wizardDesignPerformance::farFieldSetting(){
-    QJsonObject freObj;
-    QStringList strList;
-    if(this->obj.contains("ThetaPhiStep")){
-        QJsonValue freValue = obj.value("ThetaPhiStep");
-        if(freValue.isObject()){
-            freObj = freValue.toObject();
-            strList = global::singleListRegularStr(freObj.value("ThetaLower").toString().trimmed());
-            thetaStartEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("ThetaUpper").toString().trimmed());
-            thetaEndEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("ThetaStep").toString().trimmed());
-            thetaStepEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("PhiLower").toString().trimmed());
-            phiStartEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("PhiUpper").toString().trimmed());
-            phiEndEdit->setText(strList[0]);
-            strList = global::singleListRegularStr(freObj.value("PhiStep").toString().trimmed());
-            phiStepEdit->setText(strList[0]);
-        }
-        else
-            QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'ThetaPhiStep' in json file"));
+    QJsonObject farFieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
+    if(farFieldObj.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'ThetaPhiStep' in json file"));
+        return;
     }
+    QStringList strList;
+    strList = global::singleListRegularStr(farFieldObj.value("ThetaLower").toString().trimmed());
+    thetaStartEdit->setText(strList[0]);
+    vbsVariables["ThetaLower"] = strList[0];
+    strList = global::singleListRegularStr(farFieldObj.value("ThetaUpper").toString().trimmed());
+    thetaEndEdit->setText(strList[0]);
+    vbsVariables["ThetaUpper"] = strList[0];
+    strList = global::singleListRegularStr(farFieldObj.value("ThetaStep").toString().trimmed());
+    thetaStepEdit->setText(strList[0]);
+    vbsVariables["ThetaStep"] = strList[0];
+    strList = global::singleListRegularStr(farFieldObj.value("PhiLower").toString().trimmed());
+    phiStartEdit->setText(strList[0]);
+    vbsVariables["PhiLower"] = strList[0];
+    strList = global::singleListRegularStr(farFieldObj.value("PhiUpper").toString().trimmed());
+    phiEndEdit->setText(strList[0]);
+    vbsVariables["PhiUpper"] = strList[0];
+    strList = global::singleListRegularStr(farFieldObj.value("PhiStep").toString().trimmed());
+    phiStepEdit->setText(strList[0]);
+    vbsVariables["PhiStep"] = strList[0];
 }
 
 void wizardDesignPerformance::initComBoBox(){
@@ -155,4 +163,9 @@ void wizardDesignPerformance::initLayout(){
     layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     setLayout(layout);
     //!
+}
+
+QString wizardDesignPerformance::M2GHz(QString mhz){
+    double doubleGHz = mhz.toDouble() / 1000.0;
+    return QString::number(doubleGHz);
 }

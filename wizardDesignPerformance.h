@@ -5,6 +5,7 @@
 #include <QWizardPage>
 #include <QFile>
 #include "macrodefined.h"
+#include "parsejson.h"
 
 class wizardDesignPerformance : public QWizardPage{
     Q_OBJECT
@@ -17,6 +18,7 @@ private:
     void farFieldSetting();
     void initComBoBox();
     void initLayout();
+    QString M2GHz(QString mhz);
 
     QJsonObject obj;
     //frequencySetting

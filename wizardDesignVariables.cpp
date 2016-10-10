@@ -3,24 +3,27 @@
 
 wizardDesignVariables::wizardDesignVariables(QJsonObject obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
+    readDefaultVars();
     wizardDialog();
+}
+
+void wizardDesignVariables::readDefaultVars(){
+    QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "defaultvars");
+    for(QJsonObject::iterator iter = defaultVarsObj.begin(); iter != defaultVarsObj.end(); ++ iter){
+        vbsVariables[iter.key()] = iter.value().toString().trimmed();
+    }
 }
 
 void wizardDesignVariables::wizardDialog(){
     setTitle(tr("模型设置"));
     setSubTitle(tr("模型设置"));
-    if(!this->obj.contains("variables")){
-        QMessageBox::critical(this, tr("Error"), tr("not exist key('variables') in json file"));
+    QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
+    if(variablesObj.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'variables' in json file"));
         return;
     }
-    QJsonValue variablesValue = this->obj.value("variables");
-    if(!variablesValue.isObject()){
-        QMessageBox::critical(this, tr("Error"), tr("Json data format error"));
-        return;
-    }
-    QJsonObject variablesObj, varObj;
-    variablesObj = variablesValue.toObject();
 
+    QJsonObject varObj;
     QString varKey;
     QStringList varValue;
     int posx = 0, valueListLength;
@@ -37,7 +40,7 @@ void wizardDesignVariables::wizardDialog(){
         gridLayout->addWidget(keyLabel, posx, 0);
 
         // init line edit and layout
-        varValue = global::singleListRegularStr(varObj.value(varKey).toString().trimmed());
+        varValue = global::singleListRegularStr(varObj.value(varKey).toString().trimmed());        
         valueListLength = varValue.length();
         if(valueListLength == 1){
             QLineEdit *valueEdit = new QLineEdit(varValue[0]);
@@ -53,15 +56,20 @@ void wizardDesignVariables::wizardDialog(){
 
             varSlider->setStyleSheet(getSliderSheet());
             varSlider->setMinimum(0);
-            varSlider->setMaximum(100);
-            varSlider->setValue(50);
+            varSlider->setMaximum(100);            
             varSlider->setSingleStep(1);
-            realValue = (varSlider->value()*1.0 / 100) *
-                    (QString(varValue[1]).trimmed().toDouble() - QString(varValue[0]).trimmed().toDouble());
+
+            double stopValue = QString(varValue[1]).trimmed().toDouble();
+            double startValue = QString(varValue[0]).trimmed().toDouble();
+            realValue = vbsVariables[varKey].trimmed().toDouble();
+            int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
+            //realValue =startValue + (varSlider->value()*1.0 / 100) *(stopValue - startValue);
+
+            varSlider->setValue(sliderValue);
             varEdit->setText(QString::number(realValue));
+
             varEdit->setReadOnly(true);
             varEdit->setFixedWidth(240);
-
             vLayout->addWidget(varEdit);
             vLayout->addWidget(varSlider);
             //design inner space
