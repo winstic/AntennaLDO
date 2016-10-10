@@ -7,12 +7,18 @@
 #include "parsejson.h"
 #include "global.h"
 
-struct Run{
-    QString vbsPath;
+class Run{
+public:
     Run();
     ~Run(){}
+    void registerHfssVars();
     bool updateVbs();
-    void go();    
+    void go();
+    QString M2GHz(QString mhz);
+private:
+    QString vbsPath;
+    QMap<QString, QString> vbsVars;
+    QJsonObject obj;
 };
 
 #endif // RUN_H

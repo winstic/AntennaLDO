@@ -1,16 +1,20 @@
 ﻿#include "wizardDesignVariables.h"
 #include "global.h"
 
-wizardDesignVariables::wizardDesignVariables(QJsonObject obj, QWidget *parent) : QWizardPage(parent){
+wizardDesignVariables::wizardDesignVariables(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
     readDefaultVars();
     wizardDialog();
 }
 
 void wizardDesignVariables::readDefaultVars(){
-    QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "defaultvars");
+    QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "varsValue");
+    if(defaultVarsObj.isEmpty()){
+        QMessageBox::critical(0, tr("Error"), tr("Cannot parse 'varsValue' in json file"));
+        return;
+    }
     for(QJsonObject::iterator iter = defaultVarsObj.begin(); iter != defaultVarsObj.end(); ++ iter){
-        vbsVariables[iter.key()] = iter.value().toString().trimmed();
+        defaultVars[iter.key()] = iter.value().toString().trimmed();
     }
 }
 
@@ -29,6 +33,7 @@ void wizardDesignVariables::wizardDialog(){
     int posx = 0, valueListLength;
     double realValue;
     QGridLayout *gridLayout = new QGridLayout;
+    QRegExpValidator *floatValid = new QRegExpValidator(QRegExp("^(-?\d+)(\.\d+)?$"));      //float
 
     for(QJsonObject::iterator iter = variablesObj.begin(); iter != variablesObj.end(); ++ iter){
         // iter format: "W1":{"note" : "介质板宽度W1(m)", "W1" : "0.025"}
@@ -41,11 +46,12 @@ void wizardDesignVariables::wizardDialog(){
 
         // init line edit and layout
         varValue = global::singleListRegularStr(varObj.value(varKey).toString().trimmed());        
-        valueListLength = varValue.length();
+        valueListLength = varValue.length();        
         if(valueListLength == 1){
             QLineEdit *valueEdit = new QLineEdit(varValue[0]);
             valueEdit->setFixedWidth(240);
             valueEdit->setReadOnly(true);
+            valueEdit->setValidator(floatValid);
             gridLayout->addWidget(valueEdit, posx, 1);
             //delete valueEdit;
         }
@@ -61,7 +67,7 @@ void wizardDesignVariables::wizardDialog(){
 
             double stopValue = QString(varValue[1]).trimmed().toDouble();
             double startValue = QString(varValue[0]).trimmed().toDouble();
-            realValue = vbsVariables[varKey].trimmed().toDouble();
+            realValue = defaultVars[varKey].trimmed().toDouble();
             int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
             //realValue =startValue + (varSlider->value()*1.0 / 100) *(stopValue - startValue);
 
@@ -70,6 +76,7 @@ void wizardDesignVariables::wizardDialog(){
 
             varEdit->setReadOnly(true);
             varEdit->setFixedWidth(240);
+            varEdit->setValidator(floatValid);
             vLayout->addWidget(varEdit);
             vLayout->addWidget(varSlider);
             //design inner space

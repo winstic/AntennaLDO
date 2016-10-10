@@ -80,8 +80,6 @@ void projectWizard::createProject(){
         dir->rmdir(projectFullPath);
         return;
     }
-    vbsVariables["hfsspath"] = projectModelPath.split(".").at(0);
-    vbsVariables["hfssname"] = atnName;
 
     //confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
     //confManage->writeConfigInfo("MODELFILE", projectModelPath);

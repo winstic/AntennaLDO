@@ -1,7 +1,7 @@
 ﻿#include "wizardDesignPerformance.h"
 #include "global.h"
 
-wizardDesignPerformance::wizardDesignPerformance(QJsonObject obj, QWidget *parent) : QWizardPage(parent){
+wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     setTitle(tr("性能参数设置"));
     setSubTitle(tr("设置频率信息并指定远场范围"));
     this->obj = obj;
@@ -32,10 +32,27 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject obj, QWidget *paren
     this->phiEndEdit = new QLineEdit;
     this->phiStepEdit = new QLineEdit;
     this->groupBoxFarField = new QGroupBox(tr("远场范围设置"));
+
+    //set regexp
+    QRegExpValidator *posFloatValid = new QRegExpValidator(QRegExp("^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$"));    //positive float
+    QRegExpValidator *nonNegFloatValid = new QRegExpValidator(QRegExp("^\d+(\.\d+)?$"));    //non negative float
+    QRegExpValidator *floatValid = new QRegExpValidator(QRegExp("^-?(180|1?[0-7]?\\d(\\.\\d+)?)$"));      //float [-180. 180]
+    QRegExpValidator *posIntValid = new QRegExpValidator(QRegExp("^[0-9]*[1-9][0-9]*$"));   //positive int
+    freStartEdit->setValidator(posFloatValid);
+    freEndEdit->setValidator(posFloatValid);
+    freNumberEdit->setValidator(posIntValid);
+    thetaStartEdit->setValidator(floatValid);
+    thetaEndEdit->setValidator(floatValid);
+    thetaStepEdit->setValidator(nonNegFloatValid);
+    phiStartEdit->setValidator(floatValid);
+    phiEndEdit->setValidator(floatValid);
+    phiStepEdit->setValidator(nonNegFloatValid);
+
     initComBoBox();
     frequencySetting();
     farFieldSetting();
     initLayout();
+    //connect(thetaStartEdit, )
 }
 
 void wizardDesignPerformance::frequencySetting(){
@@ -44,21 +61,13 @@ void wizardDesignPerformance::frequencySetting(){
         QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
         return;
     }
-    double startFre, stopFre;
     QStringList strList;
     strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
     freStartEdit->setText(strList[0]);
-    vbsVariables["FreStart"] = M2GHz(strList[0]);
-    startFre = QString(strList[0]).toDouble();
-
     strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
     freEndEdit->setText(strList[0]);
-    vbsVariables["FreEnd"] = M2GHz(strList[0]);
-    stopFre = QString(strList[0]).toDouble();
-
     strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
     freNumberEdit->setText(strList[0]);
-    vbsVariables["FreNumber"] = strList[0];
     //strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
     sweeptypeComb->setCurrentIndex(0);
     sweeptypeComb->setEnabled(false);
@@ -66,8 +75,6 @@ void wizardDesignPerformance::frequencySetting(){
     //PMComb->setCurrentIndex(QString(strList[0]).toInt());
     PMComb->setCurrentIndex(0);
     PMComb->setEnabled(false);
-
-    vbsVariables["Freq"] = QString::number((startFre + stopFre) / 2000.0);
 }
 
 void wizardDesignPerformance::farFieldSetting(){
@@ -79,22 +86,16 @@ void wizardDesignPerformance::farFieldSetting(){
     QStringList strList;
     strList = global::singleListRegularStr(farFieldObj.value("ThetaLower").toString().trimmed());
     thetaStartEdit->setText(strList[0]);
-    vbsVariables["ThetaLower"] = strList[0];
     strList = global::singleListRegularStr(farFieldObj.value("ThetaUpper").toString().trimmed());
     thetaEndEdit->setText(strList[0]);
-    vbsVariables["ThetaUpper"] = strList[0];
     strList = global::singleListRegularStr(farFieldObj.value("ThetaStep").toString().trimmed());
     thetaStepEdit->setText(strList[0]);
-    vbsVariables["ThetaStep"] = strList[0];
     strList = global::singleListRegularStr(farFieldObj.value("PhiLower").toString().trimmed());
     phiStartEdit->setText(strList[0]);
-    vbsVariables["PhiLower"] = strList[0];
     strList = global::singleListRegularStr(farFieldObj.value("PhiUpper").toString().trimmed());
     phiEndEdit->setText(strList[0]);
-    vbsVariables["PhiUpper"] = strList[0];
     strList = global::singleListRegularStr(farFieldObj.value("PhiStep").toString().trimmed());
     phiStepEdit->setText(strList[0]);
-    vbsVariables["PhiStep"] = strList[0];
 }
 
 void wizardDesignPerformance::initComBoBox(){

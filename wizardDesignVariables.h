@@ -11,7 +11,7 @@ class wizardDesignVariables : public QWizardPage{
     Q_OBJECT
 
 public:
-    wizardDesignVariables(QJsonObject obj, QWidget *parent = 0);
+    wizardDesignVariables(QJsonObject &obj, QWidget *parent = 0);
     ~wizardDesignVariables(){}
 
 private:
@@ -22,6 +22,7 @@ private:
     void readDefaultVars();
 
     QJsonObject obj;
+    QMap<QString, QString> defaultVars;
 };
 
 #endif // WIZARDDESIGNMODELPARAMETER_H

@@ -11,7 +11,7 @@ class wizardDesignPerformance : public QWizardPage{
     Q_OBJECT
 
 public:
-    wizardDesignPerformance(QJsonObject obj, QWidget *parent = 0);
+    wizardDesignPerformance(QJsonObject &obj, QWidget *parent = 0);
     ~wizardDesignPerformance(){}
 private:
     void frequencySetting();

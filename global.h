@@ -7,7 +7,6 @@
 #include <QDir>
 
 extern QMap<QString, QString> sysParam;
-extern QMap<QString, QString> vbsVariables;
 
 class global{
 public:
