@@ -5,10 +5,14 @@
 QMap<QString, QString> sysParam;
 global::global(){}
 
-QStringList global::singleListRegularStr(QString str){
+QStringList global::str2list(QString str){
     QRegExp re("[\\[,\\]]");
     QStringList strList = str.split(re, QString::SkipEmptyParts);
     return strList;
+}
+
+QString global::str2liststr(const QString &str){
+    return QString("[%1]").arg(str);
 }
 
 void global::registerParamter(){

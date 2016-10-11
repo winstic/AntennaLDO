@@ -13,12 +13,14 @@ class wizardDesignPerformance : public QWizardPage{
 public:
     wizardDesignPerformance(QJsonObject &obj, QWidget *parent = 0);
     ~wizardDesignPerformance(){}
+    bool validateCurrentPage();
+    QJsonObject saveInJsonObj();
+
 private:
     void frequencySetting();
     void farFieldSetting();
     void initComBoBox();
     void initLayout();
-    QString M2GHz(QString mhz);
 
     QJsonObject obj;
     //frequencySetting

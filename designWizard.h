@@ -16,6 +16,7 @@ class designWizard : public QWizard{
 public:
     designWizard(const QString &path, QWidget *parent = 0);
     ~designWizard(){}
+    bool validateCurrentPage();
 
 private:
 

@@ -12,7 +12,8 @@ class global{
 public:
     global();
     ~global(){}
-    static QStringList singleListRegularStr(QString str);
+    static QStringList str2list(QString str);
+    static QString str2liststr(const QString &str);
     static QString getFileBySuffix(const QString &dir, const QString &suff);
     static void registerParamter();
     static QString getInfoFromRel(const QString &key);

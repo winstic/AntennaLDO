@@ -27,3 +27,7 @@ designWizard::designWizard(const QString &path, QWidget *parent) : QWizard(paren
         this->setMinimumSize(880, 580);
     }
 }
+
+bool designWizard::validateCurrentPage(){
+    return true;
+}

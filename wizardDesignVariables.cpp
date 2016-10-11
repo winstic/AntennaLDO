@@ -26,38 +26,39 @@ void wizardDesignVariables::wizardDialog(){
         QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'variables' in json file"));
         return;
     }
-
     QJsonObject varObj;
     QString varKey;
     QStringList varValue;
     int posx = 0, valueListLength;
     double realValue;
     QGridLayout *gridLayout = new QGridLayout;
-    QRegExpValidator *floatValid = new QRegExpValidator(QRegExp("^(-?\d+)(\.\d+)?$"));      //float
+    QRegExp rx("^(-?\d+)(\.\d+)?$");
+    QRegExpValidator *floatValid = new QRegExpValidator(rx);      //float
 
     for(QJsonObject::iterator iter = variablesObj.begin(); iter != variablesObj.end(); ++ iter){
         // iter format: "W1":{"note" : "介质板宽度W1(m)", "W1" : "0.025"}
         varKey = iter.key();
         varObj = iter.value().toObject();
+        //get note infomation
         QLabel *keyLabel = new QLabel(varObj.value("note").toString().trimmed());
         //keyLabel->setFixedWidth(100);
         keyLabel->setAlignment(Qt::AlignRight | Qt::AlignCenter);
         gridLayout->addWidget(keyLabel, posx, 0);
 
         // init line edit and layout
-        varValue = global::singleListRegularStr(varObj.value(varKey).toString().trimmed());        
-        valueListLength = varValue.length();        
+        varValue = global::str2list(varObj.value(varKey).toString().trimmed());
+        valueListLength = varValue.length();
+        QLineEdit *valueEdit = new QLineEdit;
+        valueEdit->setFixedWidth(240);
+        valueEdit->setValidator(floatValid);
+
         if(valueListLength == 1){
-            QLineEdit *valueEdit = new QLineEdit(varValue[0]);
-            valueEdit->setFixedWidth(240);
+            valueEdit->setText(varValue[0]);
             valueEdit->setReadOnly(true);
-            valueEdit->setValidator(floatValid);
-            gridLayout->addWidget(valueEdit, posx, 1);
-            //delete valueEdit;
+            gridLayout->addWidget(valueEdit, posx, 1);            
         }
         else{
             QVBoxLayout *vLayout = new QVBoxLayout;
-            QLineEdit *varEdit = new QLineEdit;
             QSlider *varSlider = new QSlider(Qt::Horizontal);
 
             varSlider->setStyleSheet(getSliderSheet());
@@ -70,21 +71,33 @@ void wizardDesignVariables::wizardDialog(){
             realValue = defaultVars[varKey].trimmed().toDouble();
             int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
             //realValue =startValue + (varSlider->value()*1.0 / 100) *(stopValue - startValue);
+            //!conversion slider value and edit value
+            //!
 
             varSlider->setValue(sliderValue);
-            varEdit->setText(QString::number(realValue));
+            valueEdit->setText(QString::number(realValue));
 
-            varEdit->setReadOnly(true);
-            varEdit->setFixedWidth(240);
-            varEdit->setValidator(floatValid);
-            vLayout->addWidget(varEdit);
-            vLayout->addWidget(varSlider);
+            //valueEdit->setReadOnly(true);
+            vLayout->addWidget(valueEdit);
+            vLayout->addWidget(varSlider);            
             //design inner space
             vLayout->setSpacing(0);
             // design outer space
             //vLayout->setMargin(0);
             gridLayout->addLayout(vLayout, posx, 1);
+            varInfo tempVarInfo;
+            tempVarInfo.lower = startValue;
+            tempVarInfo.upper = stopValue;
+            tempVarInfo.varKey = varKey;
+            tempVarInfo.varSlider = varSlider;
+            tempVarInfo.varEdit = valueEdit;
+            varinfos.append(tempVarInfo);
+            connect(varSlider, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChange(int)));
+
         }
+        connect(valueEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_LinetextChange(QString)));
+        //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
+        //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
         QComboBox *unitComBo = initUnitComBo();
         unitComBo->setFixedWidth(50);
         gridLayout->addWidget(unitComBo, posx, 2);
@@ -170,3 +183,43 @@ QString wizardDesignVariables::getSliderSheet(){
          }\
         ");
 }
+
+QJsonObject wizardDesignVariables::saveInJsonObj(){
+
+}
+
+bool wizardDesignVariables::validateCurrentPage(){
+    return true;
+}
+
+//rewrite event filter function
+bool wizardDesignVariables::eventFilter(QObject *watched, QEvent *event){
+    foreach(varInfo var, varinfos){
+        if(watched == var.varEdit){
+            if(event->type() == QEvent::MouseButtonDblClick){
+                var.varEdit->setReadOnly(false);
+            }
+        }
+    }
+    return QWizardPage::eventFilter(watched, event);
+}
+
+//slots function
+void wizardDesignVariables::slot_LinetextChange(QString text){
+    //qDebug() << text;
+}
+
+void wizardDesignVariables::slot_sliderValueChange(int value){
+    QSlider* selectSlider = static_cast<QSlider* >(sender());
+    foreach(varInfo var, varinfos){
+        if(var.varSlider == selectSlider){
+            //qDebug() << var.varKey << "---" << var.varEdit;
+            double realValue = (var.upper - var.lower)/100.0 * value + var.lower;
+            //var.varEdit->setReadOnly(true);
+            var.varEdit->setText(QString::number(realValue));
+        }
+    }
+    //selectEdit->setText(QString::number(value));
+    //qDebug() << selectEdit->text();
+}
+

@@ -24,20 +24,20 @@ void Run::registerHfssVars(){
         vbsVars[iter.key()] = iter.value().toString().trimmed();
     }
     QStringList strList;
-    strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
+    strList = global::str2list(freObj.value("FreStart").toString().trimmed());
     vbsVars["FreStart"] = M2GHz(strList[0]);
-    strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
+    strList = global::str2list(freObj.value("FreEnd").toString().trimmed());
     vbsVars["FreEnd"] = M2GHz(strList[0]);
-    strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
+    strList = global::str2list(freObj.value("FreNumber").toString().trimmed());
     vbsVars["FreNumber"] = strList[0];
-    strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
+    strList = global::str2list(freObj.value("SweepType").toString().trimmed());
     vbsVars["SweepType"] = strList[0];
-    strList = global::singleListRegularStr(freObj.value("PM").toString().trimmed());
+    strList = global::str2list(freObj.value("PM").toString().trimmed());
     vbsVars["PM"] = strList[0];
 
     vbsVars["Freq"] = QString::number((vbsVars["FreStart"].toDouble() + vbsVars["FreEnd"].toDouble()) / 2000.0);
     for(QJsonObject::iterator iter = farfieldObj.begin(); iter != farfieldObj.end(); ++ iter){
-        strList = global::singleListRegularStr(iter.value().toString().trimmed());
+        strList = global::str2list(iter.value().toString().trimmed());
         vbsVars[iter.key()] = strList[0];
     }
 }

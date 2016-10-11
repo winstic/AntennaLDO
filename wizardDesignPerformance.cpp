@@ -34,7 +34,7 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     this->groupBoxFarField = new QGroupBox(tr("远场范围设置"));
 
     //set regexp
-    QRegExpValidator *posFloatValid = new QRegExpValidator(QRegExp("^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$"));    //positive float
+    QRegExpValidator *posFloatValid = new QRegExpValidator(QRegExp("^\d+(\.\d+)?$"));    //positive float
     QRegExpValidator *nonNegFloatValid = new QRegExpValidator(QRegExp("^\d+(\.\d+)?$"));    //non negative float
     QRegExpValidator *floatValid = new QRegExpValidator(QRegExp("^-?(180|1?[0-7]?\\d(\\.\\d+)?)$"));      //float [-180. 180]
     QRegExpValidator *posIntValid = new QRegExpValidator(QRegExp("^[0-9]*[1-9][0-9]*$"));   //positive int
@@ -62,16 +62,16 @@ void wizardDesignPerformance::frequencySetting(){
         return;
     }
     QStringList strList;
-    strList = global::singleListRegularStr(freObj.value("FreStart").toString().trimmed());
+    strList = global::str2list(freObj.value("FreStart").toString().trimmed());
     freStartEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(freObj.value("FreEnd").toString().trimmed());
+    strList = global::str2list(freObj.value("FreEnd").toString().trimmed());
     freEndEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(freObj.value("FreNumber").toString().trimmed());
+    strList = global::str2list(freObj.value("FreNumber").toString().trimmed());
     freNumberEdit->setText(strList[0]);
-    //strList = global::singleListRegularStr(freObj.value("SweepType").toString().trimmed());
+    //strList = global::str2list(freObj.value("SweepType").toString().trimmed());
     sweeptypeComb->setCurrentIndex(0);
     sweeptypeComb->setEnabled(false);
-    //strList = global::singleListRegularStr(freObj.value("PM").toString().trimmed());
+    //strList = global::str2list(freObj.value("PM").toString().trimmed());
     //PMComb->setCurrentIndex(QString(strList[0]).toInt());
     PMComb->setCurrentIndex(0);
     PMComb->setEnabled(false);
@@ -84,17 +84,17 @@ void wizardDesignPerformance::farFieldSetting(){
         return;
     }
     QStringList strList;
-    strList = global::singleListRegularStr(farFieldObj.value("ThetaLower").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("ThetaLower").toString().trimmed());
     thetaStartEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(farFieldObj.value("ThetaUpper").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("ThetaUpper").toString().trimmed());
     thetaEndEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(farFieldObj.value("ThetaStep").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("ThetaStep").toString().trimmed());
     thetaStepEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(farFieldObj.value("PhiLower").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("PhiLower").toString().trimmed());
     phiStartEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(farFieldObj.value("PhiUpper").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("PhiUpper").toString().trimmed());
     phiEndEdit->setText(strList[0]);
-    strList = global::singleListRegularStr(farFieldObj.value("PhiStep").toString().trimmed());
+    strList = global::str2list(farFieldObj.value("PhiStep").toString().trimmed());
     phiStepEdit->setText(strList[0]);
 }
 
@@ -166,7 +166,26 @@ void wizardDesignPerformance::initLayout(){
     //!
 }
 
-QString wizardDesignPerformance::M2GHz(QString mhz){
-    double doubleGHz = mhz.toDouble() / 1000.0;
-    return QString::number(doubleGHz);
+QJsonObject wizardDesignPerformance::saveInJsonObj(){
+    QJsonObject saveObj, saveFreObj, saveFarObj;
+    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text()));
+    saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text()));
+    saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text()));
+    saveFreObj.insert("SweepType", QString("[%1]").arg(sweeptypeComb->currentIndex()));
+    saveFreObj.insert("PM", QString("[%1]").arg(PMComb->currentIndex()));
+
+    saveFarObj.insert("ThetaLower", QString("[%1]").arg(thetaStartEdit->text()));
+    saveFarObj.insert("ThetaUpper", QString("[%1]").arg(thetaEndEdit->text()));
+    saveFarObj.insert("ThetaStep", QString("[%1]").arg(thetaStepEdit->text()));
+    saveFarObj.insert("PhiLower", QString("[%1]").arg(phiStartEdit->text()));
+    saveFarObj.insert("PhiUpper", QString("[%1]").arg(phiEndEdit->text()));
+    saveFarObj.insert("PhiStep", QString("[%1]").arg(phiStepEdit->text()));
+
+    saveObj.insert("FreSetting", saveFreObj);
+    saveObj.insert("ThetaPhiStep", saveFarObj);
+    return saveObj;
+}
+
+bool wizardDesignPerformance::validateCurrentPage(){
+    return true;
 }
