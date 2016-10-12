@@ -15,7 +15,7 @@ bool Run::registerHfssVars(){
     QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
     QJsonObject farfieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
     if(varsValueObj.isEmpty() || freObj.isEmpty() || farfieldObj.isEmpty()){
-        QMessageBox::critical(0, QString("Error"), QString("Cannot register Hfss Vars"));
+        QMessageBox::critical(0, QString("Error"), QString("run.cpp:18: error: Cannot register Hfss Vars"));
         return false;
     }
     for(QJsonObject::iterator iter = varsValueObj.begin(); iter != varsValueObj.end(); ++ iter){
@@ -45,7 +45,7 @@ bool Run::updateVbs(){
     //read all infomation from vbsFile
     QFile inFile(vbsPath);
     if(!inFile.open(QFile::ReadOnly | QFile::Text)){
-        QMessageBox::critical(0, QString("Error"), QString("Cannot read file %1").arg(vbsPath));
+        QMessageBox::critical(0, QString("Error"), QString("run.cpp:48: error: Cannot read file %1").arg(vbsPath));
         return false;
     }
     QTextStream in(&inFile);
@@ -55,7 +55,7 @@ bool Run::updateVbs(){
     //update vbs file(assign paramters)
     QFile outFile(vbsPath);
     if(!outFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
-        QMessageBox::critical(0, QString("Error"), QString("Cannot write file %1").arg(vbsPath));
+        QMessageBox::critical(0, QString("Error"), QString("run.cpp:58: error: Cannot write file %1").arg(vbsPath));
         return false;
     }
     QString temp;

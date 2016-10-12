@@ -1,6 +1,7 @@
 ﻿#include "designWizard.h"
 
-designWizard::designWizard(QJsonObject obj, QWidget *parent) : QWizard(parent){
+designWizard::designWizard(const QString &jsonPath, QJsonObject &obj, QWidget *parent) : QWizard(parent){
+    this->jsonPath = jsonPath;
     this->obj = obj;
     this->designPerformance = new wizardDesignPerformance(this->obj, this);
     addPage(designPerformance);
@@ -19,7 +20,6 @@ designWizard::designWizard(QJsonObject obj, QWidget *parent) : QWizard(parent){
 }
 
 bool designWizard::validateCurrentPage(){
-    qDebug() << "designWizard validateCurrentPage";
     bool isUpdate = update2JsonFile();
     return isUpdate;
 }

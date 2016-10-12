@@ -39,7 +39,7 @@ QString global::getFileBySuffix(const QString &dir, const QString &suff){
 QString global::getInfoFromRel(const QString &key){
     QFile infile(QString("%1/%2.rel").arg(sysParam["WorkingProjectPath"]).arg(getProjectName()));
     if (!infile.open(QFile::Text|QFile::ReadOnly)){
-        QMessageBox::warning(0, "警告！", "rel文件缺失", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        QMessageBox::critical(0, QString("Error"), QString("global.cpp:42: error: rel文件缺失"));
         return NULL;
     }
     QTextStream txtInput(&infile);
@@ -59,7 +59,7 @@ QString global::getInfoFromRel(const QString &key){
 QString global::getProjectName(){
     QString dirPath = sysParam["WorkingProjectPath"];
     if(dirPath.isNull() || dirPath.isEmpty()){
-        QMessageBox::warning(0, "警告！", "找不到工作目录", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        QMessageBox::critical(0, QString("Error"), QString("global.cpp:62: error: 找不到工作目录"));
         return NULL;
     }
     QStringList nameList = dirPath.split("/");

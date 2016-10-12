@@ -73,7 +73,7 @@ bool wizardAddSetting::validatePage(){
 QString wizardAddSetting::readDefaultPath(){
     QFile infile("./Config.ini");
     if (!infile.open(QFile::Text|QFile::ReadOnly)){
-        QMessageBox::warning(this, "警告！", "Config.ini文件缺失", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        QMessageBox::critical(0, QString("Error"), QString("wizardAddSetting.cpp:76: error: Config.ini文件缺失"));
         return NULL;
     }
     QTextStream txtInput(&infile);

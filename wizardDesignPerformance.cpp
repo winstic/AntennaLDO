@@ -58,7 +58,7 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
 bool wizardDesignPerformance::frequencySetting(){
     QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
     if(freObj.isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardDesignPerformance.cpp:61: error: Cannot parse 'FreSetting' in json file"));
         return false;
     }
     QStringList strList;
@@ -81,7 +81,7 @@ bool wizardDesignPerformance::frequencySetting(){
 bool wizardDesignPerformance::farFieldSetting(){
     QJsonObject farFieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
     if(farFieldObj.isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'ThetaPhiStep' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardDesignPerformance.cpp:84: error: Cannot parse 'ThetaPhiStep' in json file"));
         return false;
     }
     QStringList strList;

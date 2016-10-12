@@ -9,7 +9,7 @@ bool sqliteManage::connect(QString &dbName){
     db.setDatabaseName(dbName);
     //QMessageBox::information(this, "infomation", "test my openAction");
     if (!db.open()){
-        QMessageBox::critical(0, QObject::tr("Database Error"), db.lastError().text());
+        QMessageBox::critical(0, QObject::tr("Database Error"), QString("sqliteManage.cpp:12: error: %1").arg(db.lastError().text()));
         return false;
     }
     return true;

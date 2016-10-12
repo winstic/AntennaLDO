@@ -10,7 +10,7 @@ wizardDesignVariables::wizardDesignVariables(QJsonObject &obj, QWidget *parent) 
 bool wizardDesignVariables::readDefaultVars(){
     QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "varsValue");
     if(defaultVarsObj.isEmpty()){
-        QMessageBox::critical(0, tr("Error"), tr("Cannot parse 'varsValue' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardDesignVariables.cpp:13: error: Cannot parse 'varsValue' in json file"));
         return false;
     }
     for(QJsonObject::iterator iter = defaultVarsObj.begin(); iter != defaultVarsObj.end(); ++ iter){
@@ -24,7 +24,7 @@ bool wizardDesignVariables::wizardDialog(){
     setSubTitle(tr("模型设置"));
     QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
     if(variablesObj.isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'variables' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardDesignVariables.cpp:27: error: Cannot parse 'variables' in json file"));
         return false;
     }
     QJsonObject varObj;

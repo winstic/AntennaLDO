@@ -14,7 +14,7 @@ class designWizard : public QWizard{
     Q_OBJECT
 
 public:
-    designWizard(QJsonObject obj, QWidget *parent = 0);
+    designWizard(const QString &jsonPath, QJsonObject &obj, QWidget *parent = 0);
     ~designWizard(){}
 
 protected:

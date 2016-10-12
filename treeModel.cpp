@@ -24,21 +24,21 @@ void treeModel::initIcon(){
 bool treeModel::readFile(const QString &fileName){
     QFile file(fileName);
     if(!file.open(QFile::ReadOnly | QFile::Text)){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot read file %1").arg(fileName));
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:27: error: Cannot read file %1").arg(fileName));
         return false;
     }
     QDomDocument doc;
     QString error;
     int row, column;
     if(!doc.setContent(&file, false, &error, &row, &column)){
-        QMessageBox::critical(this, tr("Error"), tr("Parse error at row %1, column %2: %3")
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:34: error: Parse error at row %1, column %2: %3")
                               .arg(row).arg(column).arg(error));
         return false;
     }
     file.close();
     QDomElement xmlRoot = doc.documentElement();
     if("project" != xmlRoot.tagName()){
-        QMessageBox::critical(this, tr("Error"), tr("Not a project file"));
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:41: error: Not a project file"));
         return false;
     }
 
@@ -330,10 +330,10 @@ void treeModel::slot_add(){
             QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
             QJsonObject obj = parseJson::getJsonObj(jsonPath);
             if(obj.isEmpty()){
-                QMessageBox::critical(0, tr("Error"), tr("Cannot parse jsonFile %1").arg(jsonPath));
+                QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:333: error: Cannot parse jsonFile %1").arg(jsonPath));
                 return;
             }
-            designWizard *wizard = new designWizard(obj);
+            designWizard *wizard = new designWizard(jsonPath, obj);
             if(wizard->exec() == 1){
                 QStandardItem *child = new QStandardItem(
                             IconMap[QStringLiteral("treeItem")], QString("设计%1").arg(item->rowCount()+1));

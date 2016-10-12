@@ -4,7 +4,7 @@ QJsonObject parseJson::getJsonObj(const QString &path){
     QJsonObject obj;
     QFile file(path);
     if(!file.open(QFile::ReadOnly | QFile::Text)){
-        QMessageBox::critical(0, QString("Error"), QString("Cannot read file %1").arg(path));
+        QMessageBox::critical(0, QString("Error"), QString("parseJson.cpp:7: error: Cannot read file %1").arg(path));
     }
     else{
         QByteArray byteArray = file.readAll();
@@ -33,7 +33,7 @@ QJsonObject parseJson::getSubJsonObj(const QJsonObject &obj, const QString &key)
 bool parseJson::write(const QString &path, QJsonObject &obj){
     QFile file(path);
     if(!file.open(QFile::WriteOnly)){
-        QMessageBox::critical(0, QString("Error"), QString("Cannot read file %1").arg(path));
+        QMessageBox::critical(0, QString("Error"), QString("parseJson.cpp:36: error: Cannot read file %1").arg(path));
         return false;
     }
     QJsonDocument jsonDocument;

@@ -76,7 +76,7 @@ void projectWizard::createProject(){
     if(! copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
            ! copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ||
             ! copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath) ){
-        QMessageBox::warning(this, "警告！", "问题文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
+        QMessageBox::critical(0, QString("Error"), QString("projectWizard.cpp:79: error: 问题文件创建失败！"));
         dir->rmdir(projectFullPath);
         return;
     }
