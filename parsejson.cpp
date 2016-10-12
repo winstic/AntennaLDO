@@ -32,7 +32,7 @@ QJsonObject parseJson::getSubJsonObj(const QJsonObject &obj, const QString &key)
 
 bool parseJson::write(const QString &path, QJsonObject &obj){
     QFile file(path);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
+    if(!file.open(QFile::WriteOnly)){
         QMessageBox::critical(0, QString("Error"), QString("Cannot read file %1").arg(path));
         return false;
     }
@@ -40,6 +40,7 @@ bool parseJson::write(const QString &path, QJsonObject &obj){
     jsonDocument.setObject(obj);
     QByteArray byteArray = jsonDocument.toJson(QJsonDocument::Compact);
     QTextStream out(&file);
+    out.setCodec("UTF-8");
     out << QString(byteArray);
     file.close();
     return true;

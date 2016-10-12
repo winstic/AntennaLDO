@@ -13,12 +13,14 @@ class wizardDesignPerformance : public QWizardPage{
 public:
     wizardDesignPerformance(QJsonObject &obj, QWidget *parent = 0);
     ~wizardDesignPerformance(){}
-    bool validateCurrentPage();
     QJsonObject saveInJsonObj();
 
+protected:
+    bool validateCurrentPage();
+
 private:
-    void frequencySetting();
-    void farFieldSetting();
+    bool frequencySetting();
+    bool farFieldSetting();
     void initComBoBox();
     void initLayout();
 
@@ -50,6 +52,8 @@ private:
     QLineEdit *phiEndEdit;
     QLineEdit *phiStepEdit;
     QGroupBox *groupBoxFarField;
+
+    bool isValid;
 };
 
 #endif // WIZARDDESIGNFREQUENCY_H

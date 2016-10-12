@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "macrodefined.h"
 #include "designWizard.h"
+#include "parsejson.h"
 #include "global.h"
 #include "run.h"
 //#include "config.h"

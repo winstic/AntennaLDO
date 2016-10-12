@@ -22,20 +22,21 @@ class wizardDesignVariables : public QWizardPage{
 public:
     wizardDesignVariables(QJsonObject &obj, QWidget *parent = 0);
     ~wizardDesignVariables(){}
-    QJsonObject saveInJsonObj();
+    QJsonObject saveInJsonObj();    
 
 protected:
-    bool validateCurrentPage();
     bool eventFilter(QObject *watched, QEvent *event);
+    bool validateCurrentPage();
+
 public slots:
     void slot_LinetextChange(QString text);
     void slot_sliderValueChange(int value);
 private:
     QComboBox* initUnitComBo();
-    void wizardDialog();
+    bool wizardDialog();
     void initLayout();
     QString getSliderSheet();
-    void readDefaultVars();
+    bool readDefaultVars();
 
     QJsonObject obj;
     QMap<QString, QString> defaultVars;

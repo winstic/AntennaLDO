@@ -14,11 +14,14 @@ class designWizard : public QWizard{
     Q_OBJECT
 
 public:
-    designWizard(const QString &path, QWidget *parent = 0);
+    designWizard(QJsonObject obj, QWidget *parent = 0);
     ~designWizard(){}
+
+protected:
     bool validateCurrentPage();
 
 private:
+    bool update2JsonFile();
 
     wizardDesignPerformance *designPerformance;
     wizardDesignVariables *designVariables;

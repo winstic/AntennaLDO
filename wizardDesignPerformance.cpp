@@ -34,12 +34,12 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     this->groupBoxFarField = new QGroupBox(tr("远场范围设置"));
 
     //set regexp
-    QRegExpValidator *posFloatValid = new QRegExpValidator(QRegExp("^\d+(\.\d+)?$"));    //positive float
-    QRegExpValidator *nonNegFloatValid = new QRegExpValidator(QRegExp("^\d+(\.\d+)?$"));    //non negative float
+    //QRegExpValidator *posFloatValid = new QRegExpValidator(QRegExp("^(-?\\d+)(\\.\\d+)?$"));    //positive float
+    QRegExpValidator *nonNegFloatValid = new QRegExpValidator(QRegExp("^(\\d+)(\\.\\d+)?$"));    //non negative float
     QRegExpValidator *floatValid = new QRegExpValidator(QRegExp("^-?(180|1?[0-7]?\\d(\\.\\d+)?)$"));      //float [-180. 180]
     QRegExpValidator *posIntValid = new QRegExpValidator(QRegExp("^[0-9]*[1-9][0-9]*$"));   //positive int
-    freStartEdit->setValidator(posFloatValid);
-    freEndEdit->setValidator(posFloatValid);
+    freStartEdit->setValidator(nonNegFloatValid);
+    freEndEdit->setValidator(nonNegFloatValid);
     freNumberEdit->setValidator(posIntValid);
     thetaStartEdit->setValidator(floatValid);
     thetaEndEdit->setValidator(floatValid);
@@ -55,11 +55,11 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     //connect(thetaStartEdit, )
 }
 
-void wizardDesignPerformance::frequencySetting(){
+bool wizardDesignPerformance::frequencySetting(){
     QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
     if(freObj.isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'FreSetting' in json file"));
-        return;
+        return false;
     }
     QStringList strList;
     strList = global::str2list(freObj.value("FreStart").toString().trimmed());
@@ -75,13 +75,14 @@ void wizardDesignPerformance::frequencySetting(){
     //PMComb->setCurrentIndex(QString(strList[0]).toInt());
     PMComb->setCurrentIndex(0);
     PMComb->setEnabled(false);
+    return true;
 }
 
-void wizardDesignPerformance::farFieldSetting(){
+bool wizardDesignPerformance::farFieldSetting(){
     QJsonObject farFieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
     if(farFieldObj.isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'ThetaPhiStep' in json file"));
-        return;
+        return false;
     }
     QStringList strList;
     strList = global::str2list(farFieldObj.value("ThetaLower").toString().trimmed());
@@ -96,6 +97,7 @@ void wizardDesignPerformance::farFieldSetting(){
     phiEndEdit->setText(strList[0]);
     strList = global::str2list(farFieldObj.value("PhiStep").toString().trimmed());
     phiStepEdit->setText(strList[0]);
+    return true;
 }
 
 void wizardDesignPerformance::initComBoBox(){

@@ -5,11 +5,9 @@ Run::Run(){
     //vbsVars
     this->obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"])
             .arg(global::getInfoFromRel("Problem")));
-    registerHfssVars();
-    updateVbs();
 }
 
-void Run::registerHfssVars(){
+bool Run::registerHfssVars(){
     QString antennaName = global::getInfoFromRel("Problem");
     vbsVars["hfsspath"] = QString("%1/%2").arg(sysParam["WorkingProjectPath"]).arg(antennaName);
     vbsVars["hfssname"] = antennaName;
@@ -18,7 +16,7 @@ void Run::registerHfssVars(){
     QJsonObject farfieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
     if(varsValueObj.isEmpty() || freObj.isEmpty() || farfieldObj.isEmpty()){
         QMessageBox::critical(0, QString("Error"), QString("Cannot register Hfss Vars"));
-        return;
+        return false;
     }
     for(QJsonObject::iterator iter = varsValueObj.begin(); iter != varsValueObj.end(); ++ iter){
         vbsVars[iter.key()] = iter.value().toString().trimmed();
@@ -40,6 +38,7 @@ void Run::registerHfssVars(){
         strList = global::str2list(iter.value().toString().trimmed());
         vbsVars[iter.key()] = strList[0];
     }
+    return true;
 }
 
 bool Run::updateVbs(){
@@ -76,15 +75,20 @@ QString Run::M2GHz(QString mhz){
 }
 
 void Run::go(){
-    QProcess p(0);;
-    //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
-    p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
-    /*if(! p.waitForStarted()){
-        QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
-        p.write("quit");
-        p.kill();
-        return;
-    }*/
-    p.waitForFinished();
-    qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
+    bool isReady = false;
+    if(registerHfssVars())
+        isReady = updateVbs();
+    if(isReady){
+        QProcess p(0);;
+        //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
+        p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
+        /*if(! p.waitForStarted()){
+            QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
+            p.write("quit");
+            p.kill();
+            return;
+        }*/
+        p.waitForFinished();
+        qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
+    }
 }

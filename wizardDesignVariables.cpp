@@ -7,24 +7,25 @@ wizardDesignVariables::wizardDesignVariables(QJsonObject &obj, QWidget *parent) 
     wizardDialog();
 }
 
-void wizardDesignVariables::readDefaultVars(){
+bool wizardDesignVariables::readDefaultVars(){
     QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "varsValue");
     if(defaultVarsObj.isEmpty()){
         QMessageBox::critical(0, tr("Error"), tr("Cannot parse 'varsValue' in json file"));
-        return;
+        return false;
     }
     for(QJsonObject::iterator iter = defaultVarsObj.begin(); iter != defaultVarsObj.end(); ++ iter){
         defaultVars[iter.key()] = iter.value().toString().trimmed();
     }
+    return true;
 }
 
-void wizardDesignVariables::wizardDialog(){
+bool wizardDesignVariables::wizardDialog(){
     setTitle(tr("模型设置"));
     setSubTitle(tr("模型设置"));
     QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
     if(variablesObj.isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Cannot parse 'variables' in json file"));
-        return;
+        return false;
     }
     QJsonObject varObj;
     QString varKey;
@@ -32,11 +33,12 @@ void wizardDesignVariables::wizardDialog(){
     int posx = 0, valueListLength;
     double realValue;
     QGridLayout *gridLayout = new QGridLayout;
-    QRegExp rx("^(-?\d+)(\.\d+)?$");
+    QRegExp rx("^(-?\\d+)(\\.\\d+)?$");
     QRegExpValidator *floatValid = new QRegExpValidator(rx);      //float
 
     for(QJsonObject::iterator iter = variablesObj.begin(); iter != variablesObj.end(); ++ iter){
         // iter format: "W1":{"note" : "介质板宽度W1(m)", "W1" : "0.025"}
+        varInfo tempVarInfo;
         varKey = iter.key();
         varObj = iter.value().toObject();
         //get note infomation
@@ -85,16 +87,17 @@ void wizardDesignVariables::wizardDialog(){
             // design outer space
             //vLayout->setMargin(0);
             gridLayout->addLayout(vLayout, posx, 1);
-            varInfo tempVarInfo;
+
             tempVarInfo.lower = startValue;
-            tempVarInfo.upper = stopValue;
-            tempVarInfo.varKey = varKey;
+            tempVarInfo.upper = stopValue;            
             tempVarInfo.varSlider = varSlider;
-            tempVarInfo.varEdit = valueEdit;
-            varinfos.append(tempVarInfo);
+
             connect(varSlider, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChange(int)));
 
         }
+        tempVarInfo.varKey = varKey;
+        tempVarInfo.varEdit = valueEdit;
+        varinfos.append(tempVarInfo);
         connect(valueEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_LinetextChange(QString)));
         //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
         //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
@@ -136,6 +139,7 @@ void wizardDesignVariables::wizardDialog(){
     layout->addLayout(hLayout);
     layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     setLayout(layout);
+    return true;
 }
 
 QComboBox* wizardDesignVariables::initUnitComBo(){
@@ -185,7 +189,12 @@ QString wizardDesignVariables::getSliderSheet(){
 }
 
 QJsonObject wizardDesignVariables::saveInJsonObj(){
-
+    QJsonObject saveObj, varObj;
+    foreach(varInfo var, varinfos){
+        varObj.insert(var.varKey, var.varEdit->text().trimmed());
+    }
+    saveObj.insert("varsValue", varObj);
+    return saveObj;
 }
 
 bool wizardDesignVariables::validateCurrentPage(){

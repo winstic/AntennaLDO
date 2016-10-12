@@ -11,7 +11,7 @@ class Run{
 public:
     Run();
     ~Run(){}
-    void registerHfssVars();
+    bool registerHfssVars();
     bool updateVbs();
     void go();
     QString M2GHz(QString mhz);

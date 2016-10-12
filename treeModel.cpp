@@ -327,8 +327,13 @@ void treeModel::slot_add(){
     if(varNode.isValid()){
         if(MARK_NODE_DESIGN == varNode.toInt()){            
             //designWizard *wizard = new designWizard(confManage->readPath("MODELVARIABLES"));
-            designWizard *wizard = new designWizard(QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"])
-                    .arg(global::getInfoFromRel("Problem")));
+            QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+            QJsonObject obj = parseJson::getJsonObj(jsonPath);
+            if(obj.isEmpty()){
+                QMessageBox::critical(0, tr("Error"), tr("Cannot parse jsonFile %1").arg(jsonPath));
+                return;
+            }
+            designWizard *wizard = new designWizard(obj);
             if(wizard->exec() == 1){
                 QStandardItem *child = new QStandardItem(
                             IconMap[QStringLiteral("treeItem")], QString("设计%1").arg(item->rowCount()+1));
