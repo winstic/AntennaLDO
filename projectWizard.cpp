@@ -73,9 +73,9 @@ void projectWizard::createProject(){
     QString projectProPath = QString("%1/%2_conf.json").arg(projectFullPath).arg(atnName);
     QString projectModelPath = QString("%1/%2.hfss").arg(projectFullPath).arg(atnName);
     QString projectScriptPath = QString("%1/%2_design.vbs").arg(projectFullPath).arg(atnName);
-    if(! copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
-           ! copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ||
-            ! copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath) ){
+    if(! global::copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
+           ! global::copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ||
+            ! global::copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath) ){
         QMessageBox::critical(0, QString("Error"), QString("projectWizard.cpp:79: error: 问题文件创建失败！"));
         dir->rmdir(projectFullPath);
         return;
@@ -85,7 +85,7 @@ void projectWizard::createProject(){
     //confManage->writeConfigInfo("MODELFILE", projectModelPath);
     //copy algorithm
     /*QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPath).fileName();
-    if(! copyFile(algPath, projectAlgPath)){
+    if(! global::copyFile(algPath, projectAlgPath)){
         QMessageBox::warning(this, "警告！", "算法文件创建失败！", QMessageBox::Yes, QMessageBox::Yes);
         dir->remove(projectFullPath);
         return;
@@ -98,27 +98,6 @@ void projectWizard::createProject(){
     out << "Problem:" << atnName << endl;
     //out << projectAlgPath << endl;
     inFile.close();
-}
-
-bool projectWizard::copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist){
-    QString sourceDir = QDir(sourceFile).absolutePath();
-    QString targetDir = QDir(targetFile).absolutePath();
-    if(sourceDir == targetDir){
-        return true;
-    }
-    if(! QFile::exists(sourceDir)){
-        return false;
-    }
-    QDir* createFile = new QDir;
-    bool isExist = createFile->exists(targetDir);
-    if(isExist && coverFileIfExist){
-        createFile->remove(targetDir);
-    }
-    //copy function: if targetDir already exist then return false
-    if(! QFile::copy(sourceDir, targetDir)){
-        return false;
-    }
-    return true;
 }
 
 QString projectWizard::getProjectName() const{

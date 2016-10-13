@@ -9,6 +9,9 @@
 #include <QLineEdit>
 
 extern QMap<QString, QString> sysParam;
+//!sysParam["DefaultProjectPath"]
+//!sysParam["WorkingProjectPath"]
+//!sysParam["CurrentDesignPath"]
 
 typedef struct{
     double lower;
@@ -28,6 +31,7 @@ public:
     static void registerParamter();
     static QString getInfoFromRel(const QString &key);
     static QString getProjectName();
+    static bool copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist = true);
 public:
 };
 

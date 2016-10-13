@@ -1,7 +1,6 @@
 ﻿#include "designWizard.h"
 
-designWizard::designWizard(const QString &jsonPath, QJsonObject &obj, QWidget *parent) : QWizard(parent){
-    this->jsonPath = jsonPath;
+designWizard::designWizard(QJsonObject &obj, QWidget *parent) : QWizard(parent){
     this->obj = obj;
     this->designPerformance = new wizardDesignPerformance(this->obj, this);
     addPage(designPerformance);
@@ -35,6 +34,7 @@ bool designWizard::update2JsonFile(){
     obj.insert("FreSetting", freObj);
     obj.insert("ThetaPhiStep", farObj);
     obj.insert("varsValue", varObj);
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
     bool isWriteInJson = parseJson::write(jsonPath, obj);
     return isWriteInJson;
 }

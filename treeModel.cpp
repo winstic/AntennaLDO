@@ -360,8 +360,15 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
         else if(varItem.isValid() && var2Int == MARK_ITEM){
             if(varItem2Int == MARK_ITEM_OPENFILE)
                 mItemViewMenu->exec(QCursor::pos());
-            else if(varItem2Int == MARK_ITEM_ATNDESIGN)
+            else if(varItem2Int == MARK_ITEM_ATNDESIGN){
                 mItemMenu->exec(QCursor::pos());
+                QStandardItemModel *itemModel = const_cast<QStandardItemModel *>(
+                            static_cast<const QStandardItemModel *>(currentIndex.model()));
+                QString designName = itemModel->itemFromIndex(currentIndex)->text();
+                //update current design path
+                sysParam["CurrentDesignPath"] = QString("%1/%2").arg(sysParam["WorkingProjectPath"]).arg(designName);
+                qDebug() << sysParam["CurrentDesignPath"];
+            }
         }
     }
 }
@@ -383,19 +390,33 @@ void treeModel::slot_add(){
     if(varNode.isValid()){
         if(MARK_NODE_DESIGN == varNode.toInt()){
             QString workingDir = sysParam["WorkingProjectPath"];
-            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(global::getInfoFromRel("Problem"));
+            QString atnName = global::getInfoFromRel("Problem");
+            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnName);
             QJsonObject obj = parseJson::getJsonObj(jsonPath);
             if(obj.isEmpty()){
                 QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:389: error: Cannot parse jsonFile %1").arg(jsonPath));
                 return;
             }
-            designWizard *wizard = new designWizard(jsonPath, obj);
+            designWizard *wizard = new designWizard(obj);
             if(wizard->exec() == 1){
+                QString designName = QString("设计%1").arg(item->rowCount()+1);
+                QDir *dir = new QDir();
+                QString designDir = QString("%1/%2").arg(workingDir).arg(designName);
+
                 QStandardItem *child = new QStandardItem(
-                            IconMap[QStringLiteral("treeItem")], QString("设计%1").arg(item->rowCount()+1));
+                            IconMap[QStringLiteral("treeItem")], designName);
                 child->setData(MARK_ITEM, ROLE_MARK);
                 child->setData(MARK_ITEM_ATNDESIGN, ROLE_MARK_ITEM);
                 item->appendRow(child);
+                dir->mkdir(designDir);
+                //copy files(.json, .vbs,) in designDir from projectDir
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), designDir) ||
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), designDir) ){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: 设计模块创建失败！"));
+                    dir->rmdir(designDir);
+                    return;
+                }
+                sysParam["CurrentDesignPath"] = designDir;      //save current design path in global variable
                 updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child);
             }
         }
@@ -407,7 +428,7 @@ void treeModel::slot_openFile(){
     QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
-        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:410: error: Cannot parse jsonFile %1").arg(jsonPath));
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
         return;
     }
     designTab *dTab = new designTab(obj);

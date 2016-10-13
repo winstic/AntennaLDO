@@ -32,7 +32,6 @@ private:
     QString projectFullPath;
 
 	void createProject();
-    bool copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist = true);
 };
 
 #endif

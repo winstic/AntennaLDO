@@ -65,3 +65,24 @@ QString global::getProjectName(){
     QStringList nameList = dirPath.split("/");
     return nameList.at(nameList.length()-1);
 }
+
+bool global::copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist){
+    QString sourceDir = QDir(sourceFile).absolutePath();
+    QString targetDir = QDir(targetFile).absolutePath();
+    if(sourceDir == targetDir){
+        return true;
+    }
+    if(! QFile::exists(sourceDir)){
+        return false;
+    }
+    QDir* createFile = new QDir;
+    bool isExist = createFile->exists(targetDir);
+    if(isExist && coverFileIfExist){
+        createFile->remove(targetDir);
+    }
+    //copy function: if targetDir already exist then return false
+    if(! QFile::copy(sourceDir, targetDir)){
+        return false;
+    }
+    return true;
+}

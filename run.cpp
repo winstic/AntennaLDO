@@ -1,16 +1,18 @@
 #include "run.h"
 
 Run::Run(){
-    this->vbsPath = QString("%1/%2_design.vbs").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+    this->designDir = sysParam["CurrentDesignPath"];
+    this->atnName = global::getInfoFromRel("Problem");
+    this->vbsPath = QString("%1/%2_design.vbs").arg(designDir).arg(atnName);
     //vbsVars
-    this->obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"])
-            .arg(global::getInfoFromRel("Problem")));
+    this->obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(designDir).arg(atnName));
 }
 
 bool Run::registerHfssVars(){
-    QString antennaName = global::getInfoFromRel("Problem");
-    vbsVars["hfsspath"] = QString("%1/%2").arg(sysParam["WorkingProjectPath"]).arg(antennaName);
-    vbsVars["hfssname"] = antennaName;
+    //copy hfss file in designDir from projectDir
+    global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), designDir);
+    vbsVars["hfsspath"] = QString("%1/%2").arg(designDir).arg(atnName);
+    vbsVars["hfssname"] = atnName;
     QJsonObject varsValueObj = parseJson::getSubJsonObj(obj, "varsValue");
     QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
     QJsonObject farfieldObj = parseJson::getSubJsonObj(obj, "ThetaPhiStep");
