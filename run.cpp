@@ -74,21 +74,23 @@ QString Run::M2GHz(QString mhz){
     return QString::number(doubleGHz);
 }
 
-void Run::go(){
+bool Run::go(){
     bool isReady = false;
     if(registerHfssVars())
         isReady = updateVbs();
     if(isReady){
         QProcess p(0);;
         //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
-        p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
+        int a = p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
         /*if(! p.waitForStarted()){
             QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
             p.write("quit");
             p.kill();
             return;
         }*/
+        qDebug() << a;
         p.waitForFinished();
         qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
     }
+    return isReady;
 }

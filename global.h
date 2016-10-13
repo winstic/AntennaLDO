@@ -5,8 +5,18 @@
 #include <QMap>
 #include <QFileInfo>
 #include <QDir>
+#include <QSlider>
+#include <QLineEdit>
 
 extern QMap<QString, QString> sysParam;
+
+typedef struct{
+    double lower;
+    double upper;
+    QString varKey;
+    QSlider *varSlider;
+    QLineEdit *varEdit;
+}varInfo;
 
 class global{
 public:

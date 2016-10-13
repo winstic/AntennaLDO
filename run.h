@@ -13,7 +13,7 @@ public:
     ~Run(){}
     bool registerHfssVars();
     bool updateVbs();
-    void go();
+    bool go();
     QString M2GHz(QString mhz);
 private:
     QString vbsPath;

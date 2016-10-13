@@ -134,8 +134,8 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
             QString workingPath =  sysParam["WorkingProjectPath"];
             QString projectName = global::getProjectName();
             qDebug() << "atnlibrary:WorkingProjectPath=" << workingPath << "pro=" << projectName;
-            mTreeModel->writeFile(QString("%1/%2.xml").arg(workingPath).arg(projectName), atnName);
-            mTreeModel->readFile(QString("%1/%2.xml").arg(workingPath).arg(projectName));
+            mTreeModel->writeXMLFile(QString("%1/%2.xml").arg(workingPath).arg(projectName), atnName);
+            mTreeModel->parseXML(QString("%1/%2.xml").arg(workingPath).arg(projectName));
         }
     }
 }

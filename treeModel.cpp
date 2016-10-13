@@ -21,46 +21,7 @@ void treeModel::initIcon(){
     IconMap[QStringLiteral("treeItem")] = QIcon(QStringLiteral("./images/item.png"));
 }
 
-bool treeModel::readFile(const QString &fileName){
-    QFile file(fileName);
-    if(!file.open(QFile::ReadOnly | QFile::Text)){
-        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:27: error: Cannot read file %1").arg(fileName));
-        return false;
-    }
-    QDomDocument doc;
-    QString error;
-    int row, column;
-    if(!doc.setContent(&file, false, &error, &row, &column)){
-        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:34: error: Parse error at row %1, column %2: %3")
-                              .arg(row).arg(column).arg(error));
-        return false;
-    }
-    file.close();
-    QDomElement xmlRoot = doc.documentElement();
-    if("project" != xmlRoot.tagName()){
-        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:41: error: Not a project file"));
-        return false;
-    }
-
-    tModel = new QStandardItemModel(mTree);
-    QStringList header;    
-    header << xmlRoot.attribute("name");
-    tModel->setHorizontalHeaderLabels(header);
-
-    QString projectName = QFileInfo(fileName).fileName().split(".").at(0);
-    treeRoot = new QStandardItem(IconMap[QStringLiteral("treeNode")], projectName);
-    treeRoot->setData(MARK_PROJECT, ROLE_MARK);
-    tModel->appendRow(treeRoot);
-    parseProjectElement(xmlRoot);
-
-    mTree->setModel(tModel);
-    mTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    mTree->setContextMenuPolicy(Qt::CustomContextMenu);        //设置右键菜单
-    mTree->expandAll();
-    return true;
-}
-
-bool treeModel::writeFile(const QString &fileName, const QString &atnName){
+bool treeModel::writeXMLFile(const QString &fileName, const QString &atnName){
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
@@ -99,7 +60,96 @@ bool treeModel::writeFile(const QString &fileName, const QString &atnName){
 
     // /group
     // /designs /data   /project
+    out.setCodec("UTF-8");
     doc.save(out, 4);   //4 spaces
+    return true;
+}
+
+bool treeModel::updateXMLFile(const QString &fileName, const QStandardItem *item, const QStandardItem *child){
+    //!get xml root node
+    QFile inFile(fileName);
+    if(!inFile.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:72: error: Cannot read file %1").arg(fileName));
+        return false;
+    }
+    QDomDocument doc;
+    QString error;
+    int row, column;
+    if(!doc.setContent(&inFile, false, &error, &row, &column)){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:79: error: Parse error at row %1, column %2: %3")
+                              .arg(row).arg(column).arg(error));
+        return false;
+    }
+    inFile.close();
+    QDomElement xmlRoot = doc.documentElement();
+    if("project" != xmlRoot.tagName()){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:86: error: Not a project file"));
+        return false;
+    }
+    //!
+    //QString childStr = child->text();
+    QDomNode rootChild = xmlRoot.firstChild();
+    QDomElement rootChildElement;
+    while(! rootChild.isNull()){
+        rootChildElement = rootChild.toElement();
+        if(("node" == rootChildElement.tagName()) && rootChildElement.hasAttribute("flag")){
+            if(MARK_NODE_DESIGN == item->data(ROLE_MARK_NODE) && ("design" == rootChildElement.attribute("flag"))){
+                QDomElement designElement = doc.createElement("item");
+                QDomText designText = doc.createTextNode(child->text());
+                designElement.appendChild(designText);
+                designElement.setAttribute("id", rootChildElement.childNodes().count()+1);
+                rootChildElement.appendChild(designElement);
+            }
+        }
+        rootChild = rootChild.nextSibling();
+    }
+
+
+    QFile outfile(fileName);
+    if(!outfile.open(QIODevice::WriteOnly))
+        return false;
+    QTextStream out(&outfile);
+    out.setCodec("utf-8");
+    doc.save(out, 4);
+    return true;
+}
+
+bool treeModel::parseXML(const QString &fileName){
+    QFile file(fileName);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:120: error: Cannot read file %1").arg(fileName));
+        return false;
+    }
+    QDomDocument doc;
+    QString error;
+    int row, column;
+    if(!doc.setContent(&file, false, &error, &row, &column)){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:127: error: Parse error at row %1, column %2: %3")
+                              .arg(row).arg(column).arg(error));
+        return false;
+    }
+    file.close();
+    QDomElement xmlRoot = doc.documentElement();
+    if("project" != xmlRoot.tagName()){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:134: error: Not a project file"));
+        return false;
+    }
+
+    tModel = new QStandardItemModel(mTree);
+    QStringList header;
+    header << xmlRoot.attribute("name");
+    tModel->setHorizontalHeaderLabels(header);
+
+    QString projectName = QFileInfo(fileName).fileName().split(".").at(0);
+    treeRoot = new QStandardItem(IconMap[QStringLiteral("treeNode")], projectName);
+    treeRoot->setData(MARK_PROJECT, ROLE_MARK);
+    tModel->appendRow(treeRoot);
+    parseProjectElement(xmlRoot);
+
+    mTree->setModel(tModel);
+    mTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    mTree->setContextMenuPolicy(Qt::CustomContextMenu);        //设置右键菜单
+    mTree->expandAll();
     return true;
 }
 
@@ -206,18 +256,22 @@ void treeModel::parseItemElement(const QDomElement &element, QStandardItem *pare
 }*/
 
 void treeModel::initMenu(){
-    QAction* actClose = new QAction(QStringLiteral("关闭"), mTree);
-    QAction* actDel = new QAction(QStringLiteral("删除"), mTree);
+    actClose = new QAction(QStringLiteral("关闭"), mTree);
+    actDel = new QAction(QStringLiteral("删除"), mTree);
     connect(actDel, &QAction::triggered, this, &treeModel::slot_del);
-    QAction* actHideAll = new QAction(QStringLiteral("全部折叠"), mTree);
+    actHideAll = new QAction(QStringLiteral("全部折叠"), mTree);
     connect(actHideAll, &QAction::triggered, this, &treeModel::slot_hideAll);
-    QAction* actShowAll = new QAction(QStringLiteral("全部展开"), mTree);
+    actShowAll = new QAction(QStringLiteral("全部展开"), mTree);
     connect(actShowAll, &QAction::triggered, this, &treeModel::slot_showAll);
-    QAction* actAdd = new QAction(QStringLiteral("新增"), mTree);
+    actAdd = new QAction(QStringLiteral("新增"), mTree);
     connect(actAdd, &QAction::triggered, this, &treeModel::slot_add);
-    QAction* actRun = new QAction(QStringLiteral("运行"), mTree);
+    actRun = new QAction(QStringLiteral("运行"), mTree);
     connect(actRun, &QAction::triggered, this, &treeModel::slot_run);
-    QAction* actOpenFile = new QAction(QStringLiteral("打开文件"), mTree);
+    actOpenFile = new QAction(QStringLiteral("打开文件"), mTree);
+    connect(actOpenFile, &QAction::triggered, this, &treeModel::slot_openFile);
+    actShowResult = new QAction(QStringLiteral("结果查看"), mTree);
+    //actShowResult->setEnabled(false);
+    connect(actShowResult, &QAction::triggered, this, &treeModel::slot_showResult);
 
     mProjectMenu->addAction(actClose);
     mProjectMenu->addAction(actDel);
@@ -242,6 +296,8 @@ void treeModel::initMenu(){
 
     mItemMenu->addAction(actOpenFile);
     mItemMenu->addAction(actRun);
+    mItemMenu->addAction(actShowResult);
+    mItemMenu->addSeparator();
     mItemMenu->addAction(actDel);
 }
 
@@ -325,12 +381,12 @@ void treeModel::slot_add(){
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
     if(varNode.isValid()){
-        if(MARK_NODE_DESIGN == varNode.toInt()){            
-            //designWizard *wizard = new designWizard(confManage->readPath("MODELVARIABLES"));
-            QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+        if(MARK_NODE_DESIGN == varNode.toInt()){
+            QString workingDir = sysParam["WorkingProjectPath"];
+            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(global::getInfoFromRel("Problem"));
             QJsonObject obj = parseJson::getJsonObj(jsonPath);
             if(obj.isEmpty()){
-                QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:333: error: Cannot parse jsonFile %1").arg(jsonPath));
+                QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:389: error: Cannot parse jsonFile %1").arg(jsonPath));
                 return;
             }
             designWizard *wizard = new designWizard(jsonPath, obj);
@@ -340,15 +396,31 @@ void treeModel::slot_add(){
                 child->setData(MARK_ITEM, ROLE_MARK);
                 child->setData(MARK_ITEM_ATNDESIGN, ROLE_MARK_ITEM);
                 item->appendRow(child);
+                updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child);
             }
         }
         else if(MARK_NODE_OPTIMIZATION == varNode.toInt()){}
     }
 }
 
+void treeModel::slot_openFile(){
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+    QJsonObject obj = parseJson::getJsonObj(jsonPath);
+    if(obj.isEmpty()){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:410: error: Cannot parse jsonFile %1").arg(jsonPath));
+        return;
+    }
+    designTab *dTab = new designTab(obj);
+    dTab->show();
+}
+
 void treeModel::slot_run(){
     Run run;
     run.go();
+}
+
+void treeModel::slot_showResult(){
+
 }
 
 void treeModel::slot_del(){

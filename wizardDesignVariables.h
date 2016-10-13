@@ -7,14 +7,7 @@
 #include "macrodefined.h"
 #include "sqliteManage.h"
 #include "parsejson.h"
-
-typedef struct{
-    double lower;
-    double upper;
-    QString varKey;
-    QSlider *varSlider;
-    QLineEdit *varEdit;
-}varInfo;
+#include "global.h"
 
 class wizardDesignVariables : public QWizardPage{
     Q_OBJECT
@@ -34,7 +27,6 @@ public slots:
 private:
     QComboBox* initUnitComBo();
     bool wizardDialog();
-    void initLayout();
     QString getSliderSheet();
     bool readDefaultVars();
 

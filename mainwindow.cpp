@@ -239,11 +239,12 @@ void MainWindow::slot_OpenProject(){
         defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     QString path = QFileDialog::getOpenFileName(this, tr("打开工程"), defaultDir, tr("REL Files(*.rel)"));
     if(path.length() == 0){
-        QMessageBox::critical(0, QString("Error"), QString("MainWindow.cpp:242: error: rel文件打开失败"));
+        //QMessageBox::critical(0, QString("Error"), QString("MainWindow.cpp:242: error: rel文件打开失败"));
+        qDebug() << "MainWindow.cpp:242: error: rel文件打开失败";
         //QMessageBox::warning(0, "警告！", "MainWindow.cpp:242: error: rel文件打开失败", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
         return;
     }
-    mTreeModel->readFile(QString("%1.xml").arg(path.split(".").at(0)));
+    mTreeModel->parseXML(QString("%1.xml").arg(path.split(".").at(0)));
     sysParam["WorkingProjectPath"] = QFileInfo(path).absolutePath();
     qDebug() << "OpenProject:WorkingProjectPath=" << sysParam["WorkingProjectPath"];
     //QMessageBox::information(this, "infomation", "test my openAction");

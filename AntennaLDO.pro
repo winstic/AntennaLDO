@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     sqliteManage.cpp \
     global.cpp \
     parsejson.cpp \
-    run.cpp
+    run.cpp \
+    designtab.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -49,6 +50,7 @@ HEADERS  += mainwindow.h \
     config.h \
     macrodefined.h \
     parsejson.h \
-    run.h
+    run.h \
+    designtab.h
 
 FORMS    += mainwindow.ui

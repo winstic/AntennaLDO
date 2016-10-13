@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "macrodefined.h"
 #include "designWizard.h"
+#include "designtab.h"
 #include "parsejson.h"
 #include "global.h"
 #include "run.h"
@@ -27,8 +28,9 @@ public:
     void initMenu();
     void initIcon();
     //void showTree();
-    bool readFile(const QString &fileName);
-    bool writeFile(const QString &fileName, const QString &atnName);
+    bool parseXML(const QString &fileName);
+    bool writeXMLFile(const QString &fileName, const QString &atnName);
+    bool updateXMLFile(const QString &fileName, const QStandardItem *item, const QStandardItem *child);
 
     inline QMenu* getProjectMenu() {return mProjectMenu;}
     inline QMenu* getAtnDesignMenu() {return mAtnDesignMenu;}
@@ -43,6 +45,8 @@ private slots:
     void slot_add();
     void slot_run();
     void slot_del();
+    void slot_openFile();
+    void slot_showResult();
 
     //mouse right click
     void slot_customContextMenuRequested(const QPoint &pos);
@@ -63,6 +67,17 @@ private:
     QMenu* mResultMenu;
     QMenu* mItemMenu;
     QMenu* mItemViewMenu;
+
+    //!Actions
+    QAction* actClose;
+    QAction* actDel;
+    QAction* actHideAll;
+    QAction* actShowAll;
+    QAction* actAdd;
+    QAction* actRun;
+    QAction* actOpenFile;
+    QAction* actShowResult;
+    //!
 
     //cursor position index
     QModelIndex currentIndex;
