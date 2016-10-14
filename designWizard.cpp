@@ -19,8 +19,10 @@ designWizard::designWizard(QJsonObject &obj, QWidget *parent) : QWizard(parent){
 }
 
 bool designWizard::validateCurrentPage(){
-    bool isUpdate = update2JsonFile();
-    return isUpdate;
+    //bool isUpdate = update2JsonFile();
+    //qDebug() << "isUpdate: " << isUpdate;
+    //return isUpdate;
+    return true;
 }
 
 bool designWizard::update2JsonFile(){

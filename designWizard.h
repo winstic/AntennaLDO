@@ -16,13 +16,12 @@ class designWizard : public QWizard{
 public:
     designWizard(QJsonObject &obj, QWidget *parent = 0);
     ~designWizard(){}
+    bool update2JsonFile();
 
 protected:
     bool validateCurrentPage();
 
 private:
-    bool update2JsonFile();
-
     wizardDesignPerformance *designPerformance;
     wizardDesignVariables *designVariables;
     QJsonObject obj;

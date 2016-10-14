@@ -361,13 +361,13 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
             if(varItem2Int == MARK_ITEM_OPENFILE)
                 mItemViewMenu->exec(QCursor::pos());
             else if(varItem2Int == MARK_ITEM_ATNDESIGN){
-                mItemMenu->exec(QCursor::pos());
-                QStandardItemModel *itemModel = const_cast<QStandardItemModel *>(
-                            static_cast<const QStandardItemModel *>(currentIndex.model()));
-                QString designName = itemModel->itemFromIndex(currentIndex)->text();
+                //QStandardItemModel *itemModel = const_cast<QStandardItemModel *>(
+                            //static_cast<const QStandardItemModel *>(currentIndex.model()));
+                //QString designName = itemModel->itemFromIndex(currentIndex)->text();
+                int designIndex = currentIndex.row() + 1;
                 //update current design path
-                sysParam["CurrentDesignPath"] = QString("%1/%2").arg(sysParam["WorkingProjectPath"]).arg(designName);
-                qDebug() << sysParam["CurrentDesignPath"];
+                sysParam["CurrentDesignPath"] = QString("%1/design%2").arg(sysParam["WorkingProjectPath"]).arg(designIndex);
+                mItemMenu->exec(QCursor::pos());
             }
         }
     }
@@ -401,7 +401,7 @@ void treeModel::slot_add(){
             if(wizard->exec() == 1){
                 QString designName = QString("设计%1").arg(item->rowCount()+1);
                 QDir *dir = new QDir();
-                QString designDir = QString("%1/%2").arg(workingDir).arg(designName);
+                QString designDir = QString("%1/design%2").arg(workingDir).arg(item->rowCount()+1);
 
                 QStandardItem *child = new QStandardItem(
                             IconMap[QStringLiteral("treeItem")], designName);
@@ -410,14 +410,17 @@ void treeModel::slot_add(){
                 item->appendRow(child);
                 dir->mkdir(designDir);
                 //copy files(.json, .vbs,) in designDir from projectDir
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), designDir) ||
-                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), designDir) ){
-                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: 设计模块创建失败！"));
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(designDir).arg(atnName)) ||
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(designDir).arg(atnName)) ){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
                     dir->rmdir(designDir);
                     return;
                 }
                 sysParam["CurrentDesignPath"] = designDir;      //save current design path in global variable
-                updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child);
+                qDebug() << "CurrentDesignPath: " << sysParam["CurrentDesignPath"];
+                if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child))){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));
+                }
             }
         }
         else if(MARK_NODE_OPTIMIZATION == varNode.toInt()){}
@@ -425,7 +428,7 @@ void treeModel::slot_add(){
 }
 
 void treeModel::slot_openFile(){
-    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["WorkingProjectPath"]).arg(global::getInfoFromRel("Problem"));
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
@@ -441,7 +444,13 @@ void treeModel::slot_run(){
 }
 
 void treeModel::slot_showResult(){
-
+    QString hfssPath = QString("%1/%2.hfss").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
+    QProcess p(0);;
+    int isOK  = p.execute("hfss", QStringList() << hfssPath);
+    if(isOK != 0)
+       QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:451: error: Cannot execute hfssPath"));
+    p.waitForFinished();
+    qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
 }
 
 void treeModel::slot_del(){

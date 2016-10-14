@@ -10,7 +10,7 @@ Run::Run(){
 
 bool Run::registerHfssVars(){
     //copy hfss file in designDir from projectDir
-    global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), designDir);
+    global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), QString("%1/%2.hfss").arg(designDir).arg(atnName));
     vbsVars["hfsspath"] = QString("%1/%2").arg(designDir).arg(atnName);
     vbsVars["hfssname"] = atnName;
     QJsonObject varsValueObj = parseJson::getSubJsonObj(obj, "varsValue");
@@ -35,7 +35,7 @@ bool Run::registerHfssVars(){
     strList = global::str2list(freObj.value("PM").toString().trimmed());
     vbsVars["PM"] = strList[0];
 
-    vbsVars["Freq"] = QString::number((vbsVars["FreStart"].toDouble() + vbsVars["FreEnd"].toDouble()) / 2000.0);
+    vbsVars["Freq"] = QString::number((vbsVars["FreStart"].toDouble() + vbsVars["FreEnd"].toDouble()) / 2.0);
     for(QJsonObject::iterator iter = farfieldObj.begin(); iter != farfieldObj.end(); ++ iter){
         strList = global::str2list(iter.value().toString().trimmed());
         vbsVars[iter.key()] = strList[0];
@@ -83,14 +83,13 @@ bool Run::go(){
     if(isReady){
         QProcess p(0);;
         //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
-        int a = p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
+        p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
         /*if(! p.waitForStarted()){
             QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
             p.write("quit");
             p.kill();
             return;
         }*/
-        qDebug() << a;
         p.waitForFinished();
         qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
     }

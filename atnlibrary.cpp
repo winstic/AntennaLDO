@@ -10,7 +10,7 @@ atnLibrary::atnLibrary(QString sql, treeModel *mTreeModel, QWidget *parent) : QW
     showInfo();
     arrangeAtn(setAtnList(sql), atnDockWH, numOfTableCol);
     //QMessageBox::information(this, "infomation", "atnlibrary:"+QString::number(geometry().width()));
-    qDebug() << sizeHint().width() << "," << sizeHint().height();
+    //qDebug() << sizeHint().width() << "," << sizeHint().height();
     connect(tableView, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(slot_tableCellDoubleClick(int,int)));
 }
 
@@ -124,7 +124,7 @@ void atnLibrary::slot_showProTree(bool isShow){
 
 void atnLibrary::slot_tableCellDoubleClick(int row, int col){
     int index = numOfTableCol * row + col;
-    qDebug() << index;
+    //qDebug() << index;
     QWidget* currentWidget = tableView->cellWidget(row, col);
     if(currentWidget){
         antennaCell* cellTab = static_cast<antennaCell* >(currentWidget);
@@ -133,7 +133,7 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
         if(wizard->exec() == 1){           
             QString workingPath =  sysParam["WorkingProjectPath"];
             QString projectName = global::getProjectName();
-            qDebug() << "atnlibrary:WorkingProjectPath=" << workingPath << "pro=" << projectName;
+            //qDebug() << "atnlibrary:WorkingProjectPath=" << workingPath << "pro=" << projectName;
             mTreeModel->writeXMLFile(QString("%1/%2.xml").arg(workingPath).arg(projectName), atnName);
             mTreeModel->parseXML(QString("%1/%2.xml").arg(workingPath).arg(projectName));
         }
