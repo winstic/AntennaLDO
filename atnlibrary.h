@@ -8,6 +8,7 @@
 #include "antennaCell.h"
 #include "projectWizard.h"
 #include "treeModel.h"
+#include "modelfile.h"
 //#include "config.h"
 
 class atnLibrary : public QWidget{
@@ -34,16 +35,22 @@ public slots:
     //是否显示工程结构
     void slot_showProTree(bool isShow);
     void slot_tableCellDoubleClick(int, int);
+    void slot_customContextMenuRequested(QPoint);
+    void slot_property();
 
-private:
+private:    
+    void showInfo();
+    QList<int> setAtnWidth(int width, int colNum);
+    void initMenu();
+
     treeModel *mTreeModel;
     QTableWidget* tableView;
     QLabel* failedSearch;
     int atnDockWH;
     int numOfTableCol;
-
-    void showInfo();
-    QList<int> setAtnWidth(int width, int colNum);
+    QMenu *itemMenu;
+    QAction *actNew;
+    QAction *actProperty;
 };
 
 

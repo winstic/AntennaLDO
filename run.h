@@ -1,20 +1,25 @@
 #ifndef RUN_H
 #define RUN_H
 
+#include <QThread>
 #include <QFile>
 #include <QProcess>
 #include <QDebug>
 #include "parsejson.h"
 #include "global.h"
 
-class Run{
+class ThreadRun : public QThread{
 public:
-    Run();
-    ~Run(){}
+    ThreadRun();
+    ~ThreadRun(){
+        this->quit();
+    }
     bool registerHfssVars();
     bool updateVbs();
-    bool go();
     QString M2GHz(QString mhz);
+
+    //over write run function
+    void run();
 private:
     QString designDir;
     QString vbsPath;

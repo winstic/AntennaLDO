@@ -4,11 +4,14 @@
 projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(parent){
     atnName = antennaName;
     setWindowTitle(atnName + " 工程向导");
+    //remove help menu
+    this->setWindowFlags(windowFlags() &~ Qt::WindowContextHelpButtonHint);
     setButtonText(QWizard::NextButton, "下一步>");
-    introduce = new wizardIntroduce(atnName, this);
-    addSetting = new wizardAddSetting(atnName, this);
-    // need improve
+    introduce = new wizardIntroduce(atnName);
+    addSetting = new wizardAddSetting(atnName);
     selectPy = new wizardSelectPy(atnName);
+    // need improve
+
     //confManage = new config();
 
     if (atnName != NULL){

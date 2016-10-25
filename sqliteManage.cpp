@@ -1,7 +1,7 @@
 ﻿#include "sqliteManage.h"
 sqliteManage::sqliteManage(){
     db = QSqlDatabase::addDatabase(("QSQLITE"));
-    QString dbname = "antenna.db";
+    QString dbname = "./antenna.db";
     connect(dbname);
 }
 

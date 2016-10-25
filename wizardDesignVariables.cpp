@@ -51,7 +51,7 @@ bool wizardDesignVariables::wizardDialog(){
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
         QLineEdit *valueEdit = new QLineEdit;
-        valueEdit->setFixedWidth(240);
+        //valueEdit->setFixedWidth(240);
         valueEdit->setValidator(floatValid);
 
         if(valueListLength == 1){
@@ -71,12 +71,17 @@ bool wizardDesignVariables::wizardDialog(){
             double stopValue = QString(varValue[1]).trimmed().toDouble();
             double startValue = QString(varValue[0]).trimmed().toDouble();
             realValue = defaultVars[varKey].trimmed().toDouble();
-            int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
+            if(stopValue == startValue){
+                varSlider->setValue(100);
+                varSlider->setEnabled(false);
+            }
+            else{
+                int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
+                varSlider->setValue(sliderValue);
+            }
             //realValue =startValue + (varSlider->value()*1.0 / 100) *(stopValue - startValue);
             //!conversion slider value and edit value
             //!
-
-            varSlider->setValue(sliderValue);
             valueEdit->setText(QString::number(realValue));
 
             //valueEdit->setReadOnly(true);
@@ -102,15 +107,15 @@ bool wizardDesignVariables::wizardDialog(){
         //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
         //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
         QComboBox *unitComBo = initUnitComBo();
-        unitComBo->setFixedWidth(50);
+        //unitComBo->setFixedWidth(50);
         gridLayout->addWidget(unitComBo, posx, 2);
         ++ posx;
     }
 
     gridLayout->setAlignment(Qt::AlignHCenter);
     gridLayout->setAlignment(Qt::AlignVCenter);
-    gridLayout->setColumnStretch(3, 1);
     gridLayout->setSpacing(10);
+    gridLayout->setContentsMargins(2,20,2,2);
 
     //!add picture
     QString picturePath;
@@ -128,16 +133,22 @@ bool wizardDesignVariables::wizardDialog(){
     }
     QLabel *atnPhoto = new QLabel;
     QPixmap pm = QPixmap(picturePath);
-    atnPhoto->setPixmap(pm.scaled(440, 400));
+    if(pm.width() > 440)
+        atnPhoto->setPixmap(pm.scaledToWidth(440));
+    else
+        atnPhoto->setPixmap(pm);
     //!
     QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->addLayout(gridLayout);
-    hLayout->addWidget(atnPhoto);
+    hLayout->addLayout(gridLayout, 1);
+    hLayout->addWidget(atnPhoto, 1);
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layout->addLayout(hLayout);
-    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    //vlayout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    vlayout->addLayout(hLayout);
+    //vlayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addLayout(vlayout);
     setLayout(layout);
     return true;
 }
@@ -160,8 +171,6 @@ QString wizardDesignVariables::getSliderSheet(){
             spacing: 0px;\
             min-height:8px;\
             max-height:8px;\
-            min-width:240px;\
-            max-width:240px;\
          }\
          QSlider::add-page:Horizontal\
          {     \

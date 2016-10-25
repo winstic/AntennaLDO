@@ -59,6 +59,7 @@ private:
     QLineEdit *phiEndEdit;
     QLineEdit *phiStepEdit;
     QGroupBox *groupBoxFarField;
+    QPushButton *saveAllButton;
 
     //model variables setting
     QMap<QString, QString> defaultVars;

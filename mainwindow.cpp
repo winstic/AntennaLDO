@@ -214,14 +214,27 @@ void MainWindow::createActions(){
     helpMenu->addAction(aboutQtAction);
     //Help Menu End
 
-    //Others
-    QToolBar *otherToolBar = addToolBar(QStringLiteral("其他"));
+    //execution
+    QToolBar *execToolBar = addToolBar(QStringLiteral("执行"));
+    const QIcon stopAtnIcon = QIcon::fromTheme("find-atenna", QIcon("./images/stop.png"));
+    QAction *stopAtnAction = new QAction(stopAtnIcon, QStringLiteral("终止"), this);
+    execToolBar->addAction(stopAtnAction);
 
-    const QIcon findAtnIcon = QIcon::fromTheme("find-atenna", QIcon("./images/search.png"));
-    QAction *findAtnAction = new QAction(findAtnIcon, QStringLiteral("查找天线"), this);
+    const QIcon runAtnIcon = QIcon::fromTheme("find-atenna", QIcon("./images/run.png"));
+    QAction *runAtnAction = new QAction(runAtnIcon, QStringLiteral("运行"), this);
+    execToolBar->addAction(runAtnAction);
+
+    const QIcon interruptAtnIcon = QIcon::fromTheme("find-atenna", QIcon("./images/interrupt.png"));
+    QAction *interruptAtnAction = new QAction(interruptAtnIcon, QStringLiteral("中断"), this);
+    execToolBar->addAction(interruptAtnAction);
+
+    /*const QIcon findAtnIcon = QIcon::fromTheme("find-atenna", QIcon("./images/search.png"));
+    QAction *findAtnAction = new QAction(findAtnIcon, QStringLiteral("查找"), this);
     //connect(findAtnAction, &QAction::triggered, this, &MainWindow::findAtn);
-    otherToolBar->addAction(findAtnAction);
+    execToolBar->addAction(findAtnAction);*/
 
+    //other
+    QToolBar *otherToolBar = addToolBar(QStringLiteral("其他"));
     searchAct = new searchAction(this);
     otherToolBar->addAction(searchAct);
 }

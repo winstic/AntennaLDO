@@ -8,6 +8,7 @@
 #include "macrodefined.h"
 #include "designWizard.h"
 #include "designtab.h"
+#include "modelfile.h"
 #include "parsejson.h"
 #include "global.h"
 #include "run.h"
@@ -42,14 +43,18 @@ public:
 private slots:
     void slot_showAll();
     void slot_hideAll();
-    void slot_add();
+    void slot_addDesign();
     void slot_run();
+    void slot_interrupt();
+    void slot_stop();
     void slot_del();
     void slot_openFile();
+    void slot_ModifyVar();
     void slot_showResult();
 
     //mouse right click
     void slot_customContextMenuRequested(const QPoint &pos);
+    void slot_doubleClick(QModelIndex itemIndex);
 
 private:
     void parseProjectElement(const QDomElement &element);
@@ -73,9 +78,13 @@ private:
     QAction* actDel;
     QAction* actHideAll;
     QAction* actShowAll;
-    QAction* actAdd;
+    QAction* actAddDesign;
+    QAction* actAddOptimize;
     QAction* actRun;
+    QAction* actInterrupt;
+    QAction* actStop;
     QAction* actOpenFile;
+    QAction* actModifyVar;
     QAction* actShowResult;
     //!
 

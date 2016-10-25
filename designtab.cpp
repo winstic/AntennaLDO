@@ -3,8 +3,12 @@
 designTab::designTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->obj = obj;
     this->tabWidget = new QTabWidget;
+    this->setMinimumSize(880, 580);
+    //remove help menu
+    this->setWindowFlags(windowFlags() &~ Qt::WindowContextHelpButtonHint);
     this->firstTab = new QWidget;
     this->secondTab = new QWidget;
+    this->saveAllButton = new QPushButton("保存所有");
 
     //!first tabwidget
     //frequencySetting
@@ -48,11 +52,17 @@ designTab::designTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     //firstTab->setWindowTitle(tr("设置频率信息并指定远场范围"));
     tabWidget->addTab(secondTab, QIcon(""), tr("模型设置"));
     //secondTab->setWindowTitle(tr("模型设置"));
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(tabWidget);
+    //QScrollArea *scrollArea = new QScrollArea;
+    //scrollArea->setWidget(tabWidget);
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    buttonLayout->addWidget(saveAllButton);
 
-    this->setWindowTitle(tr("天线设计"));
-    this->setMinimumSize(880, 580);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(tabWidget);
+    layout->addLayout(buttonLayout);
+
+    this->setWindowTitle(tr("天线设计"));    
     this->setLayout(layout);
 }
 
@@ -161,11 +171,11 @@ void designTab::setFirstTabLayout(){
 
     //!global layout
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addSpacerItem(new QSpacerItem(4, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     layout->addWidget(groupBoxFrequency);
-    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     layout->addWidget(groupBoxFarField);
     layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    layout->setSpacing(100);
+    layout->setContentsMargins(2,50,2,50);
     firstTab->setLayout(layout);
     //!
 }
@@ -217,7 +227,6 @@ bool designTab::variablesSetting(){
         varObj = iter.value().toObject();
         //get note infomation
         QLabel *keyLabel = new QLabel(varObj.value("note").toString().trimmed());
-        //keyLabel->setFixedWidth(100);
         keyLabel->setAlignment(Qt::AlignRight | Qt::AlignCenter);
         gridLayout->addWidget(keyLabel, posx, 0);
 
@@ -225,7 +234,6 @@ bool designTab::variablesSetting(){
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
         QLineEdit *valueEdit = new QLineEdit;
-        valueEdit->setFixedWidth(240);
         valueEdit->setValidator(floatValid);
 
         if(valueListLength == 1){
@@ -245,12 +253,15 @@ bool designTab::variablesSetting(){
             double stopValue = QString(varValue[1]).trimmed().toDouble();
             double startValue = QString(varValue[0]).trimmed().toDouble();
             realValue = defaultVars[varKey].trimmed().toDouble();
-            int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
-            //realValue =startValue + (varSlider->value()*1.0 / 100) *(stopValue - startValue);
-            //!conversion slider value and edit value
-            //!
+            if(stopValue == startValue){
+                varSlider->setValue(100);
+                varSlider->setEnabled(false);
+            }
+            else{
+                int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
+                varSlider->setValue(sliderValue);
+            }
 
-            varSlider->setValue(sliderValue);
             valueEdit->setText(QString::number(realValue));
 
             //valueEdit->setReadOnly(true);
@@ -276,15 +287,15 @@ bool designTab::variablesSetting(){
         //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
         //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
         QComboBox *unitComBo = initUnitComBo();
-        unitComBo->setFixedWidth(50);
+        //unitComBo->setFixedWidth(50);
         gridLayout->addWidget(unitComBo, posx, 2);
         ++ posx;
     }
 
     gridLayout->setAlignment(Qt::AlignHCenter);
     gridLayout->setAlignment(Qt::AlignVCenter);
-    gridLayout->setColumnStretch(3, 1);
     gridLayout->setSpacing(10);
+    gridLayout->setContentsMargins(2,20,2,2);
 
     //!add picture
     QString picturePath;
@@ -302,16 +313,20 @@ bool designTab::variablesSetting(){
     }
     QLabel *atnPhoto = new QLabel;
     QPixmap pm = QPixmap(picturePath);
-    atnPhoto->setPixmap(pm.scaled(440, 400));
+    if(pm.width() > 440)
+        atnPhoto->setPixmap(pm.scaledToWidth(440));
+    else
+        atnPhoto->setPixmap(pm);
     //!
     QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->addLayout(gridLayout);
-    hLayout->addWidget(atnPhoto);
+    hLayout->addLayout(gridLayout, 1);
+    hLayout->addWidget(atnPhoto, 1);
+
 
     QVBoxLayout *tabLayout = new QVBoxLayout;
-    tabLayout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //tabLayout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     tabLayout->addLayout(hLayout);
-    tabLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //tabLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     secondTab->setLayout(tabLayout);
     return true;
 }
@@ -323,8 +338,6 @@ QString designTab::getSliderSheet(){
             spacing: 0px;\
             min-height:8px;\
             max-height:8px;\
-            min-width:240px;\
-            max-width:240px;\
          }\
          QSlider::add-page:Horizontal\
          {     \

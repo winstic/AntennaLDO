@@ -12,8 +12,9 @@ treeModel::treeModel(QTreeView* m_tree){
     mResultMenu = new QMenu;
     //actRightClick = nullptr;
     initMenu();
-    initIcon();
+    initIcon();    
     connect(mTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(slot_customContextMenuRequested(const QPoint&)));
+    connect(mTree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(slot_doubleClick(QModelIndex)));
 }
 
 void treeModel::initIcon(){
@@ -263,12 +264,19 @@ void treeModel::initMenu(){
     connect(actHideAll, &QAction::triggered, this, &treeModel::slot_hideAll);
     actShowAll = new QAction(QStringLiteral("全部展开"), mTree);
     connect(actShowAll, &QAction::triggered, this, &treeModel::slot_showAll);
-    actAdd = new QAction(QStringLiteral("新增"), mTree);
-    connect(actAdd, &QAction::triggered, this, &treeModel::slot_add);
+    actAddDesign = new QAction(QStringLiteral("添加设计"), mTree);
+    connect(actAddDesign, &QAction::triggered, this, &treeModel::slot_addDesign);
+    actAddOptimize = new QAction(QStringLiteral("添加优化"), mTree);
     actRun = new QAction(QStringLiteral("运行"), mTree);
     connect(actRun, &QAction::triggered, this, &treeModel::slot_run);
-    actOpenFile = new QAction(QStringLiteral("打开文件"), mTree);
+    actInterrupt = new QAction(QStringLiteral("暂停"), mTree);
+    connect(actInterrupt, &QAction::triggered, this, &treeModel::slot_interrupt);
+    actStop = new QAction(QStringLiteral("终止"), mTree);
+    connect(actStop, &QAction::triggered, this, &treeModel::slot_stop);
+    actOpenFile = new QAction(QStringLiteral("打开"), mTree);
     connect(actOpenFile, &QAction::triggered, this, &treeModel::slot_openFile);
+    actModifyVar = new QAction(QStringLiteral("修改参数"), mTree);
+    connect(actModifyVar, &QAction::triggered, this, &treeModel::slot_ModifyVar);
     actShowResult = new QAction(QStringLiteral("结果查看"), mTree);
     //actShowResult->setEnabled(false);
     connect(actShowResult, &QAction::triggered, this, &treeModel::slot_showResult);
@@ -279,25 +287,19 @@ void treeModel::initMenu(){
     mProjectMenu->addAction(actHideAll);
     mProjectMenu->addAction(actShowAll);
 
-    mAtnDesignMenu->addAction(actAdd);
-    mAtnDesignMenu->addSeparator();
-    mAtnDesignMenu->addAction(actHideAll);
-    mAtnDesignMenu->addAction(actShowAll);
+    mAtnDesignMenu->addAction(actAddDesign);
 
-    mAtnOptimizationMenu->addAction(actAdd);
-    mAtnOptimizationMenu->addSeparator();
-    mAtnOptimizationMenu->addAction(actHideAll);
-    mAtnOptimizationMenu->addAction(actShowAll);
-
-    mResultMenu->addAction(actHideAll);
-    mResultMenu->addAction(actShowAll);
+    mAtnOptimizationMenu->addAction(actAddOptimize);
 
     mItemViewMenu->addAction(actOpenFile);
 
-    mItemMenu->addAction(actOpenFile);
-    mItemMenu->addAction(actRun);
-    mItemMenu->addAction(actShowResult);
+    mItemMenu->addAction(actModifyVar);
     mItemMenu->addSeparator();
+    mItemMenu->addAction(actRun);
+    mItemMenu->addAction(actInterrupt);
+    mItemMenu->addAction(actStop);
+    mItemMenu->addSeparator();
+    mItemMenu->addAction(actShowResult);    
     mItemMenu->addAction(actDel);
 }
 
@@ -373,6 +375,19 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
     }
 }
 
+void treeModel::slot_doubleClick(QModelIndex itemIndex){
+    QVariant varItem = itemIndex.data(ROLE_MARK_ITEM);
+    int designIndex = itemIndex.row() + 1;
+    sysParam["CurrentDesignPath"] = QString("%1/design%2").arg(sysParam["WorkingProjectPath"]).arg(designIndex);
+    if(varItem.isValid()){
+        int item2int = varItem.toInt();
+        if(item2int == MARK_ITEM_ATNDESIGN)
+            slot_ModifyVar();
+        else if(item2int == MARK_ITEM_OPENFILE)
+            slot_openFile();
+    }
+}
+
 void treeModel::slot_showAll(){
     mTree->expandAll();
 }
@@ -381,7 +396,7 @@ void treeModel::slot_hideAll(){
     mTree->collapseAll();
 }
 
-void treeModel::slot_add(){
+void treeModel::slot_addDesign(){
     //qDebug() << currentIndex.data().toString();
     QStandardItemModel *itemModel = const_cast<QStandardItemModel *>(
                 static_cast<const QStandardItemModel *>(currentIndex.model()));
@@ -428,6 +443,12 @@ void treeModel::slot_add(){
 }
 
 void treeModel::slot_openFile(){
+    QString antennaName = global::getInfoFromRel("Problem");
+    modelFile *mf = new modelFile(antennaName);
+    mf->show();
+}
+
+void treeModel::slot_ModifyVar(){
     QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
@@ -439,9 +460,13 @@ void treeModel::slot_openFile(){
 }
 
 void treeModel::slot_run(){
-    Run run;
-    run.go();
+    ThreadRun *ProThread = new ThreadRun();
+    ProThread->start();
 }
+
+void treeModel::slot_interrupt(){}
+
+void treeModel::slot_stop(){}
 
 void treeModel::slot_showResult(){
     QString hfssPath = QString("%1/%2.hfss").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));

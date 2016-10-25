@@ -4,14 +4,18 @@
 atnLibrary::atnLibrary(QString sql, treeModel *mTreeModel, QWidget *parent) : QWidget(parent){
     this->mTreeModel = mTreeModel;
     tableView = new QTableWidget();
+    tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     failedSearch = new QLabel;
+    itemMenu = new QMenu;
     atnDockWH = 1148;
     numOfTableCol = 6;
+    initMenu();
     showInfo();
     arrangeAtn(setAtnList(sql), atnDockWH, numOfTableCol);
     //QMessageBox::information(this, "infomation", "atnlibrary:"+QString::number(geometry().width()));
     //qDebug() << sizeHint().width() << "," << sizeHint().height();
     connect(tableView, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(slot_tableCellDoubleClick(int,int)));
+    connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slot_customContextMenuRequested(QPoint)));
 }
 
 void atnLibrary::showInfo(){
@@ -58,6 +62,10 @@ void atnLibrary::arrangeAtn(QList<antennaCell *> atnList, int tabWH, int numOfCo
             tableView->setCellWidget(k / numOfTableCol, k % numOfTableCol, atnList.at(k));
         }
     }
+    QLabel *plusPhoto = new QLabel;
+    QPixmap plusMap = QPixmap("./images/plus.png");
+    plusPhoto->setPixmap(plusMap);
+    tableView->setCellWidget(numOfAtn / numOfTableCol, numOfAtn % numOfTableCol, plusPhoto);
 }
 
 // set antenna width
@@ -91,6 +99,15 @@ QList<antennaCell *> atnLibrary::setAtnList(QString selectSql){
         //delete mSqlManage;
     }
     return atnCellList;
+}
+
+void atnLibrary::initMenu(){
+    actNew = new QAction(QStringLiteral("新建工程"), this);
+    actProperty = new QAction(QStringLiteral("属性"), this);
+    connect(actProperty, &QAction::triggered, this, &atnLibrary::slot_property);
+
+    itemMenu->addAction(actNew);
+    itemMenu->addAction(actProperty);
 }
 
 int atnLibrary::getAtnDockWH(){
@@ -138,4 +155,14 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
             mTreeModel->parseXML(QString("%1/%2.xml").arg(workingPath).arg(projectName));
         }
     }
+}
+
+void atnLibrary::slot_customContextMenuRequested(QPoint pos){
+    if(tableView->indexAt(pos).model())
+        itemMenu->exec(QCursor::pos());
+}
+
+void atnLibrary::slot_property(){
+    //modelFile *mf = new modelFile();
+    //mf->show();
 }

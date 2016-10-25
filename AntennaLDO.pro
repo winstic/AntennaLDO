@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     global.cpp \
     parsejson.cpp \
     run.cpp \
-    designtab.cpp
+    designtab.cpp \
+    modelfile.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -51,6 +52,7 @@ HEADERS  += mainwindow.h \
     macrodefined.h \
     parsejson.h \
     run.h \
-    designtab.h
+    designtab.h \
+    modelfile.h
 
 FORMS    += mainwindow.ui

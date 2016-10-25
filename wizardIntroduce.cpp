@@ -10,7 +10,10 @@ wizardIntroduce::wizardIntroduce(QString antennaName, QWidget *parent) : QWizard
     setAtnIntroduceInfo(antennaName);
     atnInfo->setText(info);
     QPixmap mPixmap = QPixmap(photo);
-    atnPhoto->setPixmap(mPixmap.scaled(440, 400));
+    if(mPixmap.width() > 440)
+        atnPhoto->setPixmap(mPixmap.scaledToWidth(440));
+    else
+        atnPhoto->setPixmap(mPixmap);
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(atnInfo);

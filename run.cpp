@@ -1,14 +1,16 @@
 #include "run.h"
 
-Run::Run(){
+ThreadRun::ThreadRun(){
     this->designDir = sysParam["CurrentDesignPath"];
     this->atnName = global::getInfoFromRel("Problem");
     this->vbsPath = QString("%1/%2_design.vbs").arg(designDir).arg(atnName);
     //vbsVars
     this->obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(designDir).arg(atnName));
+    registerHfssVars();
+    updateVbs();
 }
 
-bool Run::registerHfssVars(){
+bool ThreadRun::registerHfssVars(){
     //copy hfss file in designDir from projectDir
     global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), QString("%1/%2.hfss").arg(designDir).arg(atnName));
     vbsVars["hfsspath"] = QString("%1/%2").arg(designDir).arg(atnName);
@@ -43,7 +45,7 @@ bool Run::registerHfssVars(){
     return true;
 }
 
-bool Run::updateVbs(){
+bool ThreadRun::updateVbs(){
     //read all infomation from vbsFile
     QFile inFile(vbsPath);
     if(!inFile.open(QFile::ReadOnly | QFile::Text)){
@@ -71,27 +73,21 @@ bool Run::updateVbs(){
     return true;
 }
 
-QString Run::M2GHz(QString mhz){
+QString ThreadRun::M2GHz(QString mhz){
     double doubleGHz = mhz.toDouble() / 1000.0;
     return QString::number(doubleGHz);
 }
 
-bool Run::go(){
-    bool isReady = false;
-    if(registerHfssVars())
-        isReady = updateVbs();
-    if(isReady){
-        QProcess p(0);;
-        //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
-        p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
-        /*if(! p.waitForStarted()){
-            QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
-            p.write("quit");
-            p.kill();
-            return;
-        }*/
-        p.waitForFinished();
-        qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
-    }
-    return isReady;
+void ThreadRun::run(){
+    QProcess p(0);;
+    //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
+    p.execute("hfss", QStringList()<< "-RunScript" << vbsPath);
+    /*if(! p.waitForStarted()){
+        QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
+        p.write("quit");
+        p.kill();
+        return;
+    }*/
+    p.waitForFinished();
+    qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
 }

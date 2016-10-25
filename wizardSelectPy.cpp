@@ -2,31 +2,11 @@
 
 wizardSelectPy::wizardSelectPy(QString antennaName, QWidget *parent) : QWizardPage(parent){
     atnName = antennaName;
-    proLabel = new QLabel();
-    proLabel->setText("选择问题:");
-    algLabel = new QLabel;
-    algLabel->setText("选择算法:");
+    proLabel = new QLabel(tr("选择问题:"));
+    algLabel = new QLabel(tr("选择算法:"));
     proCombo = new QComboBox;
     algCombo = new QComboBox;
     hint = new QLabel;
-	QHBoxLayout *hbox=new QHBoxLayout;
-	QVBoxLayout *vbox=new QVBoxLayout;
-
-    hbox->addWidget(proLabel);
-    hbox->addWidget(proCombo);
-	hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-	vbox->addLayout(hbox);
-	hbox = new QHBoxLayout;
-    hbox->addWidget(algLabel);
-    hbox->addWidget(algCombo);
-	hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-	vbox->addLayout(hbox);
-	vbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-	hbox = new QHBoxLayout;
-	hbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    hbox->addWidget(hint);
-	vbox->addLayout(hbox);
-	setLayout(vbox);
 
     initProCombo();
     if (atnName != NULL){
@@ -39,7 +19,25 @@ wizardSelectPy::wizardSelectPy(QString antennaName, QWidget *parent) : QWizardPa
         proCombo->setCurrentIndex(-1);
     }
     algCombo->setCurrentIndex(-1);
-
+    QHBoxLayout *hbox=new QHBoxLayout;
+    QVBoxLayout *vbox=new QVBoxLayout;
+    proLabel->setFixedWidth(80);
+    hbox->addWidget(proLabel);
+    hbox->addWidget(proCombo);
+    vbox->addLayout(hbox);
+    vbox->addSpacing(100);
+    hbox = new QHBoxLayout;
+    algLabel->setFixedWidth(80);
+    hbox->addWidget(algLabel);
+    hbox->addWidget(algCombo);
+    vbox->addLayout(hbox);
+    hbox = new QHBoxLayout;
+    hint->setAlignment(Qt::AlignRight);
+    hbox->addWidget(hint);
+    vbox->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    vbox->addLayout(hbox);
+    vbox->setContentsMargins(20,80,20,20);
+    setLayout(vbox);
     connect(algCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algName(int)));
     connect(proCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_proName(int)));
 }

@@ -158,12 +158,14 @@ void wizardDesignPerformance::initLayout(){
     //!
 
     //!global layout
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addSpacerItem(new QSpacerItem(4, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layout->addWidget(groupBoxFrequency);
-    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layout->addWidget(groupBoxFarField);
-    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    vlayout->addWidget(groupBoxFrequency);
+    vlayout->addWidget(groupBoxFarField);
+    vlayout->setSpacing(50);
+    vlayout->setContentsMargins(2,20,2,2);
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addLayout(vlayout);
     setLayout(layout);
     //!
 }
