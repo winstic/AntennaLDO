@@ -22,7 +22,7 @@
 // 对应于ROLE_MARK_FOLDER，设定每种role的值
 #define MARK_NODE_GENERAL 1  //通用值（保留）
 #define MARK_NODE_DESIGN 2
-#define MARK_NODE_OPTIMIZATION 3
+#define MARK_NODE_OPTIMIZE 3
 #define MARK_NODE_RESULT 4
 
 
@@ -31,8 +31,10 @@
 #define MARK_ITEM_PERDESIGN 2
 #define MARK_ITEM_ALGDESIGN 3
 #define MARK_ITEM_ATNDESIGN 4
+#define MARK_ITEM_ATNOPTIMIZE 5
 
 enum pyFlag{proPy = 0, algPy};
 enum SWEEPTYPES{linearly = 0, logarithmically};
+enum ATNFLAG{flagDesign = 0, flagOptimize};
 
 #endif // MACRODEFINED_H

@@ -31,7 +31,11 @@ SOURCES += main.cpp\
     parsejson.cpp \
     run.cpp \
     designtab.cpp \
-    modelfile.cpp
+    modelfile.cpp \
+    wizardOptimizeAlg.cpp \
+    wizardOptimizeVariables.cpp \
+    optimizeWizard.cpp \
+    wizardOptimizeGainAxialLoss.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -53,6 +57,10 @@ HEADERS  += mainwindow.h \
     parsejson.h \
     run.h \
     designtab.h \
-    modelfile.h
+    modelfile.h \
+    wizardOptimizeAlg.h \
+    wizardOptimizeVariables.h \
+    optimizeWizard.h \
+    wizardOptimizeGainAxialLoss.h
 
 FORMS    += mainwindow.ui

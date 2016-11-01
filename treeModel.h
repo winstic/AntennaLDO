@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "macrodefined.h"
 #include "designWizard.h"
+#include "optimizeWizard.h"
 #include "designtab.h"
 #include "modelfile.h"
 #include "parsejson.h"
@@ -35,21 +36,24 @@ public:
 
     inline QMenu* getProjectMenu() {return mProjectMenu;}
     inline QMenu* getAtnDesignMenu() {return mAtnDesignMenu;}
-    inline QMenu* getAtnOptimizationMenu() {return mAtnOptimizationMenu;}
-    inline QMenu* getItemMenu() {return mItemMenu;}
-    inline QMenu* getItemViewMenu() {return mItemViewMenu;}
+    inline QMenu* getAtnOptimizeMenu() {return mAtnOptimizeMenu;}
     inline QMenu* getResultMenu() {return mResultMenu;}
+    inline QMenu* getItemViewMenu() {return mItemViewMenu;}
+    inline QMenu* getItemDesignMenu() {return mItemDesignMenu;}
+    inline QMenu* getItemOptimizeMenu() {return mItemOptimizeMenu;}
 
 private slots:
     void slot_showAll();
     void slot_hideAll();
     void slot_addDesign();
+    void slot_addOptimize();
     void slot_run();
     void slot_interrupt();
     void slot_stop();
     void slot_del();
     void slot_openFile();
-    void slot_ModifyVar();
+    void slot_modifyDesignVar();
+    void slot_modifyOptimizeVar();
     void slot_showResult();
 
     //mouse right click
@@ -68,9 +72,10 @@ private:
     //different menu can respond different right click
     QMenu* mProjectMenu;    
     QMenu* mAtnDesignMenu;
-    QMenu* mAtnOptimizationMenu;
+    QMenu* mAtnOptimizeMenu;
     QMenu* mResultMenu;
-    QMenu* mItemMenu;
+    QMenu* mItemDesignMenu;
+    QMenu* mItemOptimizeMenu;
     QMenu* mItemViewMenu;
 
     //!Actions
@@ -84,7 +89,8 @@ private:
     QAction* actInterrupt;
     QAction* actStop;
     QAction* actOpenFile;
-    QAction* actModifyVar;
+    QAction* actModifyDesignVar;
+    QAction* actModifyOptimizeVar;
     QAction* actShowResult;
     //!
 

@@ -19,7 +19,7 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
-    bool validateCurrentPage();
+    bool validatePage();
 
 public slots:
     void slot_LinetextChange(QString text);

@@ -6,8 +6,9 @@ treeModel::treeModel(QTreeView* m_tree){
     mTree = m_tree;
     mProjectMenu = new QMenu;
     mAtnDesignMenu = new QMenu;
-    mAtnOptimizationMenu = new QMenu;
-    mItemMenu = new QMenu;
+    mAtnOptimizeMenu = new QMenu;
+    mItemDesignMenu = new QMenu;
+    mItemOptimizeMenu = new QMenu;
     mItemViewMenu = new QMenu;
     mResultMenu = new QMenu;
     //actRightClick = nullptr;
@@ -51,7 +52,7 @@ bool treeModel::writeXMLFile(const QString &fileName, const QString &atnName){
 
     element = doc.createElement("node");
     element.setAttribute("name", "优化");
-    element.setAttribute("flag", "optimization");
+    element.setAttribute("flag", "optimize");
     root.appendChild(element);
 
     element = doc.createElement("node");
@@ -94,12 +95,14 @@ bool treeModel::updateXMLFile(const QString &fileName, const QStandardItem *item
     while(! rootChild.isNull()){
         rootChildElement = rootChild.toElement();
         if(("node" == rootChildElement.tagName()) && rootChildElement.hasAttribute("flag")){
-            if(MARK_NODE_DESIGN == item->data(ROLE_MARK_NODE) && ("design" == rootChildElement.attribute("flag"))){
+            if( (MARK_NODE_DESIGN == item->data(ROLE_MARK_NODE) && "design" == rootChildElement.attribute("flag")) ||
+                    (MARK_NODE_OPTIMIZE == item->data(ROLE_MARK_NODE) && "optimize" == rootChildElement.attribute("flag"))){
                 QDomElement designElement = doc.createElement("item");
                 QDomText designText = doc.createTextNode(child->text());
                 designElement.appendChild(designText);
                 designElement.setAttribute("id", rootChildElement.childNodes().count()+1);
                 rootChildElement.appendChild(designElement);
+                break;
             }
         }
         rootChild = rootChild.nextSibling();
@@ -175,9 +178,9 @@ void treeModel::parseNodeElement(const QDomElement &element, QStandardItem *pare
         item->setData(MARK_NODE, ROLE_MARK);
         item->setData(MARK_NODE_DESIGN, ROLE_MARK_NODE);
     }
-    else if(element.hasAttribute("flag") && "optimization" == element.attribute("flag")){
+    else if(element.hasAttribute("flag") && "optimize" == element.attribute("flag")){
         item->setData(MARK_NODE, ROLE_MARK);
-        item->setData(MARK_NODE_OPTIMIZATION, ROLE_MARK_NODE);
+        item->setData(MARK_NODE_OPTIMIZE, ROLE_MARK_NODE);
     }
     else{
         item->setData(MARK_NODE, ROLE_MARK);
@@ -206,55 +209,16 @@ void treeModel::parseItemElement(const QDomElement &element, QStandardItem *pare
         item->setData(MARK_ITEM, ROLE_MARK);
         item->setData(MARK_ITEM_OPENFILE, ROLE_MARK_ITEM);
     }
-    else{
+    else if(MARK_NODE_DESIGN == parent->data(ROLE_MARK_NODE)){
         item->setData(MARK_ITEM, ROLE_MARK);
         item->setData(MARK_ITEM_ATNDESIGN, ROLE_MARK_ITEM);
     }
+    else if(MARK_NODE_OPTIMIZE == parent->data(ROLE_MARK_NODE)){
+        item->setData(MARK_ITEM, ROLE_MARK);
+        item->setData(MARK_ITEM_ATNOPTIMIZE, ROLE_MARK_ITEM);
+    }
     parent->appendRow(item);
 }
-
-/*void treeModel::showTree(){
-    //initIcon();
-    //tModel = new QStandardItemModel(mTree);
-    QStandardItem *itemPro = new QStandardItem(IconMap[QStringLiteral("treeNode")], QStringLiteral("工程名"));
-    // set value and role
-    itemPro->setData(MARK_PROJECT, ROLE_MARK);
-    //itemPro->setData(MARK_FOLDER_GENERAL, ROLE_MARK_FOLDER);
-    tModel->appendRow(itemPro);
-    QStandardItem *itemModel = new QStandardItem(IconMap[QStringLiteral("treeItem")], QStringLiteral("模型简介"));
-    itemModel->setData(MARK_ITEM, ROLE_MARK);
-    itemModel->setData(MARK_ITEM_MODELVIEW, ROLE_MARK_ITEM);
-    //itemModel->setFlags();
-    itemPro->appendRow(itemModel);
-    QStandardItem *itemDandO = new QStandardItem(IconMap[QStringLiteral("treeNode")], QStringLiteral("设计"));
-    itemDandO->setData(MARK_FOLDER, ROLE_MARK);
-    itemDandO->setData(MARK_FOLDER_ODESIGN, ROLE_MARK_FOLDER);
-    itemPro->appendRow(itemDandO);
-    QStandardItem *itemPerP = new QStandardItem(IconMap[QStringLiteral("treeItem")], QStringLiteral("性能指标"));
-    itemPerP->setData(MARK_ITEM, ROLE_MARK);
-    itemPerP->setData(MARK_ITEM_PERDESIGN, ROLE_MARK_ITEM);
-    itemDandO->appendRow(itemPerP);
-    //QStandardItem *itemAlgD = new QStandardItem(IconMap[QStringLiteral("treeItem")], QStringLiteral("算法设置"));
-    //itemAlgD->setData(MARK_ITEM, ROLE_MARK);
-    //itemAlgD->setData(MARK_ITEM_ALGDESIGN, ROLE_MARK_ITEM);
-    //itemDandO->appendRow(itemAlgD);
-    QStandardItem *itemModD = new QStandardItem(IconMap[QStringLiteral("treeNode")], QStringLiteral("模型设计"));
-    itemModD->setData(MARK_FOLDER, ROLE_MARK);
-    itemModD->setData(MARK_FOLDER_ODESIGN, ROLE_MARK_FOLDER);
-    itemDandO->appendRow(itemModD);
-    QStandardItem *itemAtnD = new QStandardItem(IconMap[QStringLiteral("treeItem")], QStringLiteral("设计1"));
-    itemAtnD->setData(MARK_ITEM, ROLE_MARK);
-    itemAtnD->setData(MARK_ITEM_ATNDESIGN, ROLE_MARK_ITEM);
-    itemModD->appendRow(itemAtnD);
-    QStandardItem *itemResult = new QStandardItem(IconMap[QStringLiteral("treeNode")], QStringLiteral("结果查看"));
-    itemResult->setData(MARK_FOLDER, ROLE_MARK);
-    itemResult->setData(MARK_FOLDER_RESULT, ROLE_MARK_FOLDER);
-    itemDandO->appendRow(itemResult);
-    mTree->setModel(tModel);
-    mTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    mTree->setContextMenuPolicy(Qt::CustomContextMenu);        //设置右键菜单    
-    mTree->expandAll();
-}*/
 
 void treeModel::initMenu(){
     actClose = new QAction(QStringLiteral("关闭"), mTree);
@@ -267,6 +231,7 @@ void treeModel::initMenu(){
     actAddDesign = new QAction(QStringLiteral("添加设计"), mTree);
     connect(actAddDesign, &QAction::triggered, this, &treeModel::slot_addDesign);
     actAddOptimize = new QAction(QStringLiteral("添加优化"), mTree);
+    connect(actAddOptimize, &QAction::triggered, this, &treeModel::slot_addOptimize);
     actRun = new QAction(QStringLiteral("运行"), mTree);
     connect(actRun, &QAction::triggered, this, &treeModel::slot_run);
     actInterrupt = new QAction(QStringLiteral("暂停"), mTree);
@@ -275,8 +240,10 @@ void treeModel::initMenu(){
     connect(actStop, &QAction::triggered, this, &treeModel::slot_stop);
     actOpenFile = new QAction(QStringLiteral("打开"), mTree);
     connect(actOpenFile, &QAction::triggered, this, &treeModel::slot_openFile);
-    actModifyVar = new QAction(QStringLiteral("修改参数"), mTree);
-    connect(actModifyVar, &QAction::triggered, this, &treeModel::slot_ModifyVar);
+    actModifyDesignVar = new QAction(QStringLiteral("修改参数"), mTree);
+    connect(actModifyDesignVar, &QAction::triggered, this, &treeModel::slot_modifyDesignVar);
+    actModifyOptimizeVar = new QAction(QStringLiteral("修改参数"), mTree);
+    connect(actModifyOptimizeVar, &QAction::triggered, this, &treeModel::slot_modifyOptimizeVar);
     actShowResult = new QAction(QStringLiteral("结果查看"), mTree);
     //actShowResult->setEnabled(false);
     connect(actShowResult, &QAction::triggered, this, &treeModel::slot_showResult);
@@ -289,18 +256,27 @@ void treeModel::initMenu(){
 
     mAtnDesignMenu->addAction(actAddDesign);
 
-    mAtnOptimizationMenu->addAction(actAddOptimize);
+    mAtnOptimizeMenu->addAction(actAddOptimize);
 
     mItemViewMenu->addAction(actOpenFile);
 
-    mItemMenu->addAction(actModifyVar);
-    mItemMenu->addSeparator();
-    mItemMenu->addAction(actRun);
-    mItemMenu->addAction(actInterrupt);
-    mItemMenu->addAction(actStop);
-    mItemMenu->addSeparator();
-    mItemMenu->addAction(actShowResult);    
-    mItemMenu->addAction(actDel);
+    mItemDesignMenu->addAction(actModifyDesignVar);
+    mItemDesignMenu->addSeparator();
+    mItemDesignMenu->addAction(actRun);
+    mItemDesignMenu->addAction(actInterrupt);
+    mItemDesignMenu->addAction(actStop);
+    mItemDesignMenu->addSeparator();
+    mItemDesignMenu->addAction(actDel);
+    mItemDesignMenu->addAction(actShowResult);
+
+    mItemOptimizeMenu->addAction(actModifyOptimizeVar);
+    mItemOptimizeMenu->addSeparator();
+    mItemOptimizeMenu->addAction(actRun);
+    mItemOptimizeMenu->addAction(actInterrupt);
+    mItemOptimizeMenu->addAction(actStop);
+    mItemOptimizeMenu->addSeparator();
+    mItemOptimizeMenu->addAction(actDel);
+    mItemOptimizeMenu->addAction(actShowResult);
 }
 
 QList<QStandardItem*> treeModel::getRoots(){
@@ -354,8 +330,8 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
         else if(varFolder.isValid() && var2Int == MARK_NODE){
             if(varFolder.toInt() == MARK_NODE_DESIGN)
                 mAtnDesignMenu->exec(QCursor::pos());
-            else if(varFolder.toInt() == MARK_NODE_OPTIMIZATION)
-                mAtnOptimizationMenu->exec(QCursor::pos());
+            else if(varFolder.toInt() == MARK_NODE_OPTIMIZE)
+                mAtnOptimizeMenu->exec(QCursor::pos());
             else
                 mResultMenu->exec(QCursor::pos());
         }
@@ -369,7 +345,12 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
                 int designIndex = currentIndex.row() + 1;
                 //update current design path
                 sysParam["CurrentDesignPath"] = QString("%1/design%2").arg(sysParam["WorkingProjectPath"]).arg(designIndex);
-                mItemMenu->exec(QCursor::pos());
+                mItemDesignMenu->exec(QCursor::pos());
+            }
+            else if(varItem2Int == MARK_ITEM_ATNOPTIMIZE){
+                int optimizeIndex = currentIndex.row() + 1;
+                sysParam["CurrentOptimizePath"] = QString("%1/optimize%2").arg(sysParam["WorkingProjectPath"]).arg(optimizeIndex);
+                mItemOptimizeMenu->exec(QCursor::pos());
             }
         }
     }
@@ -377,12 +358,17 @@ void treeModel::slot_customContextMenuRequested(const QPoint &pos){
 
 void treeModel::slot_doubleClick(QModelIndex itemIndex){
     QVariant varItem = itemIndex.data(ROLE_MARK_ITEM);
-    int designIndex = itemIndex.row() + 1;
-    sysParam["CurrentDesignPath"] = QString("%1/design%2").arg(sysParam["WorkingProjectPath"]).arg(designIndex);
+    int doIndex = itemIndex.row() + 1;
     if(varItem.isValid()){
         int item2int = varItem.toInt();
-        if(item2int == MARK_ITEM_ATNDESIGN)
-            slot_ModifyVar();
+        if(item2int == MARK_ITEM_ATNDESIGN){
+            sysParam["CurrentDesignPath"] = QString("%1/design%2").arg(sysParam["WorkingProjectPath"]).arg(doIndex);
+            slot_modifyDesignVar();
+        }
+        else if(item2int == MARK_ITEM_ATNOPTIMIZE){
+            sysParam["CurrentOptimizePath"] = QString("%1/optimize%2").arg(sysParam["WorkingProjectPath"]).arg(doIndex);
+            slot_modifyOptimizeVar();
+        }
         else if(item2int == MARK_ITEM_OPENFILE)
             slot_openFile();
     }
@@ -438,7 +424,49 @@ void treeModel::slot_addDesign(){
                 }
             }
         }
-        else if(MARK_NODE_OPTIMIZATION == varNode.toInt()){}
+    }
+}
+
+void treeModel::slot_addOptimize(){
+    QStandardItemModel *itemModel = const_cast<QStandardItemModel *>(
+                static_cast<const QStandardItemModel *>(currentIndex.model()));
+    QStandardItem *item = itemModel->itemFromIndex(currentIndex);
+    QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
+    if(varNode.isValid()){
+        if(MARK_NODE_OPTIMIZE == varNode.toInt()){
+            QString workingDir = sysParam["WorkingProjectPath"];
+            QString atnName = global::getInfoFromRel("Problem");
+            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnName);
+            QJsonObject obj = parseJson::getJsonObj(jsonPath);
+            if(obj.isEmpty()){
+                QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:457: error: Cannot parse jsonFile %1").arg(jsonPath));
+                return;
+            }
+            optimizeWizard *wizard = new optimizeWizard(obj);
+            if(wizard->exec() == 1){
+                QString designName = QString("优化%1").arg(item->rowCount()+1);
+                QDir *dir = new QDir();
+                QString designDir = QString("%1/optimize%2").arg(workingDir).arg(item->rowCount()+1);
+
+                QStandardItem *child = new QStandardItem(
+                            IconMap[QStringLiteral("treeItem")], designName);
+                child->setData(MARK_ITEM, ROLE_MARK);
+                child->setData(MARK_ITEM_ATNOPTIMIZE, ROLE_MARK_ITEM);
+                item->appendRow(child);
+                dir->mkdir(designDir);
+                //copy files(.json, .vbs,) in designDir from projectDir
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(designDir).arg(atnName)) ||
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(designDir).arg(atnName)) ){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
+                    dir->rmdir(designDir);
+                    return;
+                }
+                sysParam["CurrentOptimizePath"] = designDir;      //save current design path in global variable
+                qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
+                //if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
+                    //QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));
+            }
+        }
     }
 }
 
@@ -448,7 +476,7 @@ void treeModel::slot_openFile(){
     mf->show();
 }
 
-void treeModel::slot_ModifyVar(){
+void treeModel::slot_modifyDesignVar(){
     QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
@@ -457,6 +485,15 @@ void treeModel::slot_ModifyVar(){
     }
     designTab *dTab = new designTab(obj);
     dTab->show();
+}
+
+void treeModel::slot_modifyOptimizeVar(){
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
+    QJsonObject obj = parseJson::getJsonObj(jsonPath);
+    if(obj.isEmpty()){
+        QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
+        return;
+    }
 }
 
 void treeModel::slot_run(){

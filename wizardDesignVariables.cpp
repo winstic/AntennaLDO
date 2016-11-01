@@ -206,7 +206,7 @@ QJsonObject wizardDesignVariables::saveInJsonObj(){
     return saveObj;
 }
 
-bool wizardDesignVariables::validateCurrentPage(){
+bool wizardDesignVariables::validatePage(){
     return true;
 }
 

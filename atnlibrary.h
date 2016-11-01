@@ -36,13 +36,17 @@ public slots:
     void slot_showProTree(bool isShow);
     void slot_tableCellDoubleClick(int, int);
     void slot_customContextMenuRequested(QPoint);
+    //emitted when the mouse button press
+    void slot_cellPressed(int, int);
     void slot_property();
+    void slot_newProject();
 
 private:    
     void showInfo();
     QList<int> setAtnWidth(int width, int colNum);
     void initMenu();
 
+    QString atnName;
     treeModel *mTreeModel;
     QTableWidget* tableView;
     QLabel* failedSearch;

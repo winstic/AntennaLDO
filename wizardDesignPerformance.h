@@ -16,7 +16,7 @@ public:
     QJsonObject saveInJsonObj();
 
 protected:
-    bool validateCurrentPage();
+    bool validatePage();
 
 private:
     bool frequencySetting();

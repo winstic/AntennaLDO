@@ -13,6 +13,10 @@ public:
     designTab(QJsonObject obj, QWidget *parent = 0);
     ~designTab(){}
 
+public slots:
+    void slot_saveAllButton(bool);
+    void slot_sliderValueChange(int);
+
 private:
     //!first tab widget function
     void initSetupCom();
@@ -26,6 +30,7 @@ private:
     bool variablesSetting();
     QString getSliderSheet();
     //!
+    QJsonObject saveInJsonObj();
 
     QTabWidget *tabWidget;
     QWidget *firstTab;

@@ -9,11 +9,12 @@ designTab::designTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->firstTab = new QWidget;
     this->secondTab = new QWidget;
     this->saveAllButton = new QPushButton("保存所有");
+    connect(saveAllButton, SIGNAL(clicked(bool)), this, SLOT(slot_saveAllButton(bool)));
 
     //!first tabwidget
     //frequencySetting
-    this->freStartLabel = new QLabel("起始频点:");
-    this->freEndLabel = new QLabel("终止频点:");
+    this->freStartLabel = new QLabel("频段上限:");
+    this->freEndLabel = new QLabel("频段下限:");
     this->freNumberLabel = new QLabel("频点个数:");
     this->sweepTypeLabel = new QLabel("扫频方式:");
     this->PMLabel = new QLabel("极化方式:");
@@ -277,7 +278,7 @@ bool designTab::variablesSetting(){
             tempVarInfo.upper = stopValue;
             tempVarInfo.varSlider = varSlider;
 
-            //connect(varSlider, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChange(int)));
+            connect(varSlider, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChange(int)));
 
         }
         tempVarInfo.varKey = varKey;
@@ -364,3 +365,67 @@ QString designTab::getSliderSheet(){
         ");
 }
 //!
+
+QJsonObject designTab::saveInJsonObj(){
+    QJsonObject saveObj, saveFreObj, saveFarObj, varObj;
+
+    //Frequency Setting json object
+    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
+    saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
+    saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text().trimmed()));
+    saveFreObj.insert("SweepType", QString("[%1]").arg(sweeptypeComb->currentIndex()));
+    saveFreObj.insert("PM", QString("[%1]").arg(PMComb->currentIndex()));
+
+    //Farfield Setting json object
+    saveFarObj.insert("ThetaLower", QString("[%1]").arg(thetaStartEdit->text().trimmed()));
+    saveFarObj.insert("ThetaUpper", QString("[%1]").arg(thetaEndEdit->text().trimmed()));
+    saveFarObj.insert("ThetaStep", QString("[%1]").arg(thetaStepEdit->text().trimmed()));
+    saveFarObj.insert("PhiLower", QString("[%1]").arg(phiStartEdit->text().trimmed()));
+    saveFarObj.insert("PhiUpper", QString("[%1]").arg(phiEndEdit->text().trimmed()));
+    saveFarObj.insert("PhiStep", QString("[%1]").arg(phiStepEdit->text().trimmed()));
+
+    //Variables Setting json object
+    foreach(varInfo var, varinfos){
+        varObj.insert(var.varKey, var.varEdit->text().trimmed());
+    }
+
+    saveObj.insert("FreSetting", saveFreObj);
+    saveObj.insert("ThetaPhiStep", saveFarObj);
+    saveObj.insert("varsValue", varObj);
+    return saveObj;
+}
+
+//slots function
+void designTab::slot_sliderValueChange(int value){
+    QSlider* selectSlider = static_cast<QSlider* >(sender());
+    foreach(varInfo var, varinfos){
+        if(var.varSlider == selectSlider){
+            //qDebug() << var.varKey << "---" << var.varEdit;
+            double realValue = (var.upper - var.lower)/100.0 * value + var.lower;
+            //var.varEdit->setReadOnly(true);
+            var.varEdit->setText(QString::number(realValue));
+        }
+    }
+}
+
+void designTab::slot_saveAllButton(bool isChecked){
+    bool isOK = true;
+    QJsonObject newObj = saveInJsonObj();
+    QJsonObject freObj = parseJson::getSubJsonObj(newObj, "FreSetting");
+    QJsonObject farObj = parseJson::getSubJsonObj(newObj, "ThetaPhiStep");
+    QJsonObject varObj = parseJson::getSubJsonObj(newObj, "varsValue");
+    if(freObj.isEmpty() || farObj.isEmpty() || varObj.isEmpty())
+        isOK = false;
+    else{
+        obj.insert("FreSetting", freObj);
+        obj.insert("ThetaPhiStep", farObj);
+        obj.insert("varsValue", varObj);
+        QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
+        if(!parseJson::write(jsonPath, obj))
+            isOK = false;
+    }
+    if(isOK)
+        this->close();
+    else
+        QMessageBox::critical(0, QString("Error"), QString("designTab.cpp:416: error: Cannot update in json file"));
+}

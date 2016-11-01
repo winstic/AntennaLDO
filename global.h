@@ -9,9 +9,10 @@
 #include <QLineEdit>
 
 extern QMap<QString, QString> sysParam;
-//!sysParam["DefaultProjectPath"]
-//!sysParam["WorkingProjectPath"]
-//!sysParam["CurrentDesignPath"]
+//! sysParam["DefaultProjectPath"]
+//! sysParam["WorkingProjectPath"]
+//! sysParam["CurrentDesignPath"]
+//! sysParam["CurrentOptimizePath"]
 
 typedef struct{
     double lower;

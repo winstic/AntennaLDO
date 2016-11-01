@@ -6,8 +6,8 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     setSubTitle(tr("设置频率信息并指定远场范围"));
     this->obj = obj;
     //frequencySetting
-    this->freStartLabel = new QLabel("起始频点:");
-    this->freEndLabel = new QLabel("终止频点:");
+    this->freStartLabel = new QLabel("频段上限:");
+    this->freEndLabel = new QLabel("频段下限:");
     this->freNumberLabel = new QLabel("频点个数:");
     this->sweepTypeLabel = new QLabel("扫频方式:");
     this->PMLabel = new QLabel("极化方式:");
@@ -172,24 +172,24 @@ void wizardDesignPerformance::initLayout(){
 
 QJsonObject wizardDesignPerformance::saveInJsonObj(){
     QJsonObject saveObj, saveFreObj, saveFarObj;
-    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text()));
-    saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text()));
-    saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text()));
+    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
+    saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
+    saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text().trimmed()));
     saveFreObj.insert("SweepType", QString("[%1]").arg(sweeptypeComb->currentIndex()));
     saveFreObj.insert("PM", QString("[%1]").arg(PMComb->currentIndex()));
 
-    saveFarObj.insert("ThetaLower", QString("[%1]").arg(thetaStartEdit->text()));
-    saveFarObj.insert("ThetaUpper", QString("[%1]").arg(thetaEndEdit->text()));
-    saveFarObj.insert("ThetaStep", QString("[%1]").arg(thetaStepEdit->text()));
-    saveFarObj.insert("PhiLower", QString("[%1]").arg(phiStartEdit->text()));
-    saveFarObj.insert("PhiUpper", QString("[%1]").arg(phiEndEdit->text()));
-    saveFarObj.insert("PhiStep", QString("[%1]").arg(phiStepEdit->text()));
+    saveFarObj.insert("ThetaLower", QString("[%1]").arg(thetaStartEdit->text().trimmed()));
+    saveFarObj.insert("ThetaUpper", QString("[%1]").arg(thetaEndEdit->text().trimmed()));
+    saveFarObj.insert("ThetaStep", QString("[%1]").arg(thetaStepEdit->text().trimmed()));
+    saveFarObj.insert("PhiLower", QString("[%1]").arg(phiStartEdit->text().trimmed()));
+    saveFarObj.insert("PhiUpper", QString("[%1]").arg(phiEndEdit->text().trimmed()));
+    saveFarObj.insert("PhiStep", QString("[%1]").arg(phiStepEdit->text().trimmed()));
 
     saveObj.insert("FreSetting", saveFreObj);
     saveObj.insert("ThetaPhiStep", saveFarObj);
     return saveObj;
 }
 
-bool wizardDesignPerformance::validateCurrentPage(){
+bool wizardDesignPerformance::validatePage(){
     return true;
 }

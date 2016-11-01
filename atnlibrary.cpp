@@ -15,6 +15,7 @@ atnLibrary::atnLibrary(QString sql, treeModel *mTreeModel, QWidget *parent) : QW
     //QMessageBox::information(this, "infomation", "atnlibrary:"+QString::number(geometry().width()));
     //qDebug() << sizeHint().width() << "," << sizeHint().height();
     connect(tableView, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(slot_tableCellDoubleClick(int,int)));
+    connect(tableView, SIGNAL(cellPressed(int,int)), this, SLOT(slot_cellPressed(int,int)));
     connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slot_customContextMenuRequested(QPoint)));
 }
 
@@ -103,6 +104,7 @@ QList<antennaCell *> atnLibrary::setAtnList(QString selectSql){
 
 void atnLibrary::initMenu(){
     actNew = new QAction(QStringLiteral("新建工程"), this);
+    connect(actNew, &QAction::triggered, this, &atnLibrary::slot_newProject);
     actProperty = new QAction(QStringLiteral("属性"), this);
     connect(actProperty, &QAction::triggered, this, &atnLibrary::slot_property);
 
@@ -145,7 +147,7 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
     QWidget* currentWidget = tableView->cellWidget(row, col);
     if(currentWidget){
         antennaCell* cellTab = static_cast<antennaCell* >(currentWidget);
-        QString atnName = cellTab->getAtnName();
+        atnName = cellTab->getAtnName();
         projectWizard* wizard = new projectWizard(atnName);
         if(wizard->exec() == 1){           
             QString workingPath =  sysParam["WorkingProjectPath"];
@@ -157,12 +159,31 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
     }
 }
 
+//when the mouse button press
+void atnLibrary::slot_cellPressed(int row, int col){
+    QWidget* currentWidget = tableView->cellWidget(row, col);
+    if(currentWidget){
+        antennaCell* cellTab = static_cast<antennaCell* >(currentWidget);
+        atnName = cellTab->getAtnName();
+    }
+}
+
 void atnLibrary::slot_customContextMenuRequested(QPoint pos){
     if(tableView->indexAt(pos).model())
         itemMenu->exec(QCursor::pos());
 }
 
+void atnLibrary::slot_newProject(){
+    projectWizard* wizard = new projectWizard(atnName);
+    if(wizard->exec() == 1){
+        QString workingPath =  sysParam["WorkingProjectPath"];
+        QString projectName = global::getProjectName();
+        mTreeModel->writeXMLFile(QString("%1/%2.xml").arg(workingPath).arg(projectName), atnName);
+        mTreeModel->parseXML(QString("%1/%2.xml").arg(workingPath).arg(projectName));
+    }
+}
+
 void atnLibrary::slot_property(){
-    //modelFile *mf = new modelFile();
-    //mf->show();
+    modelFile *mf = new modelFile(atnName);
+    mf->show();
 }
