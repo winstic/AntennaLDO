@@ -55,7 +55,7 @@ bool wizardSelectPy::validatePage(){
 }
 
 void wizardSelectPy::initProCombo(){
-    QString selectProSql = "select pName from antennaProblem;";
+    QString selectProSql = "select pName, proPath from antennaProblem;";
     QSqlQuery sqlQuery;
     sqlQuery.prepare(selectProSql);
     if(!sqlQuery.exec(selectProSql)){
@@ -64,6 +64,8 @@ void wizardSelectPy::initProCombo(){
     else{
         while(sqlQuery.next()){
             proCombo->addItem(sqlQuery.value("pName").toString());
+            //resigned proPath many times need to improved
+            proPath = sqlQuery.value("proPath").toString();
         }
     }
 }
@@ -107,8 +109,6 @@ void wizardSelectPy::setAlgComBoItem(QString name){
     else{
         while(sqlQuery.next()){
             algCombo->addItem(sqlQuery.value("aName").toString());
-            //resigned proPath many times need to improved
-            proPath = sqlQuery.value("proPath").toString();
         }
     }
 }

@@ -6,7 +6,7 @@ QMap<QString, QString> sysParam;
 global::global(){}
 
 QStringList global::str2list(QString str){
-    QRegExp re("[\\[,\\]]");
+    QRegExp re("[\\[,'\\]]");
     QStringList strList = str.split(re, QString::SkipEmptyParts);
     return strList;
 }

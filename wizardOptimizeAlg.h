@@ -3,20 +3,38 @@
 
 #include <QtWidgets>
 #include <QWizardPage>
-#include "parsejson.h"
+//#include "parsejson.h"
+#include "sqliteManage.h"
+#include "macrodefined.h"
+#include "global.h"
 
 class wizardOptimizeAlg : public QWizardPage{
     Q_OBJECT
 
 public:
-    wizardOptimizeAlg(QJsonObject &obj, QWidget *parent = 0);
+    wizardOptimizeAlg(QWidget *parent = 0);
     ~wizardOptimizeAlg(){}
+    QString getProPath() const;
+    QString getAlgPath() const;
+    QJsonObject saveInJsonObj();
 
 protected:
     bool validatePage();
 
 private:
-    QJsonObject obj;
+    void setAlgComboItem(QString name);
+    QString setPath(QString name, bool flag = proPy);
+    void initLayout();
+
+    //QJsonObject obj;
+    QString atnName;
+    QLabel *proLabel;
+    QLabel *algLabel;
+    QLineEdit *atnLine;
+    QComboBox *algCombo;
+    QString proPath;
+    QString algPath;
+    QLabel *hint;
 };
 
 #endif // WIZARDOPTIMIZEALG_H

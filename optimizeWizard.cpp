@@ -19,7 +19,7 @@ optimizeWizard::optimizeWizard(QJsonObject &obj, QWidget *parent) : QWizard(pare
     addPage(optimizeAXL);
     this->optimizeVariables = new wizardOptimizeVariables(this->obj, this);
     addPage(optimizeVariables);
-    this->optimizeAlg = new wizardOptimizeAlg(this->obj, this);
+    this->optimizeAlg = new wizardOptimizeAlg(this);
     addPage(optimizeAlg);
 }
 

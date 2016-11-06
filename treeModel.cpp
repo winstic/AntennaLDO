@@ -444,24 +444,24 @@ void treeModel::slot_addOptimize(){
             }
             optimizeWizard *wizard = new optimizeWizard(obj);
             if(wizard->exec() == 1){
-                QString designName = QString("优化%1").arg(item->rowCount()+1);
+                QString optimizeName = QString("优化%1").arg(item->rowCount()+1);
                 QDir *dir = new QDir();
-                QString designDir = QString("%1/optimize%2").arg(workingDir).arg(item->rowCount()+1);
+                QString optimizeDir = QString("%1/optimize%2").arg(workingDir).arg(item->rowCount()+1);
 
                 QStandardItem *child = new QStandardItem(
-                            IconMap[QStringLiteral("treeItem")], designName);
+                            IconMap[QStringLiteral("treeItem")], optimizeName);
                 child->setData(MARK_ITEM, ROLE_MARK);
                 child->setData(MARK_ITEM_ATNOPTIMIZE, ROLE_MARK_ITEM);
                 item->appendRow(child);
-                dir->mkdir(designDir);
-                //copy files(.json, .vbs,) in designDir from projectDir
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(designDir).arg(atnName)) ||
-                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(designDir).arg(atnName)) ){
+                dir->mkdir(optimizeDir);
+                //copy files(.json, .vbs,) in optimizeDir from projectDir
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnName)) ||
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(optimizeDir).arg(atnName)) ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
-                    dir->rmdir(designDir);
+                    dir->rmdir(optimizeDir);
                     return;
                 }
-                sysParam["CurrentOptimizePath"] = designDir;      //save current design path in global variable
+                sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
                 qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
                 //if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
                     //QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));

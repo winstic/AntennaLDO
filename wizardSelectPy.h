@@ -11,8 +11,9 @@ class wizardSelectPy :public QWizardPage
 	Q_OBJECT
 public:
     wizardSelectPy(QString antennaName, QWidget *parent = 0);
+    ~wizardSelectPy(){}
 	bool validatePage();
-    QString setPath(QString name, bool flag = 0);
+    QString setPath(QString name, bool flag = proPy);
     QString getProPath() const;
     QString getAlgPath() const;
     void setAlgComBoItem(QString name);
