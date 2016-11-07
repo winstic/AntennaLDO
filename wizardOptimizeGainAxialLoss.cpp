@@ -10,14 +10,14 @@ wizardOptimizeAXL::wizardOptimizeAXL(QJsonObject &obj, QWidget *parent) : QWizar
     this->gainTable = new QTableWidget();
     this->axialTable = new QTableWidget();
     this->lossTable = new QTableWidget();
+    this->gainsignalsmap = new QSignalMapper();
+    this->axialsignalsmap = new QSignalMapper();
+    this->losssignalsmap = new QSignalMapper();
 
     gainSetting();
     axialSetting();
     lossSetting();
     initLayout();
-    connect(gainTable, SIGNAL(cellClicked(int,int)), this, SLOT(slot_cellClick(int, int)));
-    connect(axialTable, SIGNAL(cellClicked(int,int)), this, SLOT(slot_cellClick(int, int)));
-    connect(lossTable, SIGNAL(cellClicked(int,int)), this, SLOT(slot_cellClick(int, int)));
 }
 
 bool wizardOptimizeAXL::gainSetting(){
@@ -53,15 +53,19 @@ bool wizardOptimizeAXL::gainSetting(){
         initOptimalTypeComBox(optimalType);
         optimalType->setCurrentText(strListOptimaltype[i]);
         gainTable->setCellWidget(i, coptimaltype, optimalType);
+        //map combobox signal
+        connect(optimalType, SIGNAL(currentIndexChanged(int)), gainsignalsmap, SLOT(map()));
+        gainsignalsmap->setMapping(optimalType, QString("%1-%2").arg(i).arg(coptimaltype));
+
         insert2table(gainTable, i, cdelta, strListDelta[i]);
         //setting cannot edit when optimize type is delta
         if(optimalType->currentIndex() != 2)
             gainTable->item(i, cdelta)->setFlags(Qt::NoItemFlags);
 
         insert2table(gainTable, i, cobjvalue, strListGainobj[i]);
-        insert2table(gainTable, i, cweight, strListWeight[i]);
-        //connect(optimalType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_changeOptimaltype(int)));
+        insert2table(gainTable, i, cweight, strListWeight[i]);        
     }
+    connect(gainsignalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_gainChangeOptimaltype(QString)));
     return true;
 
 }
@@ -97,6 +101,10 @@ bool wizardOptimizeAXL::axialSetting(){
         initOptimalTypeComBox(optimalType);
         optimalType->setCurrentText(strListOptimaltype[i]);
         axialTable->setCellWidget(i, coptimaltype, optimalType);
+        //map combobox signal
+        connect(optimalType, SIGNAL(currentIndexChanged(int)), axialsignalsmap, SLOT(map()));
+        axialsignalsmap->setMapping(optimalType, QString("%1-%2").arg(i).arg(coptimaltype));
+
         insert2table(axialTable, i, cdelta, strListDelta[i]);
         //setting cannot edit when optimize type is delta
         if(optimalType->currentIndex() != 2)
@@ -104,8 +112,8 @@ bool wizardOptimizeAXL::axialSetting(){
 
         insert2table(axialTable, i, cobjvalue, strListGainobj[i]);
         insert2table(axialTable, i, cweight, strListWeight[i]);
-        //connect(optimalType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_changeOptimaltype(int)));
     }
+    connect(axialsignalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_axialChangeOptimaltype(QString)));
     return true;
 }
 
@@ -143,11 +151,17 @@ bool wizardOptimizeAXL::lossSetting(){
         initLossTypeComBox(lossType);
         lossType->setCurrentIndex(QString(strListReturnLossType[i]).toInt());
         lossTable->setCellWidget(i, closstype, lossType);
+        //map combobox signal
+        connect(lossType, SIGNAL(currentIndexChanged(int)), losssignalsmap, SLOT(map()));
+        losssignalsmap->setMapping(lossType, QString("%1-%2").arg(i).arg(closstype));
 
         QComboBox *optimalType = new QComboBox;
         initOptimalTypeComBox(optimalType);
         optimalType->setCurrentText(strListOptimaltype[i]);
         lossTable->setCellWidget(i, clossoptimaltype, optimalType);
+        //map combobox signal
+        connect(optimalType, SIGNAL(currentIndexChanged(int)), losssignalsmap, SLOT(map()));
+        losssignalsmap->setMapping(optimalType, QString("%1-%2").arg(i).arg(clossoptimaltype));
 
         insert2table(lossTable, i, cdeltareal, strListDeltaReal[i]);
         insert2table(lossTable, i, cdeltaimag, strListDeltaImag[i]);
@@ -180,10 +194,10 @@ bool wizardOptimizeAXL::lossSetting(){
             lossTable->item(i, cobjreal)->setFlags(Qt::NoItemFlags);
             lossTable->item(i, cobjimag)->setFlags(Qt::NoItemFlags);
         }
-        insert2table(lossTable, i, clossweight, strListWeight[i]);
-        //connect(optimalType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_changeOptimaltype(int)));
-        //connect(lossType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_changeLosstype(int)));
+        insert2table(lossTable, i, clossweight, strListWeight[i]);        
     }
+    connect(losssignalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_lossChangeType(QString)));
+    return true;
     return true;
 }
 
@@ -238,15 +252,27 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
 }
 
 //slots function
-void wizardOptimizeAXL::slot_cellClick(int row, int col){
-    QTableWidget *selectTable = static_cast<QTableWidget* >(sender());
-    qDebug() << row << col << selectTable->currentRow();
+void wizardOptimizeAXL::slot_gainChangeOptimaltype(QString pos){
+    QStringList coordinates = pos.split("-");
+    int row = coordinates[0].toInt();
+    int col = coordinates[1].toInt();
+    QComboBox *selectCombox = (QComboBox *)gainTable->cellWidget(row, col);
+    qDebug() << row << selectCombox->currentText();
 }
 
-void wizardOptimizeAXL::slot_changeOptimaltype(int index){
-    QComboBox *selectCombox = static_cast<QComboBox* >(sender());
+void wizardOptimizeAXL::slot_axialChangeOptimaltype(QString pos){
+    QStringList coordinates = pos.split("-");
+    int row = coordinates[0].toInt();
+    int col = coordinates[1].toInt();
+    QComboBox *selectCombox = (QComboBox *)axialTable->cellWidget(row, col);
+    qDebug() << row << selectCombox->currentText();
 }
 
-void wizardOptimizeAXL::slot_changeLosstype(int index){
-
+void wizardOptimizeAXL::slot_lossChangeType(QString pos){
+    QStringList coordinates = pos.split("-");
+    int row = coordinates[0].toInt();
+    int col = coordinates[1].toInt();
+    QComboBox *selectCombox = (QComboBox *)lossTable->cellWidget(row, col);
+    qDebug() << row << selectCombox->currentText();
 }
+

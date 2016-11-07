@@ -18,9 +18,9 @@ protected:
     bool validatePage();
 
 public slots:
-    void slot_cellClick(int, int);
-    void slot_changeOptimaltype(int);
-    void slot_changeLosstype(int);
+    void slot_gainChangeOptimaltype(QString);
+    void slot_axialChangeOptimaltype(QString);
+    void slot_lossChangeType(QString pos);
 
 private:
     bool gainSetting();
@@ -38,6 +38,9 @@ private:
     QGroupBox *groupBoxGain;
     QGroupBox *groupBoxAxial;
     QGroupBox *groupBoxLoss;
+    QSignalMapper *gainsignalsmap;  //use signalmaper manage signals in table
+    QSignalMapper *axialsignalsmap;
+    QSignalMapper *losssignalsmap;
     enum GACOLUMN{cthetalower = 0, cthetaupper, cphilower, cphiupper, coptimaltype, cdelta, cobjvalue, cweight};
     enum LOSSCOLUMN{cz0real = 0, cz0imag, closstype, clossoptimaltype, cdeltareal, cdeltaimag, cobjreal, cobjimag, clossweight};
 };
