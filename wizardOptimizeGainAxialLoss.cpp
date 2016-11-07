@@ -58,7 +58,7 @@ bool wizardOptimizeAXL::gainSetting(){
         gainsignalsmap->setMapping(optimalType, QString("%1-%2").arg(i).arg(coptimaltype));
 
         insert2table(gainTable, i, cdelta, strListDelta[i]);
-        //setting cannot edit when optimize type is delta
+        //setting cannot edit when optimize type is not delta
         if(optimalType->currentIndex() != 2)
             gainTable->item(i, cdelta)->setFlags(Qt::NoItemFlags);
 
@@ -256,8 +256,12 @@ void wizardOptimizeAXL::slot_gainChangeOptimaltype(QString pos){
     QStringList coordinates = pos.split("-");
     int row = coordinates[0].toInt();
     int col = coordinates[1].toInt();
-    QComboBox *selectCombox = (QComboBox *)gainTable->cellWidget(row, col);
-    qDebug() << row << selectCombox->currentText();
+    QComboBox *selectCombox = (QComboBox *)gainTable->cellWidget(row, col);    
+    //setting edit when optimize type is delta
+    if(selectCombox->currentIndex() == 2)
+        gainTable->item(row, cdelta)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    else
+        gainTable->item(row, cdelta)->setFlags(Qt::NoItemFlags);
 }
 
 void wizardOptimizeAXL::slot_axialChangeOptimaltype(QString pos){
@@ -265,7 +269,13 @@ void wizardOptimizeAXL::slot_axialChangeOptimaltype(QString pos){
     int row = coordinates[0].toInt();
     int col = coordinates[1].toInt();
     QComboBox *selectCombox = (QComboBox *)axialTable->cellWidget(row, col);
-    qDebug() << row << selectCombox->currentText();
+    //setting edit when optimize type is delta
+    if(selectCombox->currentIndex() == 2){
+        qDebug() << selectCombox->currentIndex();
+        axialTable->item(row, cdelta)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
+    else
+        axialTable->item(row, cdelta)->setFlags(Qt::NoItemFlags);
 }
 
 void wizardOptimizeAXL::slot_lossChangeType(QString pos){
@@ -273,6 +283,22 @@ void wizardOptimizeAXL::slot_lossChangeType(QString pos){
     int row = coordinates[0].toInt();
     int col = coordinates[1].toInt();
     QComboBox *selectCombox = (QComboBox *)lossTable->cellWidget(row, col);
-    qDebug() << row << selectCombox->currentText();
+    //setting edit when optimize type is delta
+    if(col == clossoptimaltype){
+        if(2 == selectCombox->currentIndex()){
+            lossTable->item(row, cdeltareal)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+            lossTable->item(row, cdeltaimag)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        }
+        else{
+            lossTable->item(row, cdeltareal)->setFlags(Qt::NoItemFlags);
+            lossTable->item(row, cdeltaimag)->setFlags(Qt::NoItemFlags);
+        }
+    }
+    if(col == closstype){
+        if(2 == selectCombox->currentIndex())
+            lossTable->item(row, cobjimag)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        else
+            lossTable->item(row, cobjimag)->setFlags(Qt::NoItemFlags);
+    }
 }
 

@@ -21,10 +21,17 @@ protected:
     void insert2table(const int &row, const int &clomun, const QString &itemValue);
     bool validatePage();
 
+public slots:
+    void slot_unitchange(QString);
+
 private:
+
     QJsonObject obj;
     QTableWidget *varTable;
+    QString currentUnit;
+    QSignalMapper *signalsmap;  //use signalmaper manage signals in table
     enum VARCOLUMN{varnote = 0, varmin, varmax, varunit};
+    //enum UNITVALUE{mm = 0, cm, m, km, lambda};
 };
 
 #endif // WIZARDOPTIMIZEVARIABLES_H

@@ -3,6 +3,8 @@
 wizardOptimizeVariables::wizardOptimizeVariables(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
     this->varTable = new QTableWidget();
+    this->signalsmap = new QSignalMapper;
+    this->currentUnit = "m";
     setTitle(tr("优化变量设置"));
     setSubTitle(tr("设置需要优化的变量参数"));
     varTable->setColumnCount(4);
@@ -37,6 +39,8 @@ bool wizardOptimizeVariables::wizardDialog(){
         //get note infomation
         QString keyNote = varObj.value("note").toString().trimmed();
         insert2table(rownumber, varnote, keyNote);
+        //setting first column can not edit
+        varTable->item(rownumber, varnote)->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled);
 
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
@@ -49,8 +53,12 @@ bool wizardOptimizeVariables::wizardDialog(){
         //unitComBo->setFixedWidth(10);
         initUnitComBo(unitComBo);
         varTable->setCellWidget(rownumber, varunit, unitComBo);
+        //map combobox signal
+        connect(unitComBo, SIGNAL(currentIndexChanged(int)), signalsmap, SLOT(map()));
+        signalsmap->setMapping(unitComBo, QString("%1-%2").arg(rownumber).arg(varunit));
         rownumber++;
     }
+    connect(signalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_unitchange(QString)));
 
     //!add picture
     QString picturePath;
@@ -87,6 +95,7 @@ void wizardOptimizeVariables::initUnitComBo(QComboBox *comb){
     comb->addItem("m");
     comb->addItem("km");
     comb->setCurrentIndex(3);
+    currentUnit = comb->currentText();
 }
 
 QJsonObject wizardOptimizeVariables::saveInJsonObj(){
@@ -101,4 +110,13 @@ void wizardOptimizeVariables::insert2table(const int &row, const int &clomun, co
 
 bool wizardOptimizeVariables::validatePage(){
     return true;
+}
+
+//slots function
+void wizardOptimizeVariables::slot_unitchange(QString pos){
+    QStringList coordinates = pos.split("-");
+    int row = coordinates.at(0).toInt();
+    int col = coordinates.at(1).toInt();
+    QComboBox *selectCombox = (QComboBox *)varTable->cellWidget(row, col);
+
 }
