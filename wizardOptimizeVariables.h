@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 #include <QWizardPage>
+#include <QMap>
+#include "macrodefined.h"
 #include "sqliteManage.h"
 #include "parsejson.h"
 #include "global.h"
@@ -25,13 +27,14 @@ public slots:
     void slot_unitchange(QString);
 
 private:
+    double unitConversion(double sourceData, int preunit, int curunit);
 
     QJsonObject obj;
     QTableWidget *varTable;
-    QString currentUnit;
+    QMap<int, int> comboDatas;
     QSignalMapper *signalsmap;  //use signalmaper manage signals in table
     enum VARCOLUMN{varnote = 0, varmin, varmax, varunit};
-    //enum UNITVALUE{mm = 0, cm, m, km, lambda};
+    //enum UNITVALUE{unitlambda = 0, unitmm, unitcm, unitm = 4, unitkm = 7};
 };
 
 #endif // WIZARDOPTIMIZEVARIABLES_H

@@ -4,7 +4,6 @@ wizardOptimizeVariables::wizardOptimizeVariables(QJsonObject &obj, QWidget *pare
     this->obj = obj;
     this->varTable = new QTableWidget();
     this->signalsmap = new QSignalMapper;
-    this->currentUnit = "m";
     setTitle(tr("优化变量设置"));
     setSubTitle(tr("设置需要优化的变量参数"));
     varTable->setColumnCount(4);
@@ -56,6 +55,8 @@ bool wizardOptimizeVariables::wizardDialog(){
         //map combobox signal
         connect(unitComBo, SIGNAL(currentIndexChanged(int)), signalsmap, SLOT(map()));
         signalsmap->setMapping(unitComBo, QString("%1-%2").arg(rownumber).arg(varunit));
+        //in 'rownumber'th row of table, save default unitComBo current data
+        comboDatas.insert(rownumber, unitComBo->currentData(ROLE_MARK_UNIT).toInt());
         rownumber++;
     }
     connect(signalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_unitchange(QString)));
@@ -90,12 +91,16 @@ bool wizardOptimizeVariables::wizardDialog(){
 
 void wizardOptimizeVariables::initUnitComBo(QComboBox *comb){
     comb->addItem("mm");
+    comb->setItemData(0, MARK_UNIT_MM, ROLE_MARK_UNIT);
     comb->addItem("cm");
+    comb->setItemData(1, MARK_UNIT_CM, ROLE_MARK_UNIT);
     comb->addItem("λ");
+    comb->setItemData(2, MARK_UNIT_LAMBDA, ROLE_MARK_UNIT);
     comb->addItem("m");
+    comb->setItemData(3, MARK_UNIT_M, ROLE_MARK_UNIT);
     comb->addItem("km");
+    comb->setItemData(4, MARK_UNIT_KM, ROLE_MARK_UNIT);
     comb->setCurrentIndex(3);
-    currentUnit = comb->currentText();
 }
 
 QJsonObject wizardOptimizeVariables::saveInJsonObj(){
@@ -108,15 +113,34 @@ void wizardOptimizeVariables::insert2table(const int &row, const int &clomun, co
     varTable->setItem(row, clomun, tableItem);
 }
 
+double wizardOptimizeVariables::unitConversion(double sourceData, int preunit, int curunit){
+    //assert(preunit != unitlambda && curunit != unitlambda);
+    return sourceData * qPow(10, preunit - curunit);
+}
+
 bool wizardOptimizeVariables::validatePage(){
     return true;
 }
 
 //slots function
 void wizardOptimizeVariables::slot_unitchange(QString pos){
+    Q_ASSERT(!comboDatas.isEmpty());
     QStringList coordinates = pos.split("-");
     int row = coordinates.at(0).toInt();
     int col = coordinates.at(1).toInt();
+    int currentUnitData = comboDatas[row];
     QComboBox *selectCombox = (QComboBox *)varTable->cellWidget(row, col);
-
+    qDebug() << selectCombox->currentText();
+    int newUnitData = selectCombox->currentData(ROLE_MARK_UNIT).toInt();
+    qDebug() << currentUnitData << newUnitData;
+    if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != currentUnitData){
+        double preValueMin = varTable->item(row, varmin)->text().trimmed().toDouble();
+        double preValueMax = varTable->item(row, varmax)->text().trimmed().toDouble();
+        double currentValueMin = unitConversion(preValueMin, currentUnitData, newUnitData);
+        double currentValueMax = unitConversion(preValueMax, currentUnitData, newUnitData);
+        qDebug() << currentValueMin << currentValueMax;
+        insert2table(row, varmin, QString::number(currentValueMin));
+        insert2table(row, varmax, QString::number(currentValueMax));
+    }
+    comboDatas[row] = newUnitData;
 }

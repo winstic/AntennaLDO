@@ -13,6 +13,7 @@
 #define ROLE_MARK Qt::UserRole + 1          //用于区分根节点、文件夹节点、条目节点的角色
 #define ROLE_MARK_NODE Qt::UserRole + 2   //用于区分优化设计文件夹、结果文件夹的角色
 #define ROLE_MARK_ITEM Qt::UserRole + 3     //用于区分所有条目节点
+#define ROLE_MARK_UNIT Qt::UserRole + 4     //unit role
 
 // 对应于ROLE_MARK，设定每种role的值
 #define MARK_PROJECT 1
@@ -32,6 +33,15 @@
 #define MARK_ITEM_ALGDESIGN 3
 #define MARK_ITEM_ATNDESIGN 4
 #define MARK_ITEM_ATNOPTIMIZE 5
+
+//对应于ROLE_MARK_UNIT，设定每种角色的值
+#define MARK_UNIT_LAMBDA 0
+#define MARK_UNIT_MM 1
+#define MARK_UNIT_CM 2
+#define MARK_UNIT_M 4
+#define MARK_UNIT_KM 7
+
+
 
 enum pyFlag{proPy = 0, algPy};
 enum SWEEPTYPES{linearly = 0, logarithmically};
