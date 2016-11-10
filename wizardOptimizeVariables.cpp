@@ -133,7 +133,8 @@ void wizardOptimizeVariables::slot_unitchange(QString pos){
     qDebug() << selectCombox->currentText();
     int newUnitData = selectCombox->currentData(ROLE_MARK_UNIT).toInt();
     qDebug() << currentUnitData << newUnitData;
-    if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != currentUnitData){
+    if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != MARK_UNIT_LAMBDA &&
+            newUnitData != currentUnitData){
         double preValueMin = varTable->item(row, varmin)->text().trimmed().toDouble();
         double preValueMax = varTable->item(row, varmax)->text().trimmed().toDouble();
         double currentValueMin = unitConversion(preValueMin, currentUnitData, newUnitData);

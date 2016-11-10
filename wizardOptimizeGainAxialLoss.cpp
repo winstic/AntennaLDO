@@ -53,6 +53,7 @@ bool wizardOptimizeAXL::gainSetting(){
         initOptimalTypeComBox(optimalType);
         optimalType->setCurrentText(strListOptimaltype[i]);
         gainTable->setCellWidget(i, coptimaltype, optimalType);
+        //qDebug() << gainTable->item(i, coptimaltype)->text();
         //map combobox signal
         connect(optimalType, SIGNAL(currentIndexChanged(int)), gainsignalsmap, SLOT(map()));
         gainsignalsmap->setMapping(optimalType, QString("%1-%2").arg(i).arg(coptimaltype));
@@ -166,31 +167,31 @@ bool wizardOptimizeAXL::lossSetting(){
         insert2table(lossTable, i, cdeltareal, strListDeltaReal[i]);
         insert2table(lossTable, i, cdeltaimag, strListDeltaImag[i]);
         //setting cannot edit when optimize type is delta
-        if(optimalType->currentIndex() != 2){
+        if(2 != optimalType->currentIndex()){
             lossTable->item(i, cdeltareal)->setFlags(Qt::NoItemFlags);
             lossTable->item(i, cdeltaimag)->setFlags(Qt::NoItemFlags);
         }
-        if(lossType->currentIndex() == 0){
+        if(0 == lossType->currentIndex()){
             //loss type is vswr
             insert2table(lossTable, i, cobjreal, strListVswrobj[i]);
-            lossTable->setItem(i, cobjimag, new QTableWidgetItem(""));
+            lossTable->setItem(i, cobjimag, new QTableWidgetItem("None"));
             lossTable->item(i, cobjimag)->setFlags(Qt::NoItemFlags);
         }
-        else if(lossType->currentIndex() == 1){
+        else if(1 == lossType->currentIndex()){
             //loss type is S11
             insert2table(lossTable, i, cobjreal, strListS11[i]);
-            lossTable->setItem(i, cobjimag, new QTableWidgetItem(""));
+            lossTable->setItem(i, cobjimag, new QTableWidgetItem("None"));
             lossTable->item(i, cobjimag)->setFlags(Qt::NoItemFlags);
         }
-        else if(lossType->currentIndex() == 2){
+        else if(2 == lossType->currentIndex()){
             //loss type is R
             insert2table(lossTable, i, cobjreal, strListR1Real[i]);
             insert2table(lossTable, i, cobjimag, strListR1Imag[i]);
         }
         else{
             //loss type is None
-            lossTable->setItem(i, cobjreal, new QTableWidgetItem(""));
-            lossTable->setItem(i, cobjimag, new QTableWidgetItem(""));
+            lossTable->setItem(i, cobjreal, new QTableWidgetItem("None"));
+            lossTable->setItem(i, cobjimag, new QTableWidgetItem("None"));
             lossTable->item(i, cobjreal)->setFlags(Qt::NoItemFlags);
             lossTable->item(i, cobjimag)->setFlags(Qt::NoItemFlags);
         }
@@ -248,7 +249,100 @@ bool wizardOptimizeAXL::validatePage(){
 }
 
 QJsonObject wizardOptimizeAXL::saveInJsonObj(){
+    QJsonObject saveObj, saveGainObj, saveAxialObj, saveLossObj;
+    int i;
+    //save gain setting
+    QStringList gainStr[8];
+    for(i = 0; i < gainTable->rowCount(); i++){
+        gainStr[0] << gainTable->item(i, cthetalower)->text().trimmed();
+        gainStr[1] << gainTable->item(i, cthetaupper)->text().trimmed();
+        gainStr[2] << gainTable->item(i, cphilower)->text().trimmed();
+        gainStr[3] << gainTable->item(i, cphiupper)->text().trimmed();
+        gainStr[4] << static_cast<QComboBox *>(gainTable->cellWidget(i, coptimaltype))->currentText().trimmed();
+        gainStr[5] << gainTable->item(i, cdelta)->text().trimmed();
+        gainStr[6] << gainTable->item(i, cobjvalue)->text().trimmed();
+        gainStr[7] << gainTable->item(i, cweight)->text().trimmed();
+    }
+    saveGainObj.insert("Theta_Lower_gain", QString("[[%1]]").arg(gainStr[0].join(",")));
+    saveGainObj.insert("Theta_Upper_gain", QString("[[%1]]").arg(gainStr[1].join(",")));
+    saveGainObj.insert("Phi_Lower_gain", QString("[[%1]]").arg(gainStr[2].join(",")));
+    saveGainObj.insert("Phi_Upper_gain", QString("[[%1]]").arg(gainStr[3].join(",")));
+    saveGainObj.insert("optimaltype_gain", QString("[[%1]]").arg(gainStr[4].join(",")));
+    saveGainObj.insert("delta_gain", QString("[[%1]]").arg(gainStr[5].join(",")));
+    saveGainObj.insert("gainobj", QString("[[%1]]").arg(gainStr[6].join(",")));
+    saveGainObj.insert("weight_gain", QString("[[%1]]").arg(gainStr[7].join(",")));
 
+    //save axial setting
+    QStringList axialStr[8];
+    for(i = 0; i < axialTable->rowCount(); i++){
+        axialStr[0] << axialTable->item(i, cthetalower)->text().trimmed();
+        axialStr[1] << axialTable->item(i, cthetaupper)->text().trimmed();
+        axialStr[2] << axialTable->item(i, cphilower)->text().trimmed();
+        axialStr[3] << axialTable->item(i, cphiupper)->text().trimmed();
+        axialStr[4] << static_cast<QComboBox *>(axialTable->cellWidget(i, coptimaltype))->currentText().trimmed();
+        axialStr[5] << axialTable->item(i, cdelta)->text().trimmed();
+        axialStr[6] << axialTable->item(i, cobjvalue)->text().trimmed();
+        axialStr[7] << axialTable->item(i, cweight)->text().trimmed();
+    }
+    saveAxialObj.insert("Theta_Lower_axial", QString("[[%1]]").arg(axialStr[0].join(",")));
+    saveAxialObj.insert("Theta_Upper_axial", QString("[[%1]]").arg(axialStr[1].join(",")));
+    saveAxialObj.insert("Phi_Lower_axial", QString("[[%1]]").arg(axialStr[2].join(",")));
+    saveAxialObj.insert("Phi_Upper_axial", QString("[[%1]]").arg(axialStr[3].join(",")));
+    saveAxialObj.insert("optimaltype_axial", QString("[[%1]]").arg(axialStr[4].join(",")));
+    saveAxialObj.insert("delta_axial", QString("[[%1]]").arg(axialStr[5].join(",")));
+    saveAxialObj.insert("axialobj", QString("[[%1]]").arg(axialStr[6].join(",")));
+    saveAxialObj.insert("weight_axial", QString("[[%1]]").arg(axialStr[7].join(",")));
+
+    //save loss setting
+    QStringList lossStr[11];
+    for(i = 0; i < lossTable->rowCount(); i++){
+        lossStr[0] << lossTable->item(i, cz0real)->text().trimmed();
+        lossStr[1] << lossTable->item(i, cz0imag)->text().trimmed();
+        QComboBox *lossType = static_cast<QComboBox *>(lossTable->cellWidget(i, closstype));
+        lossStr[2] << lossType->currentText().trimmed();
+        lossStr[3] << static_cast<QComboBox *>(lossTable->cellWidget(i, clossoptimaltype))->currentText().trimmed();
+        lossStr[4] << lossTable->item(i, cdeltareal)->text().trimmed();
+        lossStr[5] << lossTable->item(i, cdeltaimag)->text().trimmed();\
+        if(0 == lossType->currentIndex()){
+            lossStr[6] << lossTable->item(i, cobjreal)->text().trimmed();
+            lossStr[7] << "None";
+            lossStr[8] << "None";
+        }
+        else if(1 == lossType->currentIndex()){
+            lossStr[6] << "None";
+            lossStr[7] << lossTable->item(i, cobjreal)->text().trimmed();
+            lossStr[8] << "None";
+        }
+        else if(2 == lossType->currentIndex()){
+            lossStr[6] << "None";
+            lossStr[7] << "None";
+            lossStr[8] << lossTable->item(i, cobjreal)->text().trimmed();
+        }
+        else{
+            lossStr[6] << "None";
+            lossStr[7] << "None";
+            lossStr[8] << "None";
+        }
+        lossStr[9] << lossTable->item(i, cobjimag)->text().trimmed();
+        lossStr[10] << lossTable->item(i, clossweight)->text().trimmed();
+    }
+    saveLossObj.insert("R0_real", QString("[[%1]]").arg(lossStr[0].join(",")));
+    saveLossObj.insert("R0_imag", QString("[[%1]]").arg(lossStr[1].join(",")));
+    saveLossObj.insert("ReturnLossType", QString("[[%1]]").arg(lossStr[2].join(",")));
+    saveLossObj.insert("optimaltype_vswr", QString("[[%1]]").arg(lossStr[3].join(",")));
+    saveLossObj.insert("delta_real", QString("[[%1]]").arg(lossStr[4].join(",")));
+    saveLossObj.insert("delta_imag", QString("[[%1]]").arg(lossStr[5].join(",")));
+    saveLossObj.insert("vswrobj", QString("[[%1]]").arg(lossStr[6].join(",")));
+    saveLossObj.insert("S11", QString("[[%1]]").arg(lossStr[7].join(",")));
+    saveLossObj.insert("R1_real", QString("[[%1]]").arg(lossStr[8].join(",")));
+    saveLossObj.insert("R1_imag", QString("[[%1]]").arg(lossStr[9].join(",")));
+    saveLossObj.insert("weight_vswr", QString("[[%1]]").arg(lossStr[10].join(",")));
+
+
+    saveObj.insert("GainSetting", saveGainObj);
+    saveObj.insert("AxialratioSetting", saveAxialObj);
+    saveObj.insert("VSWRSetting", saveLossObj);
+    return saveObj;
 }
 
 //slots function

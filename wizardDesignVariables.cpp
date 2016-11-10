@@ -3,6 +3,7 @@
 
 wizardDesignVariables::wizardDesignVariables(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
+    this->signalsmap = new QSignalMapper;
     readDefaultVars();
     wizardDialog();
 }
@@ -106,11 +107,19 @@ bool wizardDesignVariables::wizardDialog(){
         connect(valueEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_LinetextChange(QString)));
         //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
         //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
-        QComboBox *unitComBo = initUnitComBo();
+        QComboBox *unitComBo = new QComboBox;
+        initUnitComBo(unitComBo);
         //unitComBo->setFixedWidth(50);
         gridLayout->addWidget(unitComBo, posx, 2);
+        //map combobox signal
+        //connect(unitComBo, SIGNAL(currentIndexChanged(int)), signalsmap, SLOT(map()));
+        //signalsmap->setMapping(unitComBo, QString("%1").arg(posx));
+        //in 'posx'th row, save default unitComBo current data
+        comboDatas.insert(posx, unitComBo->currentData(ROLE_MARK_UNIT).toInt());
+
         ++ posx;
     }
+    //connect(signalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_unitchange(QString)));
 
     gridLayout->setAlignment(Qt::AlignHCenter);
     gridLayout->setAlignment(Qt::AlignVCenter);
@@ -153,15 +162,18 @@ bool wizardDesignVariables::wizardDialog(){
     return true;
 }
 
-QComboBox* wizardDesignVariables::initUnitComBo(){
-    QComboBox *comb = new QComboBox;
+void wizardDesignVariables::initUnitComBo(QComboBox *comb){
     comb->addItem("mm");
+    comb->setItemData(0, MARK_UNIT_MM, ROLE_MARK_UNIT);
     comb->addItem("cm");
+    comb->setItemData(1, MARK_UNIT_CM, ROLE_MARK_UNIT);
     comb->addItem("λ");
+    comb->setItemData(2, MARK_UNIT_LAMBDA, ROLE_MARK_UNIT);
     comb->addItem("m");
+    comb->setItemData(3, MARK_UNIT_M, ROLE_MARK_UNIT);
     comb->addItem("km");
+    comb->setItemData(4, MARK_UNIT_KM, ROLE_MARK_UNIT);
     comb->setCurrentIndex(3);
-    return comb;
 }
 
 QString wizardDesignVariables::getSliderSheet(){
@@ -222,6 +234,11 @@ bool wizardDesignVariables::eventFilter(QObject *watched, QEvent *event){
     return QWizardPage::eventFilter(watched, event);
 }
 
+double wizardDesignVariables::unitConversion(double sourceData, int preunit, int curunit){
+    //assert(preunit != unitlambda && curunit != unitlambda);
+    return sourceData * qPow(10, preunit - curunit);
+}
+
 //slots function
 void wizardDesignVariables::slot_LinetextChange(QString text){
     //qDebug() << text;
@@ -240,4 +257,26 @@ void wizardDesignVariables::slot_sliderValueChange(int value){
     //selectEdit->setText(QString::number(value));
     //qDebug() << selectEdit->text();
 }
+
+void wizardDesignVariables::slot_unitchange(QString pos){
+    Q_ASSERT(!comboDatas.isEmpty());
+    int row = pos.toInt();
+    int currentUnitData = comboDatas[row];
+    QComboBox *selectCombox = static_cast<QComboBox* >(sender());
+    qDebug() << selectCombox->currentText();
+    int newUnitData = selectCombox->currentData(ROLE_MARK_UNIT).toInt();
+    qDebug() << currentUnitData << newUnitData;
+    if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != MARK_UNIT_LAMBDA &&
+            newUnitData != currentUnitData){
+        /*double preValueMin = varTable->item(row, varmin)->text().trimmed().toDouble();
+        double preValueMax = varTable->item(row, varmax)->text().trimmed().toDouble();
+        double currentValueMin = unitConversion(preValueMin, currentUnitData, newUnitData);
+        double currentValueMax = unitConversion(preValueMax, currentUnitData, newUnitData);
+        qDebug() << currentValueMin << currentValueMax;
+        insert2table(row, varmin, QString::number(currentValueMin));
+        insert2table(row, varmax, QString::number(currentValueMax));*/
+    }
+    comboDatas[row] = newUnitData;
+}
+
 

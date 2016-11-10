@@ -24,14 +24,19 @@ protected:
 public slots:
     void slot_LinetextChange(QString text);
     void slot_sliderValueChange(int value);
+    void slot_unitchange(QString);
+
 private:
-    QComboBox* initUnitComBo();
+    void initUnitComBo(QComboBox* comb);
     bool wizardDialog();
     QString getSliderSheet();
     bool readDefaultVars();
+    double unitConversion(double sourceData, int preunit, int curunit);
 
     QJsonObject obj;
     QMap<QString, QString> defaultVars;
+    QMap<int, int> comboDatas;      //save combobox data
+    QSignalMapper *signalsmap;  //use signalmaper manage signals in table
     QVector<varInfo> varinfos;
 };
 
