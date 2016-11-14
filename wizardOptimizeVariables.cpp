@@ -40,6 +40,7 @@ bool wizardOptimizeVariables::wizardDialog(){
         insert2table(rownumber, varnote, keyNote);
         //setting first column can not edit
         varTable->item(rownumber, varnote)->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled);
+        varTable->item(rownumber, varnote)->setWhatsThis(varKey);
 
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
@@ -104,7 +105,19 @@ void wizardOptimizeVariables::initUnitComBo(QComboBox *comb){
 }
 
 QJsonObject wizardOptimizeVariables::saveInJsonObj(){
-
+    QJsonObject saveObj, varObj;
+    QString varKey, varValue, varNote;
+    for(int i = 0; i < varTable->rowCount(); i++){
+        varKey = varTable->item(i, varnote)->whatsThis().trimmed();
+        varNote = varTable->item(i, varnote)->text().trimmed();
+        varValue = QString("[%1,%2]").arg(varTable->item(i, varmin)->text().trimmed())
+                .arg(varTable->item(i, varmax)->text().trimmed());
+        QJsonObject itemobj;
+        itemobj.insert("note", varNote);
+        itemobj.insert(varKey, varValue);
+        varObj.insert(varKey, itemobj);
+    }
+    saveObj.insert("variables", varObj);
 }
 
 void wizardOptimizeVariables::insert2table(const int &row, const int &clomun, const QString &itemValue){
@@ -132,7 +145,7 @@ void wizardOptimizeVariables::slot_unitchange(QString pos){
     QComboBox *selectCombox = (QComboBox *)varTable->cellWidget(row, col);
     qDebug() << selectCombox->currentText();
     int newUnitData = selectCombox->currentData(ROLE_MARK_UNIT).toInt();
-    qDebug() << currentUnitData << newUnitData;
+    //qDebug() << varTable->item(row, varnote)->whatsThis();
     if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != MARK_UNIT_LAMBDA &&
             newUnitData != currentUnitData){
         double preValueMin = varTable->item(row, varmin)->text().trimmed().toDouble();
