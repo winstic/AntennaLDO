@@ -118,6 +118,7 @@ QJsonObject wizardOptimizeVariables::saveInJsonObj(){
         varObj.insert(varKey, itemobj);
     }
     saveObj.insert("variables", varObj);
+    return saveObj;
 }
 
 void wizardOptimizeVariables::insert2table(const int &row, const int &clomun, const QString &itemValue){

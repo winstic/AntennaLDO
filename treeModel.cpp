@@ -463,8 +463,8 @@ void treeModel::slot_addOptimize(){
                 }
                 sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
                 qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
-                //if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
-                    //QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));
+                if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));
             }
         }
     }

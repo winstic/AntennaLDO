@@ -26,3 +26,29 @@ optimizeWizard::optimizeWizard(QJsonObject &obj, QWidget *parent) : QWizard(pare
 bool optimizeWizard::validateCurrentPage(){
     return true;
 }
+
+bool optimizeWizard::update2JsonFile(){
+    QJsonObject prefarObj = optimizePreFar->saveInJsonObj();
+    QJsonObject axlObj = optimizeAXL->saveInJsonObj();
+    QJsonObject varsObj = optimizeVariables->saveInJsonObj();
+
+    QJsonObject freObj = parseJson::getSubJsonObj(prefarObj, "FreSetting");
+    QJsonObject farObj = parseJson::getSubJsonObj(prefarObj, "ThetaPhiStep");
+    QJsonObject gainObj = parseJson::getSubJsonObj(axlObj, "GainSetting");
+    QJsonObject axialObj = parseJson::getSubJsonObj(axlObj, "AxialratioSetting");
+    QJsonObject lossObj = parseJson::getSubJsonObj(axlObj, "VSWRSetting");
+    QJsonObject varObj = parseJson::getSubJsonObj(varsObj, "variables");
+
+    if(freObj.isEmpty() || farObj.isEmpty() || gainObj.isEmpty() || axialObj.isEmpty()
+                || lossObj.isEmpty() || varObj.isEmpty())
+        return false;
+    obj.insert("FreSetting", freObj);
+    obj.insert("ThetaPhiStep", farObj);
+    obj.insert("GainSetting", gainObj);
+    obj.insert("AxialratioSetting", axialObj);
+    obj.insert("VSWRSetting", lossObj);
+    obj.insert("variables", varObj);
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
+    bool isWritenInJson = parseJson::write(jsonPath, obj);
+    return isWritenInJson;
+}

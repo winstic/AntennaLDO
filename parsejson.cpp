@@ -38,7 +38,7 @@ bool parseJson::write(const QString &path, QJsonObject &obj){
     }
     QJsonDocument jsonDocument;
     jsonDocument.setObject(obj);
-    QByteArray byteArray = jsonDocument.toJson(QJsonDocument::Compact);
+    QByteArray byteArray = jsonDocument.toJson(QJsonDocument::Indented);
     QTextStream out(&file);
     out.setCodec("UTF-8");
     out << QString(byteArray);

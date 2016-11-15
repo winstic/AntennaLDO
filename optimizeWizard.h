@@ -17,6 +17,7 @@ class optimizeWizard : public QWizard{
 public:
     optimizeWizard(QJsonObject &obj, QWidget *parent = 0);
     ~optimizeWizard(){}
+    bool update2JsonFile();
 
 protected:
     bool validateCurrentPage();
