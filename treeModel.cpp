@@ -494,6 +494,8 @@ void treeModel::slot_modifyOptimizeVar(){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
         return;
     }
+    optimizeTab *otab = new optimizeTab(obj);
+    otab->show();
 }
 
 void treeModel::slot_run(){

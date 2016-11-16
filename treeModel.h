@@ -9,6 +9,7 @@
 #include "designWizard.h"
 #include "optimizeWizard.h"
 #include "designtab.h"
+#include "optimizetab.h"
 #include "modelfile.h"
 #include "parsejson.h"
 #include "global.h"

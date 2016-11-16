@@ -68,7 +68,6 @@ bool wizardOptimizeAXL::gainSetting(){
     }
     connect(gainsignalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_gainChangeOptimaltype(QString)));
     return true;
-
 }
 
 bool wizardOptimizeAXL::axialSetting(){
@@ -198,7 +197,6 @@ bool wizardOptimizeAXL::lossSetting(){
         insert2table(lossTable, i, clossweight, strListWeight[i]);        
     }
     connect(losssignalsmap, SIGNAL(mapped(QString)), this, SLOT(slot_lossChangeType(QString)));
-    return true;
     return true;
 }
 

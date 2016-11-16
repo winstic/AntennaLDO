@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     wizardOptimizeAlg.cpp \
     wizardOptimizeVariables.cpp \
     optimizeWizard.cpp \
-    wizardOptimizeGainAxialLoss.cpp
+    wizardOptimizeGainAxialLoss.cpp \
+    optimizetab.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -61,6 +62,7 @@ HEADERS  += mainwindow.h \
     wizardOptimizeAlg.h \
     wizardOptimizeVariables.h \
     optimizeWizard.h \
-    wizardOptimizeGainAxialLoss.h
+    wizardOptimizeGainAxialLoss.h \
+    optimizetab.h
 
 FORMS    += mainwindow.ui
