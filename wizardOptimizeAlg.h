@@ -16,10 +16,14 @@ public:
     ~wizardOptimizeAlg(){}
     QString getProPath() const;
     QString getAlgPath() const;
+    QString getAlgName() const;
     QJsonObject saveInJsonObj();
 
 protected:
     bool validatePage();
+
+public slots:
+    void slot_algName(const int index);
 
 private:
     void setAlgComboItem(QString name);
@@ -28,6 +32,7 @@ private:
 
     //QJsonObject obj;
     QString atnName;
+    QString algName;
     QLabel *proLabel;
     QLabel *algLabel;
     QLineEdit *atnLine;

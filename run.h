@@ -5,24 +5,25 @@
 #include <QFile>
 #include <QProcess>
 #include <QDebug>
+#include "macrodefined.h"
 #include "parsejson.h"
 #include "global.h"
 
 class ThreadRun : public QThread{
 public:
-    ThreadRun();
+    ThreadRun(ATNFLAG aflag);
     ~ThreadRun(){
         this->quit();
     }
     bool registerHfssVars();
-    bool updateVbs();
+    bool updateVbs(const QString vbsPath);
     QString M2GHz(QString mhz);
 
     //over write run function
     void run();
 private:
-    QString designDir;
-    QString vbsPath;
+    ATNFLAG atnflag;
+    QString doDir;
     QString atnName;
     QMap<QString, QString> vbsVars;
     QJsonObject obj;
