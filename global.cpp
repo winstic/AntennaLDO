@@ -18,8 +18,6 @@ QString global::str2liststr(const QString &str){
 void global::registerParamter(){
     sysParam["DefaultProjectPath"] = "";
     sysParam["WorkingProjectPath"] = "";
-    sysParam["CurrentDesignPath"] = "";
-    sysParam["CurrentOptimizePath"] = "";
     //sysParam["ProjectName"] = "";
     //sysParam["ProblemName"] = "";
     //sysParam["ModelVariablesPath"] = "";        //.json file
@@ -56,18 +54,6 @@ QString global::getInfoFromRel(const QString &key){
         }
     }
     return NULL;
-}
-
-bool global::addedInfoInRel(const QString &key, const QString &value){
-    QFile outfile(QString("%1/%2.rel").arg(sysParam["WorkingProjectPath"]).arg(getProjectName()));
-    if (!outfile.open(QFile::WriteOnly | QIODevice::Append)){
-        QMessageBox::critical(0, QString("Error"), QString("global.cpp:64: error: rel文件缺失"));
-        return false;
-    }
-    QTextStream out(&outfile);
-    out << key << ":" << value;
-    outfile.close();
-    return true;
 }
 
 QString global::getProjectName(){

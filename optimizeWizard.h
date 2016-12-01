@@ -6,7 +6,6 @@
 #include <QFile>
 #include <QTextStream>
 #include "macrodefined.h"
-#include "global.h"
 #include "parsejson.h"
 #include "wizardDesignPerformance.h"
 #include "wizardOptimizeGainAxialLoss.h"
@@ -30,7 +29,6 @@ private:
     wizardOptimizeVariables *optimizeVariables;
     wizardOptimizeAlg *optimizeAlg;
 
-    void madeOptimalFile();
 };
 
 #endif // OPTIMIZEWIZARD_H

@@ -24,25 +24,7 @@ optimizeWizard::optimizeWizard(QJsonObject &obj, QWidget *parent) : QWizard(pare
 }
 
 bool optimizeWizard::validateCurrentPage(){
-    if(this->currentPage()->nextId() == -1){
-        madeOptimalFile();
-    }
     return true;
-}
-
-void optimizeWizard::madeOptimalFile(){
-    QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
-    QString algPath = optimizeAlg->getAlgPath();
-    QString algName = optimizeAlg->getAlgName();
-    QString projectFullPath = sysParam["WorkingProjectPath"];
-    if(! global::copyFile(QString("%1/global_conf.json").arg(DEA4ADglobalPath), QString("%1/global_conf.json").arg(projectFullPath)) ||
-            ! global::copyFile(QString("%1/%2_conf.json").arg(algPath).arg(algName), QString("%1/%2_conf.json").arg(projectFullPath).arg(algName))){
-        QMessageBox::critical(0, QString("Error"), QString("optimizeWizard.cpp:40: error: 算法文件创建失败！"));
-        return;
-    }
-
-    if(global::getInfoFromRel("Algorithm").isNull())
-        global::addedInfoInRel(QString("Algorithm"), algName);
 }
 
 bool optimizeWizard::update2JsonFile(){

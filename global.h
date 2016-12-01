@@ -31,7 +31,6 @@ public:
     static QString getFileBySuffix(const QString &dir, const QString &suff);
     static void registerParamter();
     static QString getInfoFromRel(const QString &key);
-    static bool addedInfoInRel(const QString &key, const QString &value);
     static QString getProjectName();
     static bool copyFile(QString sourceFile, QString targetFile, bool coverFileIfExist = true);
 public:

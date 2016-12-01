@@ -443,7 +443,7 @@ void treeModel::slot_addOptimize(){
                 return;
             }
             optimizeWizard *wizard = new optimizeWizard(obj);
-            if(wizard->exec() == 1){                
+            if(wizard->exec() == 1){
                 QString optimizeName = QString("优化%1").arg(item->rowCount()+1);
                 QDir *dir = new QDir();
                 QString optimizeDir = QString("%1/optimize%2").arg(workingDir).arg(item->rowCount()+1);
@@ -454,19 +454,17 @@ void treeModel::slot_addOptimize(){
                 child->setData(MARK_ITEM_ATNOPTIMIZE, ROLE_MARK_ITEM);
                 item->appendRow(child);
                 dir->mkdir(optimizeDir);
-                //copy files(.json..,) in optimizeDir from projectDir
-                QString algName = global::getInfoFromRel("Algorithm");
+                //copy files(.json, .vbs,) in optimizeDir from projectDir
                 if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnName)) ||
-                        ! global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) ||
-                        ! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(algName), QString("%1/%2_conf.json").arg(optimizeDir).arg(algName)) ){
-                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:459: error: create optimize module failed!"));
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(optimizeDir).arg(atnName)) ){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
                     dir->rmdir(optimizeDir);
                     return;
                 }
                 sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
                 qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
                 if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
-                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:467: error: update module files failed!"));
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:421: error: update module files failed!"));
             }
         }
     }
@@ -475,7 +473,6 @@ void treeModel::slot_addOptimize(){
 void treeModel::slot_openFile(){
     QString antennaName = global::getInfoFromRel("Problem");
     modelFile *mf = new modelFile(antennaName);
-    mf->setModal(true);
     mf->show();
 }
 
@@ -487,7 +484,6 @@ void treeModel::slot_modifyDesignVar(){
         return;
     }
     designTab *dTab = new designTab(obj);
-    dTab->setModal(true);
     dTab->show();
 }
 
@@ -499,12 +495,11 @@ void treeModel::slot_modifyOptimizeVar(){
         return;
     }
     optimizeTab *otab = new optimizeTab(obj);
-    otab->setModal(true);
     otab->show();
 }
 
 void treeModel::slot_run(){
-    ThreadRun *ProThread = new ThreadRun(flagDesign);
+    ThreadRun *ProThread = new ThreadRun();
     ProThread->start();
 }
 

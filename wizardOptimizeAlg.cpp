@@ -11,13 +11,9 @@ wizardOptimizeAlg::wizardOptimizeAlg(QWidget *parent) : QWizardPage(parent){
     this->algCombo = new QComboBox;
     this->hint = new QLabel;
 
-    proPath = setPath(atnName, proPy);
     setAlgComboItem(atnName);
     algCombo->setCurrentIndex(0);
-    algName = algCombo->currentText().trimmed();
-    algPath = setPath(algName, algPy);
     initLayout();
-    connect(algCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algName(int)));
 }
 
 void wizardOptimizeAlg::initLayout(){
@@ -45,7 +41,7 @@ void wizardOptimizeAlg::initLayout(){
 }
 
 void wizardOptimizeAlg::setAlgComboItem(QString name){
-    QString selectProSql = QString(" select a.aId, a.aName "
+    QString selectProSql = QString(" select a.aId, a.aName, c.proPath "
             " from algorithm as a "
             " inner join algtopro as b on a.aId = b.aId and b.pId = c.pId "
             " inner join antennaProblem as c on c.pName = '%1'; ").arg(name);
@@ -57,6 +53,8 @@ void wizardOptimizeAlg::setAlgComboItem(QString name){
     else{
         while(sqlQuery.next()){
             algCombo->addItem(sqlQuery.value("aName").toString());
+            //resigned proPath many times need to improved
+            proPath = sqlQuery.value("proPath").toString();
         }
     }
 }
@@ -94,10 +92,6 @@ QString wizardOptimizeAlg::getAlgPath() const{
     return algPath;
 }
 
-QString wizardOptimizeAlg::getAlgName() const{
-    return algName;
-}
-
 QJsonObject wizardOptimizeAlg::saveInJsonObj(){
 
 }
@@ -109,9 +103,4 @@ bool wizardOptimizeAlg::validatePage(){
         return false;
     }
     return true;
-}
-
-void wizardOptimizeAlg::slot_algName(const int index){
-    algName = algCombo->itemText(index);
-    algPath = setPath(algName, algPy);
 }
