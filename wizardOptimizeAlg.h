@@ -7,6 +7,7 @@
 #include "sqliteManage.h"
 #include "macrodefined.h"
 #include "global.h"
+#include "parsejson.h"
 
 class wizardOptimizeAlg : public QWizardPage{
     Q_OBJECT
@@ -28,18 +29,26 @@ public slots:
 private:
     void setAlgComboItem(QString name);
     QString setPath(QString name, bool flag = proPy);
+    void confSetting();
     void initLayout();
 
     //QJsonObject obj;
     QString atnName;
     QString algName;
-    QLabel *proLabel;
-    QLabel *algLabel;
-    QLineEdit *atnLine;
-    QComboBox *algCombo;
     QString proPath;
     QString algPath;
     QLabel *hint;
+
+    QLabel *proLabel;
+    QLabel *algLabel;
+    QLabel *generationLabel;
+    QLabel *popsizeLabel;
+    QLabel *threadLabel;
+    QLineEdit *atnLine;
+    QComboBox *algCombo;
+    QLineEdit *generationLine;
+    QLineEdit *popsizeLine;
+    QLineEdit *threadLine;
 };
 
 #endif // WIZARDOPTIMIZEALG_H
