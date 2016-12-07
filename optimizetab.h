@@ -12,9 +12,6 @@ class optimizeTab : public QDialog{
 public:
     optimizeTab(QJsonObject obj, QWidget *parent = 0);
     ~optimizeTab(){}
-    //fourth tab
-    QString getProPath() const;
-    QString getAlgPath() const;
 
 public slots:
     void slot_saveAllButton(bool);
@@ -22,6 +19,7 @@ public slots:
     void slot_axialChangeOptimaltype(QString);
     void slot_lossChangeType(QString);
     void slot_unitchange(QString);
+    void slot_algName(const int index);
 
 private:
     //!first tab widget function
@@ -47,7 +45,7 @@ private:
 
     //!fourth tab wodget function
     void setAlgComboItem(QString name);
-    QString setPath(QString name, bool flag = proPy);
+    void getConfInfo();
     void setFourthTabLayout();
     //!
 
@@ -110,13 +108,20 @@ private:
     enum VARCOLUMN{varnote = 0, varmin, varmax, varunit};
 
     //algorithm setting
+
     QString atnName;
-    QLabel *proLabel;
+    QString algName;
+    QJsonObject globalObj;
+    QJsonObject algObj;
     QLabel *algLabel;
-    QLineEdit *atnLine;
+    QLabel *generationLabel;
+    QLabel *popsizeLabel;
+    QLabel *threadLabel;
     QComboBox *algCombo;
-    QString proPath;
-    QString algPath;
+    QLineEdit *generationLine;
+    QLineEdit *popsizeLine;
+    QLineEdit *threadLine;
+
 };
 
 #endif // OPTIMIZETAB_H

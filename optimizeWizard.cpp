@@ -41,14 +41,16 @@ void optimizeWizard::madeOptimalFile(){
         return;
     }
 
-    if(global::getInfoFromRel("Algorithm").isNull())
-        global::addedInfoInRel(QString("Algorithm"), algName);
+    sysParam["Algorithm"] = algName;
+    /*if(global::getInfoFromRel("Algorithm").isNull())
+        global::addedInfoInRel(QString("Algorithm"), algName);*/
 }
 
 bool optimizeWizard::update2JsonFile(){
     QJsonObject prefarObj = optimizePreFar->saveInJsonObj();
     QJsonObject axlObj = optimizeAXL->saveInJsonObj();
     QJsonObject varsObj = optimizeVariables->saveInJsonObj();
+    QJsonObject gloAlgObj = optimizeAlg->saveInJsonObj();
 
     QJsonObject freObj = parseJson::getSubJsonObj(prefarObj, "FreSetting");
     QJsonObject farObj = parseJson::getSubJsonObj(prefarObj, "ThetaPhiStep");
@@ -56,9 +58,11 @@ bool optimizeWizard::update2JsonFile(){
     QJsonObject axialObj = parseJson::getSubJsonObj(axlObj, "AxialratioSetting");
     QJsonObject lossObj = parseJson::getSubJsonObj(axlObj, "VSWRSetting");
     QJsonObject varObj = parseJson::getSubJsonObj(varsObj, "variables");
+    QJsonObject globalObj = parseJson::getSubJsonObj(gloAlgObj, "global");
+    QJsonObject algorithmObj = parseJson::getSubJsonObj(gloAlgObj, "algorithm");
 
     if(freObj.isEmpty() || farObj.isEmpty() || gainObj.isEmpty() || axialObj.isEmpty()
-                || lossObj.isEmpty() || varObj.isEmpty())
+                || lossObj.isEmpty() || varObj.isEmpty() || globalObj.isEmpty() || algorithmObj.isEmpty())
         return false;
     obj.insert("FreSetting", freObj);
     obj.insert("ThetaPhiStep", farObj);
@@ -66,7 +70,12 @@ bool optimizeWizard::update2JsonFile(){
     obj.insert("AxialratioSetting", axialObj);
     obj.insert("VSWRSetting", lossObj);
     obj.insert("variables", varObj);
-    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
-    bool isWritenInJson = parseJson::write(jsonPath, obj);
+    QString problemJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
+    QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
+    QString algorithmJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]);
+
+    bool isWritenInJson = (parseJson::write(problemJsonPath, obj)
+                           && parseJson::write(globalJsonPath, globalObj)
+                           && parseJson::write(algorithmJsonPath, algorithmObj) );
     return isWritenInJson;
 }

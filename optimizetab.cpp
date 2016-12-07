@@ -59,11 +59,14 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
 
     //algorithm setting
     this->atnName = global::getInfoFromRel("Problem");
-    this->proLabel = new QLabel(tr("选择问题:"));
     this->algLabel = new QLabel(tr("选择算法:"));
-    this->atnLine = new QLineEdit(atnName);
-    atnLine->setReadOnly(true);
-    this->algCombo = new QComboBox;
+    this->generationLabel = new QLabel(tr("最大代数"));
+    this->popsizeLabel = new QLabel(tr("种群规模"));
+    this->threadLabel = new QLabel(tr("启动进程数"));
+    this->algCombo = new QComboBox();
+    this->generationLine = new QLineEdit();
+    this->popsizeLine = new QLineEdit();
+    this->threadLine = new QLineEdit();
 
     //!first tab widget
     initSetupCom();
@@ -84,8 +87,13 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
 
     //!fourth tab widget
     setAlgComboItem(atnName);
-    algCombo->setCurrentIndex(0);
+    this->globalObj = parseJson::getJsonObj(QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]));
+    this->algObj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]));
+    this->algName = globalObj.value("ALGORITHM_NAME").toString().trimmed();
+    this->algCombo->setCurrentText(algName);
+    getConfInfo();
     setFourthTabLayout();
+    connect(algCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algName(int)));
     //!
 
     tabWidget->addTab(firstTab, QIcon(""), tr("性能参数设置"));
@@ -542,17 +550,14 @@ void optimizeTab::initUnitComBo(QComboBox *comb){
 //!
 
 //!fourth tab widget
-
-QString optimizeTab::getProPath() const{
-    return proPath;
-}
-
-QString optimizeTab::getAlgPath() const{
-    return algPath;
+void optimizeTab::getConfInfo(){
+    generationLine->setText(algObj.value("generation").toString().trimmed());
+    popsizeLine->setText(algObj.value("popsize").toString().trimmed());
+    threadLine->setText(globalObj.value("ThreadNum").toString().trimmed());
 }
 
 void optimizeTab::setAlgComboItem(QString name){
-    QString selectProSql = QString(" select a.aId, a.aName, c.proPath "
+    QString selectProSql = QString(" select a.aId, a.aName "
             " from algorithm as a "
             " inner join algtopro as b on a.aId = b.aId and b.pId = c.pId "
             " inner join antennaProblem as c on c.pName = '%1'; ").arg(name);
@@ -564,53 +569,50 @@ void optimizeTab::setAlgComboItem(QString name){
     else{
         while(sqlQuery.next()){
             algCombo->addItem(sqlQuery.value("aName").toString());
-            //resigned proPath many times need to improved
-            proPath = sqlQuery.value("proPath").toString();
         }
     }
-}
-
-QString optimizeTab::setPath(QString name, bool flag){
-    QString pyPath;
-    QString getPySql;
-    QString pyFlag;
-    if(flag == 0){
-        getPySql = QString("select proPath from antennaProblem where pName = '%1';").arg(name);
-        pyFlag = "proPath";
-    }
-    else{
-        getPySql = QString("select algPath from algorithm where aName = '%1';").arg(name);
-        pyFlag = "algPath";
-    }
-    QSqlQuery sqlQuery;
-    sqlQuery.prepare(getPySql);
-    if(!sqlQuery.exec(getPySql)){
-        qDebug()<< sqlQuery.lastError();
-    }
-    else{
-        while(sqlQuery.next()){
-            pyPath = sqlQuery.value(pyFlag).toString();
-        }
-    }
-    return pyPath;
 }
 
 void optimizeTab::setFourthTabLayout(){
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    QVBoxLayout *vlayout = new QVBoxLayout;
-    proLabel->setFixedWidth(80);
-    hlayout->addWidget(proLabel);
-    hlayout->addWidget(atnLine);
-    vlayout->addLayout(hlayout);
-    vlayout->addSpacing(100);
-
-    hlayout = new QHBoxLayout;
+    QHBoxLayout *hlayout1 = new QHBoxLayout();
+    QVBoxLayout *vlayout1 = new QVBoxLayout();
+    //algorithm name
     algLabel->setFixedWidth(80);
-    hlayout->addWidget(algLabel);
-    hlayout->addWidget(algCombo);
-    vlayout->addLayout(hlayout);
+    hlayout1->addWidget(algLabel);
+    hlayout1->addWidget(algCombo);
+    vlayout1->addLayout(hlayout1);
 
-    vlayout->setContentsMargins(20, 80, 20, 20);
+    QGroupBox *algGroup = new QGroupBox();
+    QHBoxLayout *hlayout2 = new QHBoxLayout();
+    QVBoxLayout *vlayout2 = new QVBoxLayout();
+    //generation setting
+    generationLabel->setFixedWidth(80);
+    hlayout2->addWidget(generationLabel);
+    hlayout2->addWidget(generationLine);
+    vlayout2->addLayout(hlayout2);
+    vlayout2->addSpacing(50);
+    //popsize setting
+    hlayout2 = new QHBoxLayout();
+    popsizeLabel->setFixedWidth(80);
+    hlayout2->addWidget(popsizeLabel);
+    hlayout2->addWidget(popsizeLine);
+    vlayout2->addLayout(hlayout2);
+    vlayout2->addSpacing(50);
+    //thread number
+    hlayout2 = new QHBoxLayout();
+    threadLabel->setFixedWidth(80);
+    hlayout2->addWidget(threadLabel);
+    hlayout2->addWidget(threadLine);
+    vlayout2->addLayout(hlayout2);
+    algGroup->setLayout(vlayout2);
+
+
+    QVBoxLayout *vlayout = new QVBoxLayout();
+    vlayout->addLayout(vlayout1);
+    vlayout->addSpacing(50);
+    vlayout->addWidget(algGroup);
+    vlayout->setContentsMargins(20, 50, 20, 50);
+
     fourthTab->setLayout(vlayout);
 }
 //!
@@ -623,7 +625,7 @@ void optimizeTab::insert2table(QTableWidget *table, const int &row, const int &c
 }
 
 QJsonObject optimizeTab::saveInJsonObj(){
-    QJsonObject saveObj, saveFreObj, saveFarObj, saveGainObj, saveAxialObj, saveLossObj, varObj;
+    QJsonObject saveObj, saveFreObj, saveFarObj, saveGainObj, saveAxialObj, saveLossObj, varObj, saveGlobalObj, saveAlgorithmObj;
     //Frequency Setting json object
     saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
     saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
@@ -739,12 +741,22 @@ QJsonObject optimizeTab::saveInJsonObj(){
         itemobj.insert(varKey, varValue);
         varObj.insert(varKey, itemobj);
     }
+
+    //global and algorithm setting
+    saveGlobalObj.insert("ThreadNum", threadLine->text().trimmed());
+    saveGlobalObj.insert("ALGORITHM_NAME", algName);
+    saveGlobalObj.insert("PROBLEM_NAME", atnName);
+    saveAlgorithmObj.insert("generation", generationLine->text().trimmed());
+    saveAlgorithmObj.insert("popsize", popsizeLine->text().trimmed());
+
     saveObj.insert("FreSetting", saveFreObj);
     saveObj.insert("ThetaPhiStep", saveFarObj);
     saveObj.insert("GainSetting", saveGainObj);
     saveObj.insert("AxialratioSetting", saveAxialObj);
     saveObj.insert("VSWRSetting", saveLossObj);
     saveObj.insert("variables", varObj);
+    saveObj.insert("global", saveGlobalObj);
+    saveObj.insert("algorithm", saveAlgorithmObj);
     return saveObj;
 }
 
@@ -822,6 +834,11 @@ void optimizeTab::slot_unitchange(QString pos){
     comboDatas[row] = newUnitData;
 }
 
+void optimizeTab::slot_algName(const int index){
+    algName = algCombo->itemText(index);
+    getConfInfo();
+}
+
 void optimizeTab::slot_saveAllButton(bool){
     bool isOK = true;
     QJsonObject newObj = saveInJsonObj();
@@ -831,8 +848,10 @@ void optimizeTab::slot_saveAllButton(bool){
     QJsonObject axialObj = parseJson::getSubJsonObj(newObj, "AxialratioSetting");
     QJsonObject lossObj = parseJson::getSubJsonObj(newObj, "VSWRSetting");
     QJsonObject varsObj = parseJson::getSubJsonObj(newObj, "variables");
+    QJsonObject globalObj = parseJson::getSubJsonObj(newObj, "global");
+    QJsonObject algorithmObj = parseJson::getSubJsonObj(newObj, "algorithm");
     if(freObj.isEmpty() || farObj.isEmpty() || gainObj.isEmpty() || axialObj.isEmpty() ||
-            lossObj.isEmpty() || varsObj.isEmpty())
+            lossObj.isEmpty() || varsObj.isEmpty() || globalObj.isEmpty() || algorithmObj.isEmpty())
         isOK = false;
     else{
         obj.insert("FreSetting", freObj);
@@ -842,11 +861,17 @@ void optimizeTab::slot_saveAllButton(bool){
         obj.insert("VSWRSetting", lossObj);
         obj.insert("variables", varsObj);
         QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(atnName);
-        if(!parseJson::write(jsonPath, obj))
+        QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
+        QString algorithmJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]);
+        if(! (parseJson::write(jsonPath, obj)
+              && parseJson::write(globalJsonPath, globalObj)
+              && parseJson::write(algorithmJsonPath, algorithmObj)) )
             isOK = false;
     }
-    if(isOK)
+    if(isOK){
+        sysParam["Algorithm"] = algName;
         this->close();
+    }
     else
         QMessageBox::critical(0, QString("Error"), QString("optimizeTab.cpp:851: error: Cannot update in json file"));
 }

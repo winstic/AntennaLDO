@@ -1,16 +1,15 @@
 ﻿#include "treeModel.h"
 #include <QDebug>
 
-treeModel::treeModel(QTreeView* m_tree){
-    //QStandardItemModel* tModel = new QStandardItemModel(mTree);
-    mTree = m_tree;
-    mProjectMenu = new QMenu;
-    mAtnDesignMenu = new QMenu;
-    mAtnOptimizeMenu = new QMenu;
-    mItemDesignMenu = new QMenu;
-    mItemOptimizeMenu = new QMenu;
-    mItemViewMenu = new QMenu;
-    mResultMenu = new QMenu;
+treeModel::treeModel(QTreeView* m_tree) : mTree(m_tree){
+    //QStandardItemModel* tModel = new QStandardItemModel(mTree);    
+    mProjectMenu = new QMenu();
+    mAtnDesignMenu = new QMenu();
+    mAtnOptimizeMenu = new QMenu();
+    mItemDesignMenu = new QMenu();
+    mItemOptimizeMenu = new QMenu();
+    mItemViewMenu = new QMenu();
+    mResultMenu = new QMenu();
     //actRightClick = nullptr;
     initMenu();
     initIcon();    
@@ -388,11 +387,11 @@ void treeModel::slot_addDesign(){
                 static_cast<const QStandardItemModel *>(currentIndex.model()));
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
+    QString atnProName = global::getInfoFromRel("Problem");
     if(varNode.isValid()){
         if(MARK_NODE_DESIGN == varNode.toInt()){
             QString workingDir = sysParam["WorkingProjectPath"];
-            QString atnName = global::getInfoFromRel("Problem");
-            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnName);
+            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnProName);
             QJsonObject obj = parseJson::getJsonObj(jsonPath);
             if(obj.isEmpty()){
                 QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:389: error: Cannot parse jsonFile %1").arg(jsonPath));
@@ -411,8 +410,8 @@ void treeModel::slot_addDesign(){
                 item->appendRow(child);
                 dir->mkdir(designDir);
                 //copy files(.json, .vbs,) in designDir from projectDir
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(designDir).arg(atnName)) ||
-                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnName), QString("%1/%2_design.vbs").arg(designDir).arg(atnName)) ){
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(designDir).arg(atnProName)) ||
+                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnProName), QString("%1/%2_design.vbs").arg(designDir).arg(atnProName)) ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
                     dir->rmdir(designDir);
                     return;
@@ -432,11 +431,11 @@ void treeModel::slot_addOptimize(){
                 static_cast<const QStandardItemModel *>(currentIndex.model()));
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
+    QString atnProName = global::getInfoFromRel("Problem");
     if(varNode.isValid()){
         if(MARK_NODE_OPTIMIZE == varNode.toInt()){
             QString workingDir = sysParam["WorkingProjectPath"];
-            QString atnName = global::getInfoFromRel("Problem");
-            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnName);
+            QString jsonPath = QString("%1/%2_conf.json").arg(workingDir).arg(atnProName);
             QJsonObject obj = parseJson::getJsonObj(jsonPath);
             if(obj.isEmpty()){
                 QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:457: error: Cannot parse jsonFile %1").arg(jsonPath));
@@ -455,8 +454,8 @@ void treeModel::slot_addOptimize(){
                 item->appendRow(child);
                 dir->mkdir(optimizeDir);
                 //copy files(.json..,) in optimizeDir from projectDir
-                QString algName = global::getInfoFromRel("Algorithm");
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnName)) ||
+                QString algName = sysParam["Algorithm"];
+                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnProName)) ||
                         ! global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) ||
                         ! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(algName), QString("%1/%2_conf.json").arg(optimizeDir).arg(algName)) ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:459: error: create optimize module failed!"));
@@ -473,14 +472,15 @@ void treeModel::slot_addOptimize(){
 }
 
 void treeModel::slot_openFile(){
-    QString antennaName = global::getInfoFromRel("Problem");
-    modelFile *mf = new modelFile(antennaName);
+    QString atnProName = global::getInfoFromRel("Problem");
+    modelFile *mf = new modelFile(atnProName);
     mf->setModal(true);
     mf->show();
 }
 
 void treeModel::slot_modifyDesignVar(){
-    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
+    QString atnProName = global::getInfoFromRel("Problem");
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentDesignPath"]).arg(atnProName);
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
@@ -492,7 +492,8 @@ void treeModel::slot_modifyDesignVar(){
 }
 
 void treeModel::slot_modifyOptimizeVar(){
-    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
+    QString atnProName = global::getInfoFromRel("Problem");
+    QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(atnProName);
     QJsonObject obj = parseJson::getJsonObj(jsonPath);
     if(obj.isEmpty()){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
@@ -513,7 +514,8 @@ void treeModel::slot_interrupt(){}
 void treeModel::slot_stop(){}
 
 void treeModel::slot_showResult(){
-    QString hfssPath = QString("%1/%2.hfss").arg(sysParam["CurrentDesignPath"]).arg(global::getInfoFromRel("Problem"));
+    QString atnProName = global::getInfoFromRel("Problem");
+    QString hfssPath = QString("%1/%2.hfss").arg(sysParam["CurrentDesignPath"]).arg(atnProName);
     QProcess p(0);;
     int isOK  = p.execute("hfss", QStringList() << hfssPath);
     if(isOK != 0)

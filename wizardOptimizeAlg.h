@@ -39,12 +39,10 @@ private:
     QString algPath;
     QLabel *hint;
 
-    QLabel *proLabel;
     QLabel *algLabel;
     QLabel *generationLabel;
     QLabel *popsizeLabel;
     QLabel *threadLabel;
-    QLineEdit *atnLine;
     QComboBox *algCombo;
     QLineEdit *generationLine;
     QLineEdit *popsizeLine;

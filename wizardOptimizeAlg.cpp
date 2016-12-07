@@ -4,13 +4,10 @@ wizardOptimizeAlg::wizardOptimizeAlg(QWidget *parent) : QWizardPage(parent){
     setTitle(tr("优化算法设置"));
     setSubTitle(tr("设置算法参数"));
     this->atnName = global::getInfoFromRel("Problem");
-    this->proLabel = new QLabel(tr("选择问题:"));
     this->algLabel = new QLabel(tr("选择算法:"));
     this->generationLabel = new QLabel(tr("最大代数"));
     this->popsizeLabel = new QLabel(tr("种群规模"));
     this->threadLabel = new QLabel(tr("启动进程数"));
-    this->atnLine = new QLineEdit(atnName);
-    atnLine->setReadOnly(true);
     this->algCombo = new QComboBox();
     this->hint = new QLabel();
     this->generationLine = new QLineEdit();
@@ -44,19 +41,13 @@ void wizardOptimizeAlg::confSetting(){
 void wizardOptimizeAlg::initLayout(){
     QHBoxLayout *hlayout1 = new QHBoxLayout();
     QVBoxLayout *vlayout1 = new QVBoxLayout();
-    //problem name
-    proLabel->setFixedWidth(80);
-    hlayout1->addWidget(proLabel);
-    hlayout1->addWidget(atnLine);
-    vlayout1->addLayout(hlayout1);
-    vlayout1->addSpacing(100);
     //algorithm name
-    hlayout1 = new QHBoxLayout();
     algLabel->setFixedWidth(80);
     hlayout1->addWidget(algLabel);
     hlayout1->addWidget(algCombo);
     vlayout1->addLayout(hlayout1);
 
+    QGroupBox *algGroup = new QGroupBox();
     QHBoxLayout *hlayout2 = new QHBoxLayout();
     QVBoxLayout *vlayout2 = new QVBoxLayout();
     //generation setting
@@ -64,35 +55,39 @@ void wizardOptimizeAlg::initLayout(){
     hlayout2->addWidget(generationLabel);
     hlayout2->addWidget(generationLine);
     vlayout2->addLayout(hlayout2);
-    vlayout2->addSpacing(80);
+    vlayout2->addSpacing(50);
     //popsize setting
     hlayout2 = new QHBoxLayout();
     popsizeLabel->setFixedWidth(80);
     hlayout2->addWidget(popsizeLabel);
     hlayout2->addWidget(popsizeLine);
     vlayout2->addLayout(hlayout2);
-    vlayout2->addSpacing(80);
+    vlayout2->addSpacing(50);
     //thread number
     hlayout2 = new QHBoxLayout();
     threadLabel->setFixedWidth(80);
     hlayout2->addWidget(threadLabel);
     hlayout2->addWidget(threadLine);
     vlayout2->addLayout(hlayout2);
+    algGroup->setLayout(vlayout2);
 
-    QHBoxLayout *hlayout = new QHBoxLayout();
+    /*QHBoxLayout *hlayout = new QHBoxLayout();
     hlayout->addLayout(vlayout1);
-    hlayout->addLayout(vlayout2);
+    hlayout->addSpacing(40);
+    hlayout->addWidget(algGroup);*/
     //hint
     QHBoxLayout *hlayout3 = new QHBoxLayout();
     hint->setAlignment(Qt::AlignRight);
     hlayout3->addWidget(hint);
 
     QVBoxLayout *vlayout = new QVBoxLayout();
-    vlayout->addLayout(hlayout);
+    vlayout->addLayout(vlayout1);
+    vlayout->addSpacing(50);
+    vlayout->addWidget(algGroup);
     vlayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
     vlayout->addLayout(hlayout3);
 
-    vlayout->setContentsMargins(20, 80, 20, 20);
+    vlayout->setContentsMargins(20, 50, 20, 20);
     setLayout(vlayout);
 }
 
@@ -151,7 +146,16 @@ QString wizardOptimizeAlg::getAlgName() const{
 }
 
 QJsonObject wizardOptimizeAlg::saveInJsonObj(){
+    QJsonObject saveObj, globalObj, algObj;
+    globalObj.insert("ThreadNum", threadLine->text().trimmed());
+    globalObj.insert("ALGORITHM_NAME", algName);
+    globalObj.insert("PROBLEM_NAME", atnName);
+    algObj.insert("generation", generationLine->text().trimmed());
+    algObj.insert("popsize", popsizeLine->text().trimmed());
 
+    saveObj.insert("global", globalObj);
+    saveObj.insert("algorithm", algObj);
+    return saveObj;
 }
 
 bool wizardOptimizeAlg::validatePage(){
