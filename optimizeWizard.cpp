@@ -32,16 +32,16 @@ bool optimizeWizard::validateCurrentPage(){
 
 void optimizeWizard::madeOptimalFile(){
     QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
-    QString algPath = optimizeAlg->getAlgPath();
-    QString algName = optimizeAlg->getAlgName();
+    //QString algPath = optimizeAlg->getAlgPath();
+    //QString algName = optimizeAlg->getAlgName();
     QString projectFullPath = sysParam["WorkingProjectPath"];
     if(! global::copyFile(QString("%1/global_conf.json").arg(DEA4ADglobalPath), QString("%1/global_conf.json").arg(projectFullPath)) ||
-            ! global::copyFile(QString("%1/%2_conf.json").arg(algPath).arg(algName), QString("%1/%2_conf.json").arg(projectFullPath).arg(algName))){
+            ! global::copyFile(QString("%1/algorithm_conf.json").arg(DEA4ADglobalPath), QString("%1/algorithm_conf.json").arg(projectFullPath))){
         QMessageBox::critical(0, QString("Error"), QString("optimizeWizard.cpp:40: error: 算法文件创建失败！"));
         return;
     }
 
-    sysParam["Algorithm"] = algName;
+    //sysParam["Algorithm"] = algName;
     /*if(global::getInfoFromRel("Algorithm").isNull())
         global::addedInfoInRel(QString("Algorithm"), algName);*/
 }
@@ -72,7 +72,7 @@ bool optimizeWizard::update2JsonFile(){
     obj.insert("variables", varObj);
     QString problemJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
     QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
-    QString algorithmJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]);
+    QString algorithmJsonPath = QString("%1/algorithm_conf.json").arg(sysParam["CurrentOptimizePath"]);
 
     bool isWritenInJson = (parseJson::write(problemJsonPath, obj)
                            && parseJson::write(globalJsonPath, globalObj)

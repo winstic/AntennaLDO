@@ -88,7 +88,7 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     //!fourth tab widget
     setAlgComboItem(atnName);
     this->globalObj = parseJson::getJsonObj(QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]));
-    this->algObj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]));
+    this->algObj = parseJson::getJsonObj(QString("%1/algorithm_conf.json").arg(sysParam["CurrentOptimizePath"]));
     this->algName = globalObj.value("ALGORITHM_NAME").toString().trimmed();
     this->algCombo->setCurrentText(algName);
     getConfInfo();
@@ -862,14 +862,13 @@ void optimizeTab::slot_saveAllButton(bool){
         obj.insert("variables", varsObj);
         QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(atnName);
         QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
-        QString algorithmJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(sysParam["Algorithm"]);
+        QString algorithmJsonPath = QString("%1/algorithm_conf.json").arg(sysParam["CurrentOptimizePath"]);
         if(! (parseJson::write(jsonPath, obj)
               && parseJson::write(globalJsonPath, globalObj)
               && parseJson::write(algorithmJsonPath, algorithmObj)) )
             isOK = false;
     }
     if(isOK){
-        sysParam["Algorithm"] = algName;
         this->close();
     }
     else

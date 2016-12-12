@@ -20,7 +20,7 @@ void global::registerParamter(){
     sysParam["WorkingProjectPath"] = "";
     sysParam["CurrentDesignPath"] = "";
     sysParam["CurrentOptimizePath"] = "";
-    sysParam["Algorithm"] = "";
+    //sysParam["Algorithm"] = "";
     //sysParam["ProjectName"] = "";
     //sysParam["ProblemName"] = "";
     //sysParam["ModelVariablesPath"] = "";        //.json file

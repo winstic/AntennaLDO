@@ -13,7 +13,6 @@ extern QMap<QString, QString> sysParam;
 //! sysParam["WorkingProjectPath"]
 //! sysParam["CurrentDesignPath"]
 //! sysParam["CurrentOptimizePath"]
-//! sysParam["Algorithm"]
 
 typedef struct{
     double lower;

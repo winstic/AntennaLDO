@@ -20,22 +20,22 @@ wizardOptimizeAlg::wizardOptimizeAlg(QWidget *parent) : QWizardPage(parent){
     this->algName = algCombo->currentText().trimmed();
     this->algPath = setPath(algName, algPy);
 
+    //get thread num from global_conf.json
+    QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
+    QString globalJsonPath = QString("%1/global_conf.json").arg(DEA4ADglobalPath);
+    QJsonObject globalObj = parseJson::getJsonObj(globalJsonPath);
+    threadLine->setText(globalObj.value("ThreadNum").toString().trimmed());
+
     confSetting();
     initLayout();
     connect(algCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algName(int)));
 }
 
 void wizardOptimizeAlg::confSetting(){
-    QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
-    QString globalJsonPath, algConfJaonPath;
-    QJsonObject globalObj, algObj;
-    globalJsonPath = QString("%1/global_conf.json").arg(DEA4ADglobalPath);
-    algConfJaonPath = QString("%1/%2_conf.json").arg(algPath).arg(algName);
-    globalObj = parseJson::getJsonObj(globalJsonPath);
-    algObj = parseJson::getJsonObj(algConfJaonPath);
+    QString algConfJaonPath = QString("%1/%2_conf.json").arg(algPath).arg(algName);
+    QJsonObject algObj = parseJson::getJsonObj(algConfJaonPath);
     generationLine->setText(algObj.value("generation").toString().trimmed());
     popsizeLine->setText(algObj.value("popsize").toString().trimmed());
-    threadLine->setText(globalObj.value("ThreadNum").toString().trimmed());
 }
 
 void wizardOptimizeAlg::initLayout(){

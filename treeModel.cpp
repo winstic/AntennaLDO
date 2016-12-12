@@ -454,10 +454,9 @@ void treeModel::slot_addOptimize(){
                 item->appendRow(child);
                 dir->mkdir(optimizeDir);
                 //copy files(.json..,) in optimizeDir from projectDir
-                QString algName = sysParam["Algorithm"];
                 if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnProName)) ||
                         ! global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) ||
-                        ! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(algName), QString("%1/%2_conf.json").arg(optimizeDir).arg(algName)) ){
+                        ! global::copyFile(QString("%1/algorithm_conf.json").arg(workingDir), QString("%1/algorithm_conf.json").arg(optimizeDir)) ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:459: error: create optimize module failed!"));
                     dir->rmdir(optimizeDir);
                     return;
