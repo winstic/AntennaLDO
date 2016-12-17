@@ -256,7 +256,11 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
         gainStr[1] << gainTable->item(i, cthetaupper)->text().trimmed();
         gainStr[2] << gainTable->item(i, cphilower)->text().trimmed();
         gainStr[3] << gainTable->item(i, cphiupper)->text().trimmed();
-        gainStr[4] << static_cast<QComboBox *>(gainTable->cellWidget(i, coptimaltype))->currentText().trimmed();
+        QComboBox *goType = static_cast<QComboBox *>(gainTable->cellWidget(i, coptimaltype));
+        if(3 == goType->currentIndex())
+            gainStr[4] << goType->currentText().trimmed();
+        else
+            gainStr[4] << QString("'%1'").arg(goType->currentText().trimmed());
         gainStr[5] << gainTable->item(i, cdelta)->text().trimmed();
         gainStr[6] << gainTable->item(i, cobjvalue)->text().trimmed();
         gainStr[7] << gainTable->item(i, cweight)->text().trimmed();
@@ -277,7 +281,11 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
         axialStr[1] << axialTable->item(i, cthetaupper)->text().trimmed();
         axialStr[2] << axialTable->item(i, cphilower)->text().trimmed();
         axialStr[3] << axialTable->item(i, cphiupper)->text().trimmed();
-        axialStr[4] << static_cast<QComboBox *>(axialTable->cellWidget(i, coptimaltype))->currentText().trimmed();
+        QComboBox *aoType = static_cast<QComboBox *>(axialTable->cellWidget(i, coptimaltype));
+        if(3 == aoType->currentIndex())
+            axialStr[4] << aoType->currentText().trimmed();
+        else
+            axialStr[4] << QString("'%1'").arg(aoType->currentText().trimmed());
         axialStr[5] << axialTable->item(i, cdelta)->text().trimmed();
         axialStr[6] << axialTable->item(i, cobjvalue)->text().trimmed();
         axialStr[7] << axialTable->item(i, cweight)->text().trimmed();
@@ -297,10 +305,14 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
         lossStr[0] << lossTable->item(i, cz0real)->text().trimmed();
         lossStr[1] << lossTable->item(i, cz0imag)->text().trimmed();
         QComboBox *lossType = static_cast<QComboBox *>(lossTable->cellWidget(i, closstype));
-        lossStr[2] << lossType->currentText().trimmed();
-        lossStr[3] << static_cast<QComboBox *>(lossTable->cellWidget(i, clossoptimaltype))->currentText().trimmed();
+        lossStr[2] << QString::number(lossType->currentIndex());
+        QComboBox *loType = static_cast<QComboBox *>(lossTable->cellWidget(i, clossoptimaltype));
+        if(3 == loType->currentIndex())
+            lossStr[3] << loType->currentText().trimmed();
+        else
+            lossStr[3] << QString("'%1'").arg(loType->currentText().trimmed());
         lossStr[4] << lossTable->item(i, cdeltareal)->text().trimmed();
-        lossStr[5] << lossTable->item(i, cdeltaimag)->text().trimmed();\
+        lossStr[5] << lossTable->item(i, cdeltaimag)->text().trimmed();
         if(0 == lossType->currentIndex()){
             lossStr[6] << lossTable->item(i, cobjreal)->text().trimmed();
             lossStr[7] << "None";
@@ -324,6 +336,7 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
         lossStr[9] << lossTable->item(i, cobjimag)->text().trimmed();
         lossStr[10] << lossTable->item(i, clossweight)->text().trimmed();
     }
+    qDebug() << lossStr[2];
     saveLossObj.insert("R0_real", QString("[[%1]]").arg(lossStr[0].join(",")));
     saveLossObj.insert("R0_imag", QString("[[%1]]").arg(lossStr[1].join(",")));
     saveLossObj.insert("ReturnLossType", QString("[[%1]]").arg(lossStr[2].join(",")));
@@ -335,7 +348,6 @@ QJsonObject wizardOptimizeAXL::saveInJsonObj(){
     saveLossObj.insert("R1_real", QString("[[%1]]").arg(lossStr[8].join(",")));
     saveLossObj.insert("R1_imag", QString("[[%1]]").arg(lossStr[9].join(",")));
     saveLossObj.insert("weight_vswr", QString("[[%1]]").arg(lossStr[10].join(",")));
-
 
     saveObj.insert("GainSetting", saveGainObj);
     saveObj.insert("AxialratioSetting", saveAxialObj);

@@ -1,5 +1,5 @@
-#ifndef RUN_H
-#define RUN_H
+#ifndef DESIGNRUN_H
+#define DESIGNRUN_H
 
 #include <QThread>
 #include <QFile>
@@ -9,24 +9,23 @@
 #include "parsejson.h"
 #include "global.h"
 
-class ThreadRun : public QThread{
+class designRun : public QThread{
 public:
-    ThreadRun(ATNFLAG aflag);
-    ~ThreadRun(){
+    designRun();
+    ~designRun(){
         this->quit();
     }
-    bool registerHfssVars();
-    bool updateVbs(const QString vbsPath);
+    bool registerHfssVars(const QJsonObject &obj);
+    bool updateVbs(const QString &vbsPath);
     QString M2GHz(QString mhz);
 
     //over write run function
     void run();
 private:
-    ATNFLAG atnflag;
-    QString doDir;
+    //ATNFLAG atnflag;
+    QString designDir;
     QString atnName;
     QMap<QString, QString> vbsVars;
-    QJsonObject obj;
 };
 
 #endif // RUN_H

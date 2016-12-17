@@ -231,8 +231,12 @@ void treeModel::initMenu(){
     connect(actAddDesign, &QAction::triggered, this, &treeModel::slot_addDesign);
     actAddOptimize = new QAction(QStringLiteral("添加优化"), mTree);
     connect(actAddOptimize, &QAction::triggered, this, &treeModel::slot_addOptimize);
-    actRun = new QAction(QStringLiteral("运行"), mTree);
-    connect(actRun, &QAction::triggered, this, &treeModel::slot_run);
+    //design run
+    actDesignRun = new QAction(QStringLiteral("运行"), mTree);
+    connect(actDesignRun, &QAction::triggered, this, &treeModel::slot_designRun);
+    //optimize run
+    actOptimizeRun = new QAction(QStringLiteral("运行"), mTree);
+    connect(actOptimizeRun, &QAction::triggered, this, &treeModel::slot_optimizeRun);
     actInterrupt = new QAction(QStringLiteral("暂停"), mTree);
     connect(actInterrupt, &QAction::triggered, this, &treeModel::slot_interrupt);
     actStop = new QAction(QStringLiteral("终止"), mTree);
@@ -261,7 +265,7 @@ void treeModel::initMenu(){
 
     mItemDesignMenu->addAction(actModifyDesignVar);
     mItemDesignMenu->addSeparator();
-    mItemDesignMenu->addAction(actRun);
+    mItemDesignMenu->addAction(actDesignRun);
     mItemDesignMenu->addAction(actInterrupt);
     mItemDesignMenu->addAction(actStop);
     mItemDesignMenu->addSeparator();
@@ -270,7 +274,7 @@ void treeModel::initMenu(){
 
     mItemOptimizeMenu->addAction(actModifyOptimizeVar);
     mItemOptimizeMenu->addSeparator();
-    mItemOptimizeMenu->addAction(actRun);
+    mItemOptimizeMenu->addAction(actOptimizeRun);
     mItemOptimizeMenu->addAction(actInterrupt);
     mItemOptimizeMenu->addAction(actStop);
     mItemOptimizeMenu->addSeparator();
@@ -503,9 +507,14 @@ void treeModel::slot_modifyOptimizeVar(){
     otab->show();
 }
 
-void treeModel::slot_run(){
-    ThreadRun *ProThread = new ThreadRun(flagDesign);
-    ProThread->start();
+void treeModel::slot_designRun(){
+    designRun *dRun = new designRun();
+    dRun->start();
+}
+
+void treeModel::slot_optimizeRun(){
+    optimizeRun *oRun = new optimizeRun();
+    oRun->start();
 }
 
 void treeModel::slot_interrupt(){}

@@ -29,14 +29,15 @@ SOURCES += main.cpp\
     sqliteManage.cpp \
     global.cpp \
     parsejson.cpp \
-    run.cpp \
     designtab.cpp \
     modelfile.cpp \
     wizardOptimizeAlg.cpp \
     wizardOptimizeVariables.cpp \
     optimizeWizard.cpp \
     wizardOptimizeGainAxialLoss.cpp \
-    optimizetab.cpp
+    optimizetab.cpp \
+    designRun.cpp \
+    optimizeRun.cpp
 
 HEADERS  += mainwindow.h \
     wizardDesignPerformance.h \
@@ -56,13 +57,14 @@ HEADERS  += mainwindow.h \
     config.h \
     macrodefined.h \
     parsejson.h \
-    run.h \
     designtab.h \
     modelfile.h \
     wizardOptimizeAlg.h \
     wizardOptimizeVariables.h \
     optimizeWizard.h \
     wizardOptimizeGainAxialLoss.h \
-    optimizetab.h
+    optimizetab.h \
+    designRun.h \
+    optimizeRun.h
 
 FORMS    += mainwindow.ui

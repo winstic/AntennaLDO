@@ -1,17 +1,16 @@
-#include "run.h"
+#include "designRun.h"
 
-ThreadRun::ThreadRun(ATNFLAG aflag){
-    this->atnflag = aflag;
-    this->doDir = sysParam["CurrentDesignPath"];
+designRun::designRun(){
+    //this->atnflag = aflag;
+    this->designDir = sysParam["CurrentDesignPath"];
     this->atnName = global::getInfoFromRel("Problem");
-    //vbsVars
-    this->obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(doDir).arg(atnName));
+    //vbsVars    
 }
 
-bool ThreadRun::registerHfssVars(){
-    //copy hfss file in doDir from projectDir
-    global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), QString("%1/%2.hfss").arg(doDir).arg(atnName));
-    vbsVars["hfsspath"] = QString("%1/%2").arg(doDir).arg(atnName);
+bool designRun::registerHfssVars(const QJsonObject &obj){
+    //copy hfss file in designDir from projectDir
+    global::copyFile(QString("%1/%2.hfss").arg(sysParam["WorkingProjectPath"]).arg(atnName), QString("%1/%2.hfss").arg(designDir).arg(atnName));
+    vbsVars["hfsspath"] = QString("%1/%2").arg(designDir).arg(atnName);
     vbsVars["hfssname"] = atnName;
     QJsonObject varsValueObj = parseJson::getSubJsonObj(obj, "varsValue");
     QJsonObject freObj = parseJson::getSubJsonObj(obj, "FreSetting");
@@ -43,7 +42,7 @@ bool ThreadRun::registerHfssVars(){
     return true;
 }
 
-bool ThreadRun::updateVbs(const QString vbsPath){
+bool designRun::updateVbs(const QString &vbsPath){
     //read all infomation from vbsFile
     QFile inFile(vbsPath);
     if(!inFile.open(QFile::ReadOnly | QFile::Text)){
@@ -71,31 +70,25 @@ bool ThreadRun::updateVbs(const QString vbsPath){
     return true;
 }
 
-QString ThreadRun::M2GHz(QString mhz){
+QString designRun::M2GHz(QString mhz){
     double doubleGHz = mhz.toDouble() / 1000.0;
     return QString::number(doubleGHz);
 }
 
-void ThreadRun::run(){
+void designRun::run(){
     QProcess p(0);
-    if(atnflag == flagDesign){
-        QString vbsPath = QString("%1/%2_design.vbs").arg(doDir).arg(atnName);
-        registerHfssVars();
-        updateVbs(vbsPath);
-        //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
-        p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
-        /*if(! p.waitForStarted()){
-            QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
-            p.write("quit");
-            p.kill();
-            return;
-        }*/
-    }
-    else if(atnflag == flagOptimize){
-        //QString startPyPath = "./DEA4AD/trunk/start.py";
-        //p.execute("python", QStringList() << startPyPath);
-    }
-
+    QString vbsPath = QString("%1/%2_design.vbs").arg(designDir).arg(atnName);
+    QJsonObject obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(designDir).arg(atnName));
+    registerHfssVars(obj);
+    updateVbs(vbsPath);
+    //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
+    p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
+    /*if(! p.waitForStarted()){
+        QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));
+        p.write("quit");
+        p.kill();
+        return;
+    }*/
     p.waitForFinished();
     qDebug() << QString::fromLocal8Bit(p.readAllStandardError());
 }

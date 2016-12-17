@@ -13,7 +13,8 @@
 #include "modelfile.h"
 #include "parsejson.h"
 #include "global.h"
-#include "run.h"
+#include "designRun.h"
+#include "optimizeRun.h"
 //#include "config.h"
 
 class treeModel : public QTreeView{
@@ -48,7 +49,8 @@ private slots:
     void slot_hideAll();
     void slot_addDesign();
     void slot_addOptimize();
-    void slot_run();
+    void slot_designRun();
+    void slot_optimizeRun();
     void slot_interrupt();
     void slot_stop();
     void slot_del();
@@ -86,7 +88,8 @@ private:
     QAction* actShowAll;
     QAction* actAddDesign;
     QAction* actAddOptimize;
-    QAction* actRun;
+    QAction* actDesignRun;
+    QAction* actOptimizeRun;
     QAction* actInterrupt;
     QAction* actStop;
     QAction* actOpenFile;
