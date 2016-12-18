@@ -38,7 +38,8 @@ void optimizeRun::setInfo(){
 bool optimizeRun::update2DEA4AD(){
     if(! global::copyFile(QString("%1/global_conf.json").arg(optimizeDir), QString("%1/global_conf.json").arg(DEA4ADPath)) ||
             ! global::copyFile(QString("%1/algorithm_conf.json").arg(optimizeDir), QString("%1/%2_conf.json").arg(algorithmPath).arg(algorithmName)) ||
-            ! global::copyFile(QString("%1/%2_conf.json").arg(optimizeDir).arg(atnName), QString("%1/%2_conf.json").arg(atnPath).arg(atnName))){
+            ! global::copyFile(QString("%1/%2_conf.json").arg(optimizeDir).arg(atnName), QString("%1/%2_conf.json").arg(atnPath).arg(atnName)) ||
+            ! global::copyFile(QString("%1/start.json").arg(optimizeDir), QString("%1/start.json").arg(DEA4ADPath))){
         QMessageBox::critical(0, QString("Error"), QString("optimizeRun.cpp:40: error: 优化模块DEA4AD文件更新失败！"));
         return false;
     }

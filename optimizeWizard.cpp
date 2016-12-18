@@ -36,7 +36,8 @@ void optimizeWizard::madeOptimalFile(){
     //QString algName = optimizeAlg->getAlgName();
     QString projectFullPath = sysParam["WorkingProjectPath"];
     if(! global::copyFile(QString("%1/global_conf.json").arg(DEA4ADglobalPath), QString("%1/global_conf.json").arg(projectFullPath)) ||
-            ! global::copyFile(QString("%1/algorithm_conf.json").arg(DEA4ADglobalPath), QString("%1/algorithm_conf.json").arg(projectFullPath))){
+            ! global::copyFile(QString("%1/algorithm_conf.json").arg(DEA4ADglobalPath), QString("%1/algorithm_conf.json").arg(projectFullPath)) ||
+            ! global::copyFile(QString("%1/start.json").arg(DEA4ADglobalPath), QString("%1/start.json").arg(projectFullPath))){
         QMessageBox::critical(0, QString("Error"), QString("optimizeWizard.cpp:40: error: 算法文件创建失败！"));
         return;
     }
@@ -70,12 +71,20 @@ bool optimizeWizard::update2JsonFile(){
     obj.insert("AxialratioSetting", axialObj);
     obj.insert("VSWRSetting", lossObj);
     obj.insert("variables", varObj);
+
+    //start obj
+    QJsonObject startObj;
+    startObj.insert("outfilepath", QString("%1/outfilepath").arg(sysParam["CurrentOptimizePath"]));
+    startObj.insert("outhfsspath", QString("%1/outhfsspath").arg(sysParam["CurrentOptimizePath"]));
+
     QString problemJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
     QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
     QString algorithmJsonPath = QString("%1/algorithm_conf.json").arg(sysParam["CurrentOptimizePath"]);
+    QString startJsonPath = QString("%1/start.json").arg(sysParam["CurrentOptimizePath"]);
 
     bool isWritenInJson = (parseJson::write(problemJsonPath, obj)
                            && parseJson::write(globalJsonPath, globalObj)
-                           && parseJson::write(algorithmJsonPath, algorithmObj) );
+                           && parseJson::write(algorithmJsonPath, algorithmObj)
+                           && parseJson::write(startJsonPath, startObj) );
     return isWritenInJson;
 }

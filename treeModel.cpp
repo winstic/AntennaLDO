@@ -239,8 +239,10 @@ void treeModel::initMenu(){
     connect(actOptimizeRun, &QAction::triggered, this, &treeModel::slot_optimizeRun);
     actInterrupt = new QAction(QStringLiteral("暂停"), mTree);
     connect(actInterrupt, &QAction::triggered, this, &treeModel::slot_interrupt);
-    actStop = new QAction(QStringLiteral("终止"), mTree);
-    connect(actStop, &QAction::triggered, this, &treeModel::slot_stop);
+    actDesignStop = new QAction(QStringLiteral("终止"), mTree);
+    connect(actDesignStop, &QAction::triggered, this, &treeModel::slot_designStop);
+    actOptimizeStop = new QAction(QStringLiteral("终止"), mTree);
+    connect(actOptimizeStop, &QAction::triggered, this, &treeModel::slot_optimizeStop);
     actOpenFile = new QAction(QStringLiteral("打开"), mTree);
     connect(actOpenFile, &QAction::triggered, this, &treeModel::slot_openFile);
     actModifyDesignVar = new QAction(QStringLiteral("修改参数"), mTree);
@@ -267,7 +269,7 @@ void treeModel::initMenu(){
     mItemDesignMenu->addSeparator();
     mItemDesignMenu->addAction(actDesignRun);
     mItemDesignMenu->addAction(actInterrupt);
-    mItemDesignMenu->addAction(actStop);
+    mItemDesignMenu->addAction(actDesignStop);
     mItemDesignMenu->addSeparator();
     mItemDesignMenu->addAction(actDel);
     mItemDesignMenu->addAction(actShowResult);
@@ -276,7 +278,7 @@ void treeModel::initMenu(){
     mItemOptimizeMenu->addSeparator();
     mItemOptimizeMenu->addAction(actOptimizeRun);
     mItemOptimizeMenu->addAction(actInterrupt);
-    mItemOptimizeMenu->addAction(actStop);
+    mItemOptimizeMenu->addAction(actOptimizeStop);
     mItemOptimizeMenu->addSeparator();
     mItemOptimizeMenu->addAction(actDel);
     mItemOptimizeMenu->addAction(actShowResult);
@@ -460,12 +462,15 @@ void treeModel::slot_addOptimize(){
                 //copy files(.json..,) in optimizeDir from projectDir
                 if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnProName)) ||
                         ! global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) ||
+                        ! global::copyFile(QString("%1/start.json").arg(workingDir), QString("%1/start.json").arg(optimizeDir)) ||
                         ! global::copyFile(QString("%1/algorithm_conf.json").arg(workingDir), QString("%1/algorithm_conf.json").arg(optimizeDir)) ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:459: error: create optimize module failed!"));
                     dir->rmdir(optimizeDir);
                     return;
                 }
                 sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
+                dir->mkdir(QString("%1/outfilepath").arg(optimizeDir));
+                dir->mkdir(QString("%1/outhfsspath").arg(optimizeDir));
                 qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
                 if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:467: error: update module files failed!"));
@@ -519,7 +524,18 @@ void treeModel::slot_optimizeRun(){
 
 void treeModel::slot_interrupt(){}
 
-void treeModel::slot_stop(){}
+void treeModel::slot_designStop(){}
+
+void treeModel::slot_optimizeStop(){
+    QDir dir(QDir::currentPath());
+    QString ostopPath = QString("%1/DEA4AD/trunk/end.bat").arg(dir.path());
+    qDebug() << ostopPath;
+    QProcess p(0);
+    //"/c" mean close cmd window after execute .bat file.
+    p.execute("cmd.exe", QStringList() << "/c" << ostopPath);
+    p.waitForFinished();
+    qDebug() << p.readAllStandardOutput();
+}
 
 void treeModel::slot_showResult(){
     QString atnProName = global::getInfoFromRel("Problem");

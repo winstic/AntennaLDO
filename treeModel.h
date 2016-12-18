@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QTextStream>
+#include <QProcess>
 #include "macrodefined.h"
 #include "designWizard.h"
 #include "optimizeWizard.h"
@@ -52,7 +53,8 @@ private slots:
     void slot_designRun();
     void slot_optimizeRun();
     void slot_interrupt();
-    void slot_stop();
+    void slot_designStop();
+    void slot_optimizeStop();
     void slot_del();
     void slot_openFile();
     void slot_modifyDesignVar();
@@ -91,7 +93,8 @@ private:
     QAction* actDesignRun;
     QAction* actOptimizeRun;
     QAction* actInterrupt;
-    QAction* actStop;
+    QAction* actDesignStop;
+    QAction* actOptimizeStop;
     QAction* actOpenFile;
     QAction* actModifyDesignVar;
     QAction* actModifyOptimizeVar;
