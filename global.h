@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QSlider>
 #include <QLineEdit>
+#include <QComboBox>
 
 extern QMap<QString, QString> sysParam;
 //! sysParam["DefaultProjectPath"]
@@ -20,6 +21,7 @@ typedef struct{
     QString varKey;
     QSlider *varSlider;
     QLineEdit *varEdit;
+    //QComboBox *varComboBox;
 }varInfo;
 
 class global{

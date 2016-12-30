@@ -454,9 +454,16 @@ bool optimizeTab::wizardDialog(){
     QStringList header;
     header << "变量" << "最小值" << "最大值" << "单位";
     varTable->setHorizontalHeaderLabels(header);
+    varTable->horizontalHeader()->setSectionsClickable(false);
     //varTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     varTable->horizontalHeader()->setSectionResizeMode(varnote, QHeaderView::Stretch);
     varTable->horizontalHeader()->setSectionResizeMode(varunit, QHeaderView::ResizeToContents);
+    varTable->setFrameShape(QFrame::NoFrame);                   //setting no frame
+    varTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    varTable->setSelectionMode(QAbstractItemView::SingleSelection);     //select signal row every time
+    varTable->setStyleSheet("selection-background-color:lightblue;");   //setting selected background
+    varTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //setting header background
+
     QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
     if(variablesObj.isEmpty()){
         QMessageBox::critical(0, QString("Error"), QString("optimizeTab.cpp:454: error: Cannot parse 'variables' in json file"));
@@ -553,7 +560,7 @@ void optimizeTab::initUnitComBo(QComboBox *comb){
 void optimizeTab::getConfInfo(){
     generationLine->setText(algObj.value("generation").toString().trimmed());
     popsizeLine->setText(algObj.value("popsize").toString().trimmed());
-    threadLine->setText(globalObj.value("ThreadNum").toString().trimmed());
+    threadLine->setText(QString::number(globalObj.value("ThreadNum").toString().trimmed().toInt()-1));
 }
 
 void optimizeTab::setAlgComboItem(QString name){
@@ -755,7 +762,7 @@ QJsonObject optimizeTab::saveInJsonObj(){
     }
 
     //global and algorithm setting
-    saveGlobalObj.insert("ThreadNum", threadLine->text().trimmed());
+    saveGlobalObj.insert("ThreadNum", QString::number(threadLine->text().trimmed().toInt()+1));
     saveGlobalObj.insert("ALGORITHM_NAME", algName);
     saveGlobalObj.insert("PROBLEM_NAME", atnName);
     saveAlgorithmObj.insert("generation", generationLine->text().trimmed());

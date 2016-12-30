@@ -3,23 +3,30 @@
 wizardOptimizeVariables::wizardOptimizeVariables(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;
     this->varTable = new QTableWidget();
-    this->signalsmap = new QSignalMapper;
+    this->signalsmap = new QSignalMapper();
     setTitle(tr("优化变量设置"));
     setSubTitle(tr("设置需要优化的变量参数"));
     varTable->setColumnCount(4);
     QStringList header;
     header << "变量" << "最小值" << "最大值" << "单位";
     varTable->setHorizontalHeaderLabels(header);
+    varTable->horizontalHeader()->setSectionsClickable(false);
     //varTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     varTable->horizontalHeader()->setSectionResizeMode(varnote, QHeaderView::Stretch);
     varTable->horizontalHeader()->setSectionResizeMode(varunit, QHeaderView::ResizeToContents);
+    varTable->setFrameShape(QFrame::NoFrame);                   //setting no frame
+    varTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    varTable->setSelectionMode(QAbstractItemView::SingleSelection);     //select signal row every time
+    varTable->setStyleSheet("selection-background-color:lightblue;");   //setting selected background
+    varTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //setting header background
+    varTable->setEditTriggers(QAbstractItemView::NoEditTriggers);       //no edit
     wizardDialog();
 }
 
 bool wizardOptimizeVariables::wizardDialog(){
     QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
     if(variablesObj.isEmpty()){
-        QMessageBox::critical(0, QString("Error"), QString("wizardOptimizeVariables.cpp:13: error: Cannot parse 'variables' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardOptimizeVariables.cpp:22: error: Cannot parse 'variables' in json file"));
         return false;
     }
     QJsonObject varObj;
@@ -34,12 +41,10 @@ bool wizardOptimizeVariables::wizardDialog(){
     for(QJsonObject::iterator iter = variablesObj.begin(); iter != variablesObj.end(); ++ iter){
         // iter format: "W1":{"note" : "介质板宽度W1(m)", "W1" : "0.025"}
         varKey = iter.key();
-        varObj = iter.value().toObject();
+        varObj = iter.value().toObject();   //like {"note": "上贴片坐标y1(m)", "y1": "[-0.0115,0]"}
         //get note infomation
         QString keyNote = varObj.value("note").toString().trimmed();
         insert2table(rownumber, varnote, keyNote);
-        //setting first column can not edit
-        varTable->item(rownumber, varnote)->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled);
         varTable->item(rownumber, varnote)->setWhatsThis(varKey);
 
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
@@ -49,8 +54,8 @@ bool wizardOptimizeVariables::wizardDialog(){
             insert2table(rownumber, varmax, varValue[0]);
         else
             insert2table(rownumber, varmax, varValue[1]);
-        QComboBox *unitComBo = new QComboBox;
-        //unitComBo->setFixedWidth(10);
+
+        QComboBox *unitComBo = new QComboBox();
         initUnitComBo(unitComBo);
         varTable->setCellWidget(rownumber, varunit, unitComBo);
         //map combobox signal

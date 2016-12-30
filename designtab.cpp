@@ -2,12 +2,12 @@
 
 designTab::designTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->obj = obj;
-    this->tabWidget = new QTabWidget;
+    this->tabWidget = new QTabWidget();
     this->setMinimumSize(880, 580);
     //remove help menu
     this->setWindowFlags(windowFlags() &~ Qt::WindowContextHelpButtonHint);
-    this->firstTab = new QWidget;
-    this->secondTab = new QWidget;
+    this->firstTab = new QWidget(this);
+    this->secondTab = new QWidget(this);
     this->saveAllButton = new QPushButton("保存所有");
     connect(saveAllButton, SIGNAL(clicked(bool)), this, SLOT(slot_saveAllButton(bool)));
 
@@ -46,6 +46,10 @@ designTab::designTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     //!
 
     //!second tab widget
+    this->varTable = new QTableWidget();
+    this->signalsmapSlider = new QSignalMapper();
+    this->signalsmapUnit = new QSignalMapper();
+    tableSetting();
     readDefaultVars();
     variablesSetting();
     //!
@@ -183,6 +187,27 @@ void designTab::setFirstTabLayout(){
 //!
 
 //!sceond widget
+void designTab::tableSetting(){
+    varTable->setColumnCount(3);
+    QStringList header;
+    header << "变量" << "参数值" << "单位";
+    varTable->setHorizontalHeaderLabels(header);
+    varTable->horizontalHeader()->setSectionsClickable(false);
+    varTable->horizontalHeader()->setSectionResizeMode(varvalue, QHeaderView::Stretch);
+    varTable->horizontalHeader()->setSectionResizeMode(varunit, QHeaderView::ResizeToContents);
+    varTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    //varTable->verticalHeader()->setDefaultSectionSize(0);      //setting row spacing
+    varTable->setFrameShape(QFrame::NoFrame);                   //setting no frame
+    varTable->setShowGrid(false);                               //setting no grid line
+    varTable->verticalHeader()->setVisible(false);              //setting no vertical header
+    varTable->horizontalHeader()->resizeSection(0, 120);        //setting first column width is 150
+    varTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    varTable->setSelectionMode(QAbstractItemView::SingleSelection);     //select signal row every time
+    varTable->setStyleSheet("selection-background-color:lightblue;");   //setting selected background
+    varTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //setting header background
+    varTable->setEditTriggers(QAbstractItemView::NoEditTriggers);       //no edit
+}
+
 bool designTab::readDefaultVars(){
     QJsonObject defaultVarsObj = parseJson::getSubJsonObj(obj, "varsValue");
     if(defaultVarsObj.isEmpty()){
@@ -195,54 +220,60 @@ bool designTab::readDefaultVars(){
     return true;
 }
 
-QComboBox* designTab::initUnitComBo(){
-    QComboBox *comb = new QComboBox;
+void designTab::initUnitComBo(QComboBox* comb){
     comb->addItem("mm");
+    comb->setItemData(0, MARK_UNIT_MM, ROLE_MARK_UNIT);
     comb->addItem("cm");
+    comb->setItemData(1, MARK_UNIT_CM, ROLE_MARK_UNIT);
     comb->addItem("λ");
+    comb->setItemData(2, MARK_UNIT_LAMBDA, ROLE_MARK_UNIT);
     comb->addItem("m");
+    comb->setItemData(3, MARK_UNIT_M, ROLE_MARK_UNIT);
     comb->addItem("km");
+    comb->setItemData(4, MARK_UNIT_KM, ROLE_MARK_UNIT);
     comb->setCurrentIndex(3);
-    return comb;
 }
 
 bool designTab::variablesSetting(){
     QJsonObject variablesObj = parseJson::getSubJsonObj(obj, "variables");
     if(variablesObj.isEmpty()){
-        QMessageBox::critical(0, QString("Error"), QString("designTab.cpp:195: error: Cannot parse 'variables' in json file"));
+        QMessageBox::critical(0, QString("Error"), QString("wizardDesignVariables.cpp:27: error: Cannot parse 'variables' in json file"));
         return false;
     }
     QJsonObject varObj;
     QString varKey;
     QStringList varValue;
-    int posx = 0, valueListLength;
+    int rownumber = 0, valueListLength;
     double realValue;
-    QGridLayout *gridLayout = new QGridLayout;
+
     QRegExp rx("^(-?\\d+)(\\.\\d+)?$");
     QRegExpValidator *floatValid = new QRegExpValidator(rx);      //float
+    varTable->setRowCount(variablesObj.count());
 
     for(QJsonObject::iterator iter = variablesObj.begin(); iter != variablesObj.end(); ++ iter){
         // iter format: "W1":{"note" : "介质板宽度W1(m)", "W1" : "0.025"}
-        varInfo tempVarInfo;
         varKey = iter.key();
-        varObj = iter.value().toObject();
+        varObj = iter.value().toObject();   //like {"note": "上贴片坐标y1(m)", "y1": "[-0.0115,0]"}
         //get note infomation
-        QLabel *keyLabel = new QLabel(varObj.value("note").toString().trimmed());
-        keyLabel->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-        gridLayout->addWidget(keyLabel, posx, 0);
+        QString keyNote = varObj.value("note").toString().trimmed();
+        insert2table(rownumber, varnote, keyNote);
+        varTable->item(rownumber, varnote)->setWhatsThis(varKey);
+        //varTable->item(rownumber, varnote)->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled);
 
         // init line edit and layout
         varValue = global::str2list(varObj.value(varKey).toString().trimmed());
         valueListLength = varValue.length();
         QLineEdit *valueEdit = new QLineEdit;
+        //valueEdit->setFixedWidth(240);
         valueEdit->setValidator(floatValid);
 
         if(valueListLength == 1){
             valueEdit->setText(varValue[0]);
             valueEdit->setReadOnly(true);
-            gridLayout->addWidget(valueEdit, posx, 1);
+            varTable->setCellWidget(rownumber, varvalue, valueEdit);
         }
         else{
+            QWidget *cellWidget = new QWidget();
             QVBoxLayout *vLayout = new QVBoxLayout;
             QSlider *varSlider = new QSlider(Qt::Horizontal);
 
@@ -262,8 +293,9 @@ bool designTab::variablesSetting(){
                 int sliderValue = 100 * (realValue - startValue) / (stopValue - startValue);
                 varSlider->setValue(sliderValue);
             }
-
+            //!conversion slider value and edit value
             valueEdit->setText(QString::number(realValue));
+
 
             //valueEdit->setReadOnly(true);
             vLayout->addWidget(valueEdit);
@@ -272,31 +304,37 @@ bool designTab::variablesSetting(){
             vLayout->setSpacing(0);
             // design outer space
             //vLayout->setMargin(0);
-            gridLayout->addLayout(vLayout, posx, 1);
+            cellWidget->setLayout(vLayout);
+            //test begin
+            //QLineEdit *findEdit = cellWidget->findChild<QLineEdit *>();
+            //qDebug() << "findEdit: " << findEdit->text();
+            //test end
+            varTable->setCellWidget(rownumber, varvalue, cellWidget);
 
-            tempVarInfo.lower = startValue;
-            tempVarInfo.upper = stopValue;
-            tempVarInfo.varSlider = varSlider;
-
-            connect(varSlider, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChange(int)));
-
+            connect(varSlider, SIGNAL(valueChanged(int)), signalsmapSlider, SLOT(map()));
+            signalsmapSlider->setMapping(varSlider, QString("%1#%2#%3").arg(rownumber).arg(stopValue).arg(startValue));
         }
-        tempVarInfo.varKey = varKey;
-        tempVarInfo.varEdit = valueEdit;
-        varinfos.append(tempVarInfo);
         //connect(valueEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_LinetextChange(QString)));
         //valueEdit->installEventFilter(this);        //install filter in this dialog(在对话框上为QLineEdit安装过滤器)
-        //connect(valueEdit, SIGNAL(), this, SLOT(slot_LinetextChange(QString)));
-        QComboBox *unitComBo = initUnitComBo();
-        //unitComBo->setFixedWidth(50);
-        gridLayout->addWidget(unitComBo, posx, 2);
-        ++ posx;
+        QWidget *unitWidget = new QWidget();
+        QHBoxLayout *unitLayout = new QHBoxLayout();
+        QComboBox *unitComBo = new QComboBox();
+        unitComBo->setFixedHeight(25);
+        initUnitComBo(unitComBo);
+        unitLayout->addWidget(unitComBo);
+        unitWidget->setLayout(unitLayout);
+        varTable->setCellWidget(rownumber, varunit, unitWidget);
+
+        //map combobox signal
+        connect(unitComBo, SIGNAL(currentIndexChanged(int)), signalsmapUnit, SLOT(map()));
+        signalsmapUnit->setMapping(unitComBo, QString("%1").arg(rownumber));
+        //in 'rownumber'th row, save default unitComBo current data
+        comboDatas.insert(rownumber, unitComBo->currentData(ROLE_MARK_UNIT).toInt());
+        rownumber++;
     }
 
-    gridLayout->setAlignment(Qt::AlignHCenter);
-    gridLayout->setAlignment(Qt::AlignVCenter);
-    gridLayout->setSpacing(10);
-    gridLayout->setContentsMargins(2,20,2,2);
+    connect(signalsmapSlider, SIGNAL(mapped(QString)), this, SLOT(slot_sliderValueChange(QString)));
+    connect(signalsmapUnit, SIGNAL(mapped(QString)), this, SLOT(slot_unitchange(QString)));
 
     //!add picture
     QString picturePath;
@@ -319,16 +357,11 @@ bool designTab::variablesSetting(){
     else
         atnPhoto->setPixmap(pm);
     //!
-    QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->addLayout(gridLayout, 1);
+    QHBoxLayout *hLayout = new QHBoxLayout();
+    hLayout->addWidget(varTable, 1);
     hLayout->addWidget(atnPhoto, 1);
 
-
-    QVBoxLayout *tabLayout = new QVBoxLayout;
-    //tabLayout->addSpacerItem(new QSpacerItem(3, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    tabLayout->addLayout(hLayout);
-    //tabLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    secondTab->setLayout(tabLayout);
+    secondTab->setLayout(hLayout);
     return true;
 }
 
@@ -385,8 +418,11 @@ QJsonObject designTab::saveInJsonObj(){
     saveFarObj.insert("PhiStep", QString("[%1]").arg(phiStepEdit->text().trimmed()));
 
     //Variables Setting json object
-    foreach(varInfo var, varinfos){
-        varObj.insert(var.varKey, var.varEdit->text().trimmed());
+    QString varKey, varValue;
+    for(int i = 0; i < varTable->rowCount(); i++){
+        varKey = varTable->item(i, varnote)->whatsThis().trimmed();
+        varValue = varTable->cellWidget(i, varvalue)->findChild<QLineEdit *>()->text().trimmed();
+        varObj.insert(varKey, varValue);
     }
 
     saveObj.insert("FreSetting", saveFreObj);
@@ -395,18 +431,58 @@ QJsonObject designTab::saveInJsonObj(){
     return saveObj;
 }
 
-//slots function
-void designTab::slot_sliderValueChange(int value){
-    QSlider* selectSlider = static_cast<QSlider* >(sender());
-    foreach(varInfo var, varinfos){
-        if(var.varSlider == selectSlider){
-            //qDebug() << var.varKey << "---" << var.varEdit;
-            double realValue = (var.upper - var.lower)/100.0 * value + var.lower;
-            //var.varEdit->setReadOnly(true);
-            var.varEdit->setText(QString::number(realValue));
-        }
-    }
+void designTab::insert2table(const int &row, const int &clomun, const QString &itemValue){
+    QTableWidgetItem *tableItem = new QTableWidgetItem(itemValue);
+    tableItem->setTextAlignment(Qt::AlignCenter);
+    varTable->setItem(row, clomun, tableItem);
 }
+
+double designTab::unitConversion(double sourceData, int preunit, int curunit){
+    //assert(preunit != unitlambda && curunit != unitlambda);
+    return sourceData * qPow(10, preunit - curunit);
+}
+
+//slots function
+void designTab::slot_LinetextChange(QString text){
+    //qDebug() << text;
+}
+
+void designTab::slot_sliderValueChange(QString sparameter){
+    QStringList parameterList = sparameter.split("#");
+    int rowNumber = parameterList.at(0).toInt();        //table rowth
+    double upper = parameterList.at(1).toDouble();
+    double lower = parameterList.at(2).toDouble();
+    //get widget
+    QSlider* selectSlider = varTable->cellWidget(rowNumber, varvalue)->findChild<QSlider *>();
+    QLineEdit* selectLineEdit = varTable->cellWidget(rowNumber, varvalue)->findChild<QLineEdit *>();
+    int svalue = selectSlider->value();
+    double levalue = selectLineEdit->text().trimmed().toDouble();
+    //get new edit value by slider value
+    double newLineEditValue = (upper - lower)/100.0 * svalue + lower;
+    selectLineEdit->setText(QString::number(newLineEditValue));
+}
+
+void designTab::slot_unitchange(QString pos){
+    Q_ASSERT(!comboDatas.isEmpty());
+    int row = pos.toInt();
+    int currentUnitData = comboDatas[row];
+    QComboBox *selectCombox = varTable->cellWidget(row, varunit)->findChild<QComboBox *>();
+    //qDebug() << selectCombox->currentText();
+    int newUnitData = selectCombox->currentData(ROLE_MARK_UNIT).toInt();
+    //qDebug() << currentUnitData << newUnitData;
+    //unit conversion
+    if(currentUnitData != MARK_UNIT_LAMBDA && newUnitData != MARK_UNIT_LAMBDA &&
+            newUnitData != currentUnitData){
+        //get QLineEdit widget
+        QLineEdit* currLineEdit = varTable->cellWidget(row, varvalue)->findChild<QLineEdit *>();
+        double preValue = currLineEdit->text().trimmed().toDouble();
+        double currValue = unitConversion(preValue, currentUnitData, newUnitData);
+        currLineEdit->setText(QString::number(currValue));
+    }
+    //update unit item user data
+    comboDatas[row] = newUnitData;
+}
+
 
 void designTab::slot_saveAllButton(bool isChecked){
     bool isOK = true;

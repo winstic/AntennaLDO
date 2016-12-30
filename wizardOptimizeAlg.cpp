@@ -24,7 +24,7 @@ wizardOptimizeAlg::wizardOptimizeAlg(QWidget *parent) : QWizardPage(parent){
     QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
     QString globalJsonPath = QString("%1/global_conf.json").arg(DEA4ADglobalPath);
     QJsonObject globalObj = parseJson::getJsonObj(globalJsonPath);
-    threadLine->setText(globalObj.value("ThreadNum").toString().trimmed());
+    threadLine->setText(QString::number(globalObj.value("ThreadNum").toString().trimmed().toInt()-1));
 
     confSetting();
     initLayout();
@@ -147,7 +147,7 @@ QString wizardOptimizeAlg::getAlgName() const{
 
 QJsonObject wizardOptimizeAlg::saveInJsonObj(){
     QJsonObject saveObj, globalObj, algObj;
-    globalObj.insert("ThreadNum", threadLine->text().trimmed());
+    globalObj.insert("ThreadNum", QString::number(threadLine->text().trimmed().toInt()+1));
     globalObj.insert("ALGORITHM_NAME", algName);
     globalObj.insert("PROBLEM_NAME", atnName);
     algObj.insert("generation", generationLine->text().trimmed());
