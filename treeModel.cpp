@@ -403,7 +403,8 @@ void treeModel::slot_addDesign(){
                 QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:389: error: Cannot parse jsonFile %1").arg(jsonPath));
                 return;
             }
-            designWizard *wizard = new designWizard(obj);
+            designWizard *wizard = new designWizard(obj, this);
+            wizard->setAttribute(Qt::WA_DeleteOnClose);
             if(wizard->exec() == 1){
                 QString designName = QString("设计%1").arg(item->rowCount()+1);
                 QDir *dir = new QDir();
@@ -447,7 +448,8 @@ void treeModel::slot_addOptimize(){
                 QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:457: error: Cannot parse jsonFile %1").arg(jsonPath));
                 return;
             }
-            optimizeWizard *wizard = new optimizeWizard(obj);
+            optimizeWizard *wizard = new optimizeWizard(obj, this);
+            wizard->setAttribute(Qt::WA_DeleteOnClose);
             if(wizard->exec() == 1){                
                 QString optimizeName = QString("优化%1").arg(item->rowCount()+1);
                 QDir *dir = new QDir();
@@ -481,9 +483,10 @@ void treeModel::slot_addOptimize(){
 
 void treeModel::slot_openFile(){
     QString atnProName = global::getInfoFromRel("Problem");
-    modelFile *mf = new modelFile(atnProName);
-    mf->setModal(true);
-    mf->show();
+    modelFile *mf = new modelFile(atnProName, this);
+    mf->setAttribute(Qt::WA_DeleteOnClose);
+    //mf->setModal(true);
+    mf->exec();
 }
 
 void treeModel::slot_modifyDesignVar(){
@@ -494,9 +497,10 @@ void treeModel::slot_modifyDesignVar(){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
         return;
     }
-    designTab *dTab = new designTab(obj);
-    dTab->setModal(true);
-    dTab->show();
+    designTab *dTab = new designTab(obj, this);
+    dTab->setAttribute(Qt::WA_DeleteOnClose);
+    //dTab->setModal(true);
+    dTab->exec();
 }
 
 void treeModel::slot_modifyOptimizeVar(){
@@ -507,9 +511,10 @@ void treeModel::slot_modifyOptimizeVar(){
         QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:425: error: Cannot parse jsonFile %1").arg(jsonPath));
         return;
     }
-    optimizeTab *otab = new optimizeTab(obj);
-    otab->setModal(true);
-    otab->show();
+    optimizeTab *otab = new optimizeTab(obj, this);
+    otab->setAttribute(Qt::WA_DeleteOnClose);
+    //otab->setModal(true);
+    otab->exec();
 }
 
 void treeModel::slot_designRun(){
