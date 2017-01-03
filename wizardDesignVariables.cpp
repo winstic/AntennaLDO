@@ -267,22 +267,15 @@ void wizardDesignVariables::slot_LinetextChange(QString text){
 
 void wizardDesignVariables::slot_sliderValueChange(QString sparameter){
     QStringList parameterList = sparameter.split("#");
-    QSlider* selectSlider ;
-    QLineEdit* selectLineEdit;
-    int rowNumber, svalue, currUnitData;
-    double upper, lower, newLineEditValue;
-    rowNumber = parameterList.at(0).toInt();        //table rowth
-    upper = parameterList.at(1).toDouble();
-    lower = parameterList.at(2).toDouble();
+    int rowNumber = parameterList.at(0).toInt();        //table rowth
+    double upper = parameterList.at(1).toDouble();
+    double lower = parameterList.at(2).toDouble();
     //get widget
-    selectSlider = varTable->cellWidget(rowNumber, varvalue)->findChild<QSlider *>();
-    selectLineEdit = varTable->cellWidget(rowNumber, varvalue)->findChild<QLineEdit *>();
-    svalue = selectSlider->value();
+    QSlider* selectSlider = varTable->cellWidget(rowNumber, varvalue)->findChild<QSlider *>();
+    QLineEdit* selectLineEdit = varTable->cellWidget(rowNumber, varvalue)->findChild<QLineEdit *>();
+    int svalue = selectSlider->value();
     //get new edit value by slider value
-    newLineEditValue = (upper - lower)/100.0 * svalue + lower;
-    currUnitData = comboDatas[rowNumber];
-    if(MARK_UNIT_M != currUnitData && MARK_UNIT_LAMBDA != currUnitData)
-        newLineEditValue = unitConversion(newLineEditValue, MARK_UNIT_M, currUnitData);
+    double newLineEditValue = (upper - lower)/100.0 * svalue + lower;
     selectLineEdit->setText(QString::number(newLineEditValue));
 }
 
