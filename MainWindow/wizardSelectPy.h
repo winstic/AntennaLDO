@@ -3,8 +3,8 @@
 
 #include <QWizardPage>
 #include <QtWidgets>
-#include "sqliteManage.h"
-#include "macrodefined.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/sqliteManage.h"
 
 class wizardSelectPy :public QWizardPage
 {

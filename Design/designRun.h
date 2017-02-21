@@ -5,9 +5,9 @@
 #include <QFile>
 #include <QProcess>
 #include <QDebug>
-#include "macrodefined.h"
-#include "parsejson.h"
-#include "global.h"
+#include "../Global/global.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/parsejson.h"
 
 class designRun : public QThread{
 public:

@@ -5,9 +5,9 @@
 #include <QFile>
 #include <QProcess>
 #include <QDebug>
-#include "global.h"
-#include "parsejson.h"
-#include "sqliteManage.h"
+#include "../Global/global.h"
+#include "../Utility/parsejson.h"
+#include "../Utility/sqliteManage.h"
 
 class optimizeRun : public QThread{
 public:

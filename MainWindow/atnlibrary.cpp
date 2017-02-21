@@ -1,5 +1,6 @@
-﻿#include "atnlibrary.h"
-#include "global.h"
+﻿#include "../Global/global.h"
+#include "atnlibrary.h"
+
 
 atnLibrary::atnLibrary(QString sql, treeModel *mTreeModel, QWidget *parent) : QWidget(parent){
     this->mTreeModel = mTreeModel;

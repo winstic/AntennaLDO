@@ -1,5 +1,6 @@
-﻿#include "wizardDesignVariables.h"
-#include "global.h"
+﻿#include "../Global/global.h"
+#include "wizardDesignVariables.h"
+
 
 wizardDesignVariables::wizardDesignVariables(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     this->obj = obj;

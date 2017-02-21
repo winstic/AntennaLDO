@@ -1,7 +1,8 @@
 ﻿#include <QtWidgets>
+#include "../Global/global.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "global.h"
+
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), isClosedSubmdi(false){
     ui->setupUi(this);

@@ -2,8 +2,8 @@
 #define MODELFILE_H
 
 #include <QtWidgets>
+#include "../Global/global.h"
 #include "sqliteManage.h"
-#include "global.h"
 
 class modelFile : public QDialog{
     Q_OBJECT

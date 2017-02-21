@@ -1,5 +1,6 @@
-﻿#include "projectWizard.h"
-#include "global.h"
+﻿#include "../Global/global.h"
+#include "projectWizard.h"
+
 
 projectWizard::projectWizard(QString antennaName, QWidget *parent) : QWizard(parent){
     atnName = antennaName;

@@ -2,13 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "macrodefined.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/xmldomdocument.h"
+#include "../Utility/searchAction.h"
 #include "atnlibrary.h"
 #include "treeModel.h"
-#include "searchAction.h"
 #include "wizardAddSetting.h"
 #include "projectWizard.h"
-#include "xmldomdocument.h"
+
 
 namespace Ui {
 class MainWindow;

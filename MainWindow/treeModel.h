@@ -6,16 +6,16 @@
 #include <QFile>
 #include <QTextStream>
 #include <QProcess>
-#include "macrodefined.h"
-#include "designWizard.h"
-#include "optimizeWizard.h"
-#include "designtab.h"
-#include "optimizetab.h"
-#include "modelfile.h"
-#include "parsejson.h"
-#include "global.h"
-#include "designRun.h"
-#include "optimizeRun.h"
+#include "../Global/global.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/modelfile.h"
+#include "../Utility/parsejson.h"
+#include "../Design/designWizard.h"
+#include "../Design/designtab.h"
+#include "../Design/designRun.h"
+#include "../Optimize/optimizeWizard.h"
+#include "../Optimize/optimizetab.h"
+#include "../Optimize/optimizeRun.h"
 //#include "config.h"
 
 class treeModel : public QTreeView{

@@ -13,58 +13,58 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    designWizard.cpp \
-    treeModel.cpp \
-    wizardDesignPerformance.cpp \
-    wizardAddSetting.cpp \
-    wizardDesignVariables.cpp \
-    atnlibrary.cpp \
-    xmldomdocument.cpp \
-    projectWizard.cpp \
-    wizardIntroduce.cpp \
-    wizardSelectPy.cpp \
-    antennaCell.cpp \
-    searchAction.cpp \
-    sqliteManage.cpp \
-    global.cpp \
-    parsejson.cpp \
-    designtab.cpp \
-    modelfile.cpp \
-    wizardOptimizeAlg.cpp \
-    wizardOptimizeVariables.cpp \
-    optimizeWizard.cpp \
-    wizardOptimizeGainAxialLoss.cpp \
-    optimizetab.cpp \
-    designRun.cpp \
-    optimizeRun.cpp
+    Design/designRun.cpp \
+    Design/designtab.cpp \
+    Design/designWizard.cpp \
+    Design/wizardDesignPerformance.cpp \
+    Design/wizardDesignVariables.cpp \
+    Global/global.cpp \
+    MainWindow/antennaCell.cpp \
+    MainWindow/atnlibrary.cpp \
+    MainWindow/mainwindow.cpp \
+    MainWindow/projectWizard.cpp \
+    MainWindow/treeModel.cpp \
+    MainWindow/wizardAddSetting.cpp \
+    MainWindow/wizardIntroduce.cpp \
+    MainWindow/wizardSelectPy.cpp \
+    Optimize/optimizeRun.cpp \
+    Optimize/optimizetab.cpp \
+    Optimize/optimizeWizard.cpp \
+    Optimize/wizardOptimizeAlg.cpp \
+    Optimize/wizardOptimizeGainAxialLoss.cpp \
+    Optimize/wizardOptimizeVariables.cpp \
+    Utility/modelfile.cpp \
+    Utility/parsejson.cpp \
+    Utility/searchAction.cpp \
+    Utility/sqliteManage.cpp \
+    Utility/xmldomdocument.cpp
 
-HEADERS  += mainwindow.h \
-    wizardDesignPerformance.h \
-    global.h \
-    designWizard.h \
-    treeModel.h \
-    wizardDesignVariables.h \
-    atnlibrary.h \
-    projectWizard.h \
-    xmldomdocument.h \
-    wizardAddSetting.h \
-    wizardIntroduce.h \
-    wizardSelectPy.h \
-    antennaCell.h \
-    searchAction.h \
-    sqliteManage.h \
-    config.h \
-    macrodefined.h \
-    parsejson.h \
-    designtab.h \
-    modelfile.h \
-    wizardOptimizeAlg.h \
-    wizardOptimizeVariables.h \
-    optimizeWizard.h \
-    wizardOptimizeGainAxialLoss.h \
-    optimizetab.h \
-    designRun.h \
-    optimizeRun.h
+HEADERS  += Design/designRun.h \
+    Design/designtab.h \
+    Design/designWizard.h \
+    Design/wizardDesignPerformance.h \
+    Design/wizardDesignVariables.h \
+    Global/config.h \
+    Global/global.h \
+    Global/macrodefined.h \
+    MainWindow/antennaCell.h \
+    MainWindow/atnlibrary.h \
+    MainWindow/mainwindow.h \
+    MainWindow/projectWizard.h \
+    MainWindow/treeModel.h \
+    MainWindow/wizardAddSetting.h \
+    MainWindow/wizardIntroduce.h \
+    MainWindow/wizardSelectPy.h \
+    Optimize/optimizeRun.h \
+    Optimize/optimizetab.h \
+    Optimize/optimizeWizard.h \
+    Optimize/wizardOptimizeAlg.h \
+    Optimize/wizardOptimizeGainAxialLoss.h \
+    Optimize/wizardOptimizeVariables.h \
+    Utility/modelfile.h \
+    Utility/parsejson.h \
+    Utility/searchAction.h \
+    Utility/sqliteManage.h \
+    Utility/xmldomdocument.h
 
-FORMS    += mainwindow.ui
+FORMS    += MainWindow/mainwindow.ui

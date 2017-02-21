@@ -6,8 +6,8 @@
 #include <QWizardPage>
 #include <QDir>
 #include <QFile>
+#include "../Utility/sqliteManage.h"
 #include "wizardIntroduce.h"
-#include "sqliteManage.h"
 #include "wizardAddSetting.h"
 #include "wizardSelectPy.h"
 //#include "config.h"

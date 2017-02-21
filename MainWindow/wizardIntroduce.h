@@ -3,8 +3,8 @@
 
 #include <QtWidgets>
 #include <QWizardPage>
-#include "macrodefined.h"
-#include "sqliteManage.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/sqliteManage.h"
 
 class wizardIntroduce :public QWizardPage{
     Q_OBJECT

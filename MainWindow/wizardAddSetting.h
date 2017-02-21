@@ -6,7 +6,7 @@
 #include <fstream>
 #include <QRegExp>
 #include <QTextStream>
-#include "global.h"
+#include "../Global/global.h"
 
 class wizardAddSetting :public QWizardPage
 {

@@ -3,10 +3,11 @@
 
 #include <QtWidgets>
 #include <QVector>
-#include "macrodefined.h"
-#include "sqliteManage.h"
-#include "parsejson.h"
-#include "global.h"
+#include "../Global/global.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/sqliteManage.h"
+#include "../Utility/parsejson.h"
+
 
 class designTab : public QDialog{
     Q_OBJECT

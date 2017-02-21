@@ -1,4 +1,5 @@
 ﻿#include "searchAction.h"
+
 searchAction::searchAction(QWidget *parent)
 	: QWidgetAction(parent)
 {

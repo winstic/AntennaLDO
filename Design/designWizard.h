@@ -5,10 +5,10 @@
 #include <QWizardPage>
 #include <QFile>
 #include <QTextStream>
-#include "macrodefined.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/parsejson.h"
 #include "wizardDesignPerformance.h"
 #include "wizardDesignVariables.h"
-#include "parsejson.h"
 
 class designWizard : public QWizard{
     Q_OBJECT

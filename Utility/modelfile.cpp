@@ -21,13 +21,15 @@ modelFile::modelFile(QString antennaName, QWidget *parent) : QDialog(parent){
 QString modelFile::getAtnModelInfo(const QString name){
     QSqlQuery sqlQuery;
     QString sql = QString("select pModelPath, pInfo from antennaProblem where pName = '%1';").arg(name);
+    QString qsInfo;
     sqlQuery.prepare(sql);
     if(!sqlQuery.exec(sql)){
         qDebug() << sqlQuery.lastError();
     }
     else{
         while(sqlQuery.next()){
-            return sqlQuery.value("pInfo").toString();
+            qsInfo = sqlQuery.value("pInfo").toString();
         }
     }
+    return qsInfo;
 }

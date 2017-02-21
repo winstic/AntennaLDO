@@ -4,10 +4,10 @@
 #include <QtWidgets>
 #include <QWizardPage>
 //#include "parsejson.h"
-#include "sqliteManage.h"
-#include "macrodefined.h"
-#include "global.h"
-#include "parsejson.h"
+#include "../Global/global.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/parsejson.h"
+#include "../Utility/sqliteManage.h"
 
 class wizardOptimizeAlg : public QWizardPage{
     Q_OBJECT

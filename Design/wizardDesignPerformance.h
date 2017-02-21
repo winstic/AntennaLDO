@@ -4,8 +4,8 @@
 #include <QtWidgets>
 #include <QWizardPage>
 #include <QFile>
-#include "macrodefined.h"
-#include "parsejson.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/parsejson.h"
 
 class wizardDesignPerformance : public QWizardPage{
     Q_OBJECT

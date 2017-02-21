@@ -3,12 +3,12 @@
 
 #include <QListView>
 
-#include "macrodefined.h"
-#include "sqliteManage.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/sqliteManage.h"
+#include "../Utility/modelfile.h"
 #include "antennaCell.h"
 #include "projectWizard.h"
 #include "treeModel.h"
-#include "modelfile.h"
 //#include "config.h"
 
 class atnLibrary : public QWidget{

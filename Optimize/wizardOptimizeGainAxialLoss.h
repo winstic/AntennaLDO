@@ -3,8 +3,8 @@
 
 #include <QtWidgets>
 #include <QWizardPage>
-#include "parsejson.h"
-#include "global.h"
+#include "../Global/global.h"
+#include "../Utility/parsejson.h"
 
 class wizardOptimizeAXL : public QWizardPage{
     Q_OBJECT

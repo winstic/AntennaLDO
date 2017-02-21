@@ -2,8 +2,8 @@
 #define ANTENNACELL_H
 
 #include <QtWidgets>
-#include "sqliteManage.h"
-#include "macrodefined.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/sqliteManage.h"
 class antennaCell :public QWidget
 {
 public:

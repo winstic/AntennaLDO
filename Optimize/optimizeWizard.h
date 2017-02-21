@@ -5,10 +5,10 @@
 #include <QWizardPage>
 #include <QFile>
 #include <QTextStream>
-#include "macrodefined.h"
-#include "global.h"
-#include "parsejson.h"
-#include "wizardDesignPerformance.h"
+#include "../Global/global.h"
+#include "../Global/macrodefined.h"
+#include "../Utility/parsejson.h"
+#include "../Design/wizardDesignPerformance.h"
 #include "wizardOptimizeGainAxialLoss.h"
 #include "wizardOptimizeVariables.h"
 #include "wizardOptimizeAlg.h"

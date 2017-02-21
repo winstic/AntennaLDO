@@ -1,5 +1,5 @@
-﻿#include "wizardDesignPerformance.h"
-#include "global.h"
+﻿#include "../Global/global.h"
+#include "wizardDesignPerformance.h"
 
 wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *parent) : QWizardPage(parent){
     setTitle(tr("性能参数设置"));
@@ -172,7 +172,10 @@ void wizardDesignPerformance::initLayout(){
 
 QJsonObject wizardDesignPerformance::saveInJsonObj(){
     QJsonObject saveObj, saveFreObj, saveFarObj;
-    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
+    qDebug() << "start";
+    //qDebug() << "ff" << freStartEdit;
+    //saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
+    saveFreObj.insert("FreStart", "[2400]");
     saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
     saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text().trimmed()));
     saveFreObj.insert("SweepType", QString("[%1]").arg(sweeptypeComb->currentIndex()));
@@ -187,6 +190,7 @@ QJsonObject wizardDesignPerformance::saveInJsonObj(){
 
     saveObj.insert("FreSetting", saveFreObj);
     saveObj.insert("ThetaPhiStep", saveFarObj);
+    qDebug() << "end";
     return saveObj;
 }
 
