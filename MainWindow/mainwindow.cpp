@@ -242,7 +242,7 @@ void MainWindow::createActions(){
 
 void MainWindow::slot_NewProject(){
     projectWizard* wizard = new projectWizard(NULL, this);
-    wizard->setAttribute(Qt::WA_DeleteOnClose);
+    //wizard->setAttribute(Qt::WA_DeleteOnClose);
     if(wizard->exec() == 1){
         //mTreeModel->showTree();
     }

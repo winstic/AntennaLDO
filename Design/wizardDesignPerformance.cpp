@@ -11,11 +11,11 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     this->freNumberLabel = new QLabel("频点个数:");
     this->sweepTypeLabel = new QLabel("扫频方式:");
     this->PMLabel = new QLabel("极化方式:");
-    this->freStartEdit = new QLineEdit;
-    this->freEndEdit = new QLineEdit;
-    this->freNumberEdit = new QLineEdit;
-    this->sweeptypeComb = new QComboBox;
-    this->PMComb = new QComboBox;
+    this->freStartEdit = new QLineEdit();
+    this->freEndEdit = new QLineEdit();
+    this->freNumberEdit = new QLineEdit();
+    this->sweeptypeComb = new QComboBox();
+    this->PMComb = new QComboBox();
     this->groupBoxFrequency = new QGroupBox(tr("频率设置"));
 
     //farFieldSetting
@@ -25,12 +25,12 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     this->phiStartLabel = new QLabel("起始φ:");
     this->phiEndLabel = new QLabel("终止φ:");
     this->phiStepLabel = new QLabel("φ步长:");
-    this->thetaStartEdit = new QLineEdit;
-    this->thetaEndEdit = new QLineEdit;
-    this->thetaStepEdit = new QLineEdit;
-    this->phiStartEdit = new QLineEdit;
-    this->phiEndEdit = new QLineEdit;
-    this->phiStepEdit = new QLineEdit;
+    this->thetaStartEdit = new QLineEdit();
+    this->thetaEndEdit = new QLineEdit();
+    this->thetaStepEdit = new QLineEdit();
+    this->phiStartEdit = new QLineEdit();
+    this->phiEndEdit = new QLineEdit();
+    this->phiStepEdit = new QLineEdit();
     this->groupBoxFarField = new QGroupBox(tr("远场范围设置"));
 
     //set regexp
@@ -52,6 +52,13 @@ wizardDesignPerformance::wizardDesignPerformance(QJsonObject &obj, QWidget *pare
     frequencySetting();
     farFieldSetting();
     initLayout();
+    //delete nonNegFloatValid;
+    //nonNegFloatValid = NULL;
+    //delete floatValid;
+    //floatValid = NULL;
+    //delete posIntValid;
+    //posIntValid = NULL;
+
     //connect(thetaStartEdit, )
 }
 
@@ -118,12 +125,15 @@ void wizardDesignPerformance::initLayout(){
     freStartLabel->setAlignment(Qt::AlignRight);
     freLayout->addWidget(freStartLabel, 0, 0);
     freLayout->addWidget(freStartEdit, 0, 1);
-    freLayout->addWidget(new QLabel("MHz"), 0, 2);
+
+    QLabel *hzLabel = new QLabel("MHz");
+    freLayout->addWidget(hzLabel, 0, 2);
 
     freEndLabel->setAlignment(Qt::AlignRight);
     freLayout->addWidget(freEndLabel, 1, 0);
     freLayout->addWidget(freEndEdit, 1, 1);
-    freLayout->addWidget(new QLabel("MHz"), 1, 2);
+    QLabel *hzLabel2 = new QLabel("MHz");
+    freLayout->addWidget(hzLabel2, 1, 2);
 
     freNumberLabel->setAlignment(Qt::AlignRight);
     freLayout->addWidget(freNumberLabel, 2, 0);
@@ -172,10 +182,7 @@ void wizardDesignPerformance::initLayout(){
 
 QJsonObject wizardDesignPerformance::saveInJsonObj(){
     QJsonObject saveObj, saveFreObj, saveFarObj;
-    qDebug() << "start";
-    //qDebug() << "ff" << freStartEdit;
-    //saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
-    saveFreObj.insert("FreStart", "[2400]");
+    saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
     saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
     saveFreObj.insert("FreNumber", QString("[%1]").arg(freNumberEdit->text().trimmed()));
     saveFreObj.insert("SweepType", QString("[%1]").arg(sweeptypeComb->currentIndex()));
@@ -190,10 +197,11 @@ QJsonObject wizardDesignPerformance::saveInJsonObj(){
 
     saveObj.insert("FreSetting", saveFreObj);
     saveObj.insert("ThetaPhiStep", saveFarObj);
-    qDebug() << "end";
     return saveObj;
 }
 
 bool wizardDesignPerformance::validatePage(){
     return true;
 }
+
+wizardDesignPerformance::~wizardDesignPerformance(){}

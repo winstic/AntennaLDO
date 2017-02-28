@@ -12,7 +12,7 @@ class wizardDesignPerformance : public QWizardPage{
 
 public:
     wizardDesignPerformance(QJsonObject &obj, QWidget *parent = 0);
-    ~wizardDesignPerformance(){}
+    ~wizardDesignPerformance();
     QJsonObject saveInJsonObj();
 
 protected:

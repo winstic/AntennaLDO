@@ -150,7 +150,7 @@ void atnLibrary::slot_tableCellDoubleClick(int row, int col){
         antennaCell* cellTab = static_cast<antennaCell* >(currentWidget);
         atnName = cellTab->getAtnName();
         projectWizard* wizard = new projectWizard(atnName, this);
-        wizard->setAttribute(Qt::WA_DeleteOnClose);
+        //wizard->setAttribute(Qt::WA_DeleteOnClose);
         if(wizard->exec() == 1){           
             QString workingPath =  sysParam["WorkingProjectPath"];
             QString projectName = global::getProjectName();
@@ -177,7 +177,7 @@ void atnLibrary::slot_customContextMenuRequested(QPoint pos){
 
 void atnLibrary::slot_newProject(){
     projectWizard* wizard = new projectWizard(atnName, this);
-    wizard->setAttribute(Qt::WA_DeleteOnClose);
+    //wizard->setAttribute(Qt::WA_DeleteOnClose);
     if(wizard->exec() == 1){
         QString workingPath =  sysParam["WorkingProjectPath"];
         QString projectName = global::getProjectName();
@@ -188,6 +188,6 @@ void atnLibrary::slot_newProject(){
 
 void atnLibrary::slot_property(){
     modelFile *mf = new modelFile(atnName, this);
-    mf->setAttribute(Qt::WA_DeleteOnClose);
+    //mf->setAttribute(Qt::WA_DeleteOnClose);
     mf->exec();
 }
