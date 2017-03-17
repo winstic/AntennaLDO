@@ -394,6 +394,7 @@ void treeModel::slot_addDesign(){
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
     QString atnProName = global::getInfoFromRel("Problem");
+    QString atnProType = global::getInfoFromRel("ProType");
     if(varNode.isValid()){
         if(MARK_NODE_DESIGN == varNode.toInt()){
             QString workingDir = sysParam["WorkingProjectPath"];
@@ -416,10 +417,18 @@ void treeModel::slot_addDesign(){
                 child->setData(MARK_ITEM_ATNDESIGN, ROLE_MARK_ITEM);
                 item->appendRow(child);
                 dir->mkdir(designDir);
-                //copy files(.json, .vbs,) in designDir from projectDir
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(designDir).arg(atnProName)) ||
-                        ! global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnProName), QString("%1/%2_design.vbs").arg(designDir).arg(atnProName)) ){
-                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:411: error: create design module failed!"));
+                //copy files(.json, module file) in designDir from projectDir
+                bool isSuccess = false;
+                proType atntype = (proType)atnProType.toInt();
+                if( global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(designDir).arg(atnProName)) ){
+                    if( atntype == hfss)
+                        isSuccess = global::copyFile(QString("%1/%2_design.vbs").arg(workingDir).arg(atnProName), QString("%1/%2_design.vbs").arg(designDir).arg(atnProName));
+                    else
+                        isSuccess = true;
+                }
+
+                if(!isSuccess){
+                    QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:431: error: create design module failed!"));
                     dir->rmdir(designDir);
                     return;
                 }
@@ -439,6 +448,7 @@ void treeModel::slot_addOptimize(){
     QStandardItem *item = itemModel->itemFromIndex(currentIndex);
     QVariant varNode = currentIndex.data(ROLE_MARK_NODE);
     QString atnProName = global::getInfoFromRel("Problem");
+    QString atnProType = global::getInfoFromRel("ProType");
     if(varNode.isValid()){
         if(MARK_NODE_OPTIMIZE == varNode.toInt()){
             QString workingDir = sysParam["WorkingProjectPath"];
@@ -462,17 +472,24 @@ void treeModel::slot_addOptimize(){
                 item->appendRow(child);
                 dir->mkdir(optimizeDir);
                 //copy files(.json..,) in optimizeDir from projectDir
-                if(! global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnProName)) ||
-                        ! global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) ||
-                        ! global::copyFile(QString("%1/start.json").arg(workingDir), QString("%1/start.json").arg(optimizeDir)) ||
-                        ! global::copyFile(QString("%1/algorithm_conf.json").arg(workingDir), QString("%1/algorithm_conf.json").arg(optimizeDir)) ){
+                bool isSuccess = false;
+                proType atntype = (proType)atnProType.toInt();
+                isSuccess = global::copyFile(QString("%1/%2_conf.json").arg(workingDir).arg(atnProName), QString("%1/%2_conf.json").arg(optimizeDir).arg(atnProName)) &&
+                        global::copyFile(QString("%1/global_conf.json").arg(workingDir), QString("%1/global_conf.json").arg(optimizeDir)) &&
+                        global::copyFile(QString("%1/start.json").arg(workingDir), QString("%1/start.json").arg(optimizeDir)) &&
+                        global::copyFile(QString("%1/algorithm_conf.json").arg(workingDir), QString("%1/algorithm_conf.json").arg(optimizeDir));
+
+                sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
+                dir->mkdir(QString("%1/outfilepath").arg(optimizeDir));
+                dir->mkdir(QString("%1/outhfsspath").arg(optimizeDir));
+                if( isSuccess && (atntype == feko) )
+                    isSuccess = global::copyFile(QString("%1/%2.cfx").arg(workingDir).arg(atnProName), QString("%1/outfilepath/%2.cfx").arg(optimizeDir).arg(atnProName));
+
+                if( !isSuccess ){
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:459: error: create optimize module failed!"));
                     dir->rmdir(optimizeDir);
                     return;
                 }
-                sysParam["CurrentOptimizePath"] = optimizeDir;      //save current optimize path in global variable
-                dir->mkdir(QString("%1/outfilepath").arg(optimizeDir));
-                dir->mkdir(QString("%1/outhfsspath").arg(optimizeDir));
                 qDebug() << "CurrentOptimizePath: " << sysParam["CurrentOptimizePath"];
                 if(!(wizard->update2JsonFile() && updateXMLFile(QString("%1/%2.xml").arg(workingDir).arg(global::getProjectName()), item, child)))
                     QMessageBox::critical(0, QString("Error"), QString("treeModel.cpp:467: error: update module files failed!"));
@@ -534,6 +551,7 @@ void treeModel::slot_designStop(){}
 void treeModel::slot_optimizeStop(){
     QDir dir(QDir::currentPath());
     QString ostopPath = QString("%1/DEA4AD/trunk/end.bat").arg(dir.path());
+    //QString ostopPath = QString("./DEA4AD/trunk/end.bat");
     qDebug() << ostopPath;
     QProcess p(0);
     //"/c" mean close cmd window after execute .bat file.

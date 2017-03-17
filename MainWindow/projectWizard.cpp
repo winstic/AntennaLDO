@@ -68,6 +68,7 @@ void projectWizard::createProject(){
     QString proPath = selectPy->getProPath();
     QString algPath= selectPy->getAlgPath();
     QString relFile = projectName + ".rel";
+    bool isSuccess = false;
 
     //create project dir
 	QDir *dir = new QDir();
@@ -75,18 +76,35 @@ void projectWizard::createProject(){
 
     //copy antenna problem
     QString projectProPath = QString("%1/%2_conf.json").arg(projectFullPath).arg(atnName);
-    QString projectModelPath = QString("%1/%2.hfss").arg(projectFullPath).arg(atnName);
+    QString projectModelPathHfss = QString("%1/%2.hfss").arg(projectFullPath).arg(atnName);
+    QString projectModelPathFeko = QString("%1/%2.cfx").arg(projectFullPath).arg(atnName);
     QString projectScriptPath = QString("%1/%2_design.vbs").arg(projectFullPath).arg(atnName);
-    if(! global::copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath) ||
-           ! global::copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPath) ||
-            ! global::copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath) ){
-        QMessageBox::critical(0, QString("Error"), QString("projectWizard.cpp:79: error: 问题文件创建失败！"));
+
+    //后续在数据库中添加问题标识来区别问题（hfss/feko/...）
+    proType atntype = hfss;
+    if(global::copyFile(QString("%1/%2_conf.json").arg(proPath).arg(atnName), projectProPath)){
+        //hfss problem
+        if(global::copyFile(QString("%1/%2.hfss").arg(proPath).arg(atnName), projectModelPathHfss) &&
+                global::copyFile(QString("%1/%2_design.vbs").arg(proPath).arg(atnName), projectScriptPath)){
+            atntype = hfss;
+            isSuccess = true;
+        }
+
+        //feko problem
+        if( global::copyFile(QString("%1/%2.cfx").arg(proPath).arg(atnName), projectModelPathFeko) ){
+            atntype = feko;
+            isSuccess = true;
+        }
+    }
+
+    if(!isSuccess){
+        QMessageBox::critical(0, QString("Error"), QString("projectWizard.cpp:97: error: 问题文件创建失败！"));
         dir->rmdir(projectFullPath);
         return;
     }
 
     //confManage->writeConfigInfo("MODELVARIABLES", projectProPath);
-    //confManage->writeConfigInfo("MODELFILE", projectModelPath);
+    //confManage->writeConfigInfo("MODELFILE", projectModelPathHfss);
     //copy algorithm
     /*QString projectAlgPath = projectFullPath + "/" + QFileInfo(algPath).fileName();
     if(! global::copyFile(algPath, projectAlgPath)){
@@ -100,6 +118,7 @@ void projectWizard::createProject(){
     inFile.open(QIODevice::WriteOnly);
     QTextStream out(&inFile);
     out << "Problem:" << atnName << endl;
+    out << "ProType:" << atntype << endl;
     //out << projectAlgPath << endl;
     inFile.close();
 }

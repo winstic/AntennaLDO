@@ -30,6 +30,7 @@ private:
     QString projectName;
     QString projectPath;
     QString projectFullPath;
+    enum proType{hfss=0, feko};
 
 	void createProject();
 };

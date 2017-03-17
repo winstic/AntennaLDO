@@ -81,7 +81,7 @@ void designRun::run(){
     QJsonObject obj = parseJson::getJsonObj(QString("%1/%2_conf.json").arg(designDir).arg(atnName));
     registerHfssVars(obj);
     updateVbs(vbsPath);
-    //p.execute("hfss", QStringList() << "-RunScriptAndExit" << vbsPath);
+    //p.execute("hfss", QStringList() << "-RunScriptAndExit -Ng" << vbsPath);
     p.execute("hfss", QStringList() << "-RunScript" << vbsPath);
     /*if(! p.waitForStarted()){
         QMessageBox::critical(0, QString("Error"), QString("this process can not be called."));

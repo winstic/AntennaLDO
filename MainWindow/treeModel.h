@@ -103,6 +103,8 @@ private:
 
     //cursor position index
     QModelIndex currentIndex;
+    //problem type
+    enum proType{hfss=0, feko};
 };
 
 #endif // TREEMODEL_H
