@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include <QWizardPage>
+#include <QUuid>
 //#include "parsejson.h"
 #include "../Global/global.h"
 #include "../Global/macrodefined.h"
@@ -22,9 +23,14 @@ public:
 
 protected:
     bool validatePage();
+    void insert2table(QTableWidget *table, const int &row, const int &clomun, const QString &itemValue);
 
 public slots:
     void slot_algName(const int index);
+    void slot_singleCheckBoxStateChange(const int state);
+    void slot_multiCheckBoxStateChange(const int state);
+    void slot_addNodeButton(/*bool check*/);
+    void slot_delNodeButton(/*bool check*/);
 
 private:
     void setAlgComboItem(QString name);
@@ -37,16 +43,32 @@ private:
     QString algName;
     QString proPath;
     QString algPath;
-    QLabel *hint;
 
     QLabel *algLabel;
-    QLabel *generationLabel;
-    QLabel *popsizeLabel;
-    QLabel *threadLabel;
     QComboBox *algCombo;
-    QLineEdit *generationLine;
-    QLineEdit *popsizeLine;
+
+    QTableWidget *varTable;
+    enum VARCOLUMN{keyFlag = 0, valueFlag};
+
+
+    QLabel *threadLabel;
     QLineEdit *threadLine;
+    QCheckBox *singleComp;
+
+    QTableWidget *nodesTable;
+    enum NODESCOLUMN{nodeFlag = 0, coreFlag};
+
+    QLabel *nodeLabel;
+    QLabel *coreLabel;
+    QLineEdit *nodeEdit;
+    QLineEdit *coreEdit;
+    QPushButton *addButton;
+    QPushButton *delButton;
+
+    QCheckBox *multiComp;
+    QGroupBox *singleGroup;
+    QGroupBox *multiGroup;
+    QLabel *hint;
 };
 
 #endif // WIZARDOPTIMIZEALG_H

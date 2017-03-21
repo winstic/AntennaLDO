@@ -32,11 +32,11 @@ bool optimizeWizard::validateCurrentPage(){
 
 void optimizeWizard::madeOptimalFile(){
     QString DEA4ADglobalPath = QString("./DEA4AD/trunk");
-    //QString algPath = optimizeAlg->getAlgPath();
-    //QString algName = optimizeAlg->getAlgName();
+    QString algPath = optimizeAlg->getAlgPath();
+    QString algName = optimizeAlg->getAlgName();
     QString projectFullPath = sysParam["WorkingProjectPath"];
     if(! global::copyFile(QString("%1/global_conf.json").arg(DEA4ADglobalPath), QString("%1/global_conf.json").arg(projectFullPath)) ||
-            ! global::copyFile(QString("%1/algorithm_conf.json").arg(DEA4ADglobalPath), QString("%1/algorithm_conf.json").arg(projectFullPath)) ||
+            ! global::copyFile(QString("%1/%2_conf.json").arg(algPath).arg(algName), QString("%1/algorithm_conf.json").arg(projectFullPath)) ||
             ! global::copyFile(QString("%1/start.json").arg(DEA4ADglobalPath), QString("%1/start.json").arg(projectFullPath))){
         QMessageBox::critical(0, QString("Error"), QString("optimizeWizard.cpp:40: error: 算法文件创建失败！"));
         return;
@@ -61,6 +61,7 @@ bool optimizeWizard::update2JsonFile(){
     QJsonObject varObj = parseJson::getSubJsonObj(varsObj, "variables");
     QJsonObject globalObj = parseJson::getSubJsonObj(gloAlgObj, "global");
     QJsonObject algorithmObj = parseJson::getSubJsonObj(gloAlgObj, "algorithm");
+    QJsonObject nodeAndThreadObj = parseJson::getSubJsonObj(gloAlgObj, "NodeAndThread");
 
     if(freObj.isEmpty() || farObj.isEmpty() || gainObj.isEmpty() || axialObj.isEmpty()
                 || lossObj.isEmpty() || varObj.isEmpty() || globalObj.isEmpty() || algorithmObj.isEmpty())
@@ -76,6 +77,7 @@ bool optimizeWizard::update2JsonFile(){
     QJsonObject startObj;
     startObj.insert("outfilepath", QString("%1/outfilepath").arg(sysParam["CurrentOptimizePath"]));
     startObj.insert("outhfsspath", QString("%1/outhfsspath").arg(sysParam["CurrentOptimizePath"]));
+    startObj.insert("NodeAndThread", nodeAndThreadObj);
 
     QString problemJsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(global::getInfoFromRel("Problem"));
     QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);

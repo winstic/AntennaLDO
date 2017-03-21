@@ -20,6 +20,10 @@ public slots:
     void slot_lossChangeType(QString);
     void slot_unitchange(QString);
     void slot_algName(const int index);
+    void slot_singleCheckBoxStateChange(const int state);
+    void slot_multiCheckBoxStateChange(const int state);
+    void slot_addNodeButton(/*bool check*/);
+    void slot_delNodeButton(/*bool check*/);
 
 private:
     //!first tab widget function
@@ -114,14 +118,27 @@ private:
     QJsonObject globalObj;
     QJsonObject algObj;
     QLabel *algLabel;
-    QLabel *generationLabel;
-    QLabel *popsizeLabel;
     QLabel *threadLabel;
     QComboBox *algCombo;
-    QLineEdit *generationLine;
-    QLineEdit *popsizeLine;
     QLineEdit *threadLine;
 
+    QTableWidget *algTable;
+    enum ALGVARCOLUMN{keyFlag = 0, valueFlag};
+
+    QCheckBox *singleComp;
+    QTableWidget *nodesTable;
+    enum NODESCOLUMN{nodeFlag = 0, coreFlag};
+
+    QLabel *nodeLabel;
+    QLabel *coreLabel;
+    QLineEdit *nodeEdit;
+    QLineEdit *coreEdit;
+    QPushButton *addButton;
+    QPushButton *delButton;
+
+    QCheckBox *multiComp;
+    QGroupBox *singleGroup;
+    QGroupBox *multiGroup;
 };
 
 #endif // OPTIMIZETAB_H

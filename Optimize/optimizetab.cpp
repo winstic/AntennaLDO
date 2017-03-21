@@ -3,7 +3,7 @@
 optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->setWindowTitle(tr("天线优化"));
     this->obj = obj;
-    this->tabWidget = new QTabWidget;
+    this->tabWidget = new QTabWidget();
     this->setMinimumSize(880, 580);
     //remove help menu
     this->setWindowFlags(windowFlags() &~ Qt::WindowContextHelpButtonHint);
@@ -43,9 +43,9 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->groupBoxFarField = new QGroupBox(QString("远场范围设置"));
 
     //gain axial loss setting
-    this->gainTable = new QTableWidget;
-    this->axialTable = new QTableWidget;
-    this->lossTable = new QTableWidget;
+    this->gainTable = new QTableWidget();
+    this->axialTable = new QTableWidget();
+    this->lossTable = new QTableWidget();
     this->groupBoxGain = new QGroupBox(QString("增益设置"));
     this->groupBoxAxial = new QGroupBox(tr("轴比设置"));
     this->groupBoxLoss = new QGroupBox(tr("回波损失"));
@@ -58,15 +58,30 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->signalsmap = new QSignalMapper;
 
     //algorithm setting
+    this->algTable = new QTableWidget();
     this->atnName = global::getInfoFromRel("Problem");
     this->algLabel = new QLabel(tr("选择算法:"));
-    this->generationLabel = new QLabel(tr("最大代数"));
-    this->popsizeLabel = new QLabel(tr("种群规模"));
-    this->threadLabel = new QLabel(tr("启动进程数"));
     this->algCombo = new QComboBox();
-    this->generationLine = new QLineEdit();
-    this->popsizeLine = new QLineEdit();
+
+    this->singleComp = new QCheckBox();
+    this->singleComp->setText(QString("单机计算"));
+    this->singleComp->setCheckState(Qt::Checked);
+    this->threadLabel = new QLabel(tr("启动核数"));
     this->threadLine = new QLineEdit();
+
+    this->multiComp = new QCheckBox();
+    this->multiComp->setText(QString("多机计算"));
+    this->multiComp->setCheckState(Qt::Unchecked);
+    this->nodeLabel = new QLabel(QString("node"));
+    this->coreLabel = new QLabel(QString("cores"));
+    this->nodeEdit = new QLineEdit();
+    this->coreEdit = new QLineEdit();
+    this->nodesTable = new QTableWidget();
+    this->addButton = new QPushButton(QString("添加"));
+    this->delButton = new QPushButton(QString("删除"));
+
+    this->singleGroup = new QGroupBox();
+    this->multiGroup = new QGroupBox();
 
     //!first tab widget
     initSetupCom();
@@ -93,6 +108,10 @@ optimizeTab::optimizeTab(QJsonObject obj, QWidget *parent) : QDialog(parent){
     this->algCombo->setCurrentText(algName);
     getConfInfo();
     setFourthTabLayout();
+    connect(singleComp, SIGNAL(stateChanged(int)), this, SLOT(slot_singleCheckBoxStateChange(int)));
+    connect(multiComp, SIGNAL(stateChanged(int)), this, SLOT(slot_multiCheckBoxStateChange(int)));
+    connect(addButton, SIGNAL(clicked(bool)), this, SLOT(slot_addNodeButton()));
+    connect(delButton, SIGNAL(clicked(bool)), this, SLOT(slot_delNodeButton()));
     connect(algCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algName(int)));
     //!
 
@@ -558,9 +577,48 @@ void optimizeTab::initUnitComBo(QComboBox *comb){
 
 //!fourth tab widget
 void optimizeTab::getConfInfo(){
-    generationLine->setText(algObj.value("generation").toString().trimmed());
-    popsizeLine->setText(algObj.value("popsize").toString().trimmed());
+    algTable->setColumnCount(2);
+    algTable->horizontalHeader()->setVisible(false);
+    algTable->horizontalHeader()->setSectionResizeMode(valueFlag, QHeaderView::Stretch);
+    algTable->verticalHeader()->setVisible(false);
+    algTable->setFrameShape(QFrame::NoFrame);                   //setting no frame
+    algTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    algTable->setSelectionMode(QAbstractItemView::SingleSelection);     //select signal row every time
+    algTable->setStyleSheet("selection-background-color:lightblue;");   //setting selected background
+
+    algTable->setRowCount(algObj.count());
+    QString varKey, varValue, valueNote;
+    QJsonObject varObj; //format:{"generation": "1000", "note": "最大代数", "instruction": "最大迭代次数"}
+    int rownumber = 0;
+
+    for(QJsonObject::iterator iter = algObj.begin(); iter != algObj.end(); ++ iter){
+        varKey = iter.key();
+        varObj = iter.value().toObject();
+        varValue = varObj.value(varKey).toString().trimmed();
+        valueNote = varObj.value("note").toString().trimmed();
+        //valueInstruction = varObj.value("instruction").toString().trimmed();
+
+        insert2table(algTable, rownumber, keyFlag, valueNote);
+        QTableWidgetItem *flagItem = algTable->item(rownumber, keyFlag);
+        flagItem->setWhatsThis(varKey);
+        //set this column cannot edit
+        flagItem->setFlags(flagItem->flags() & (~Qt::ItemIsEditable));
+        insert2table(algTable, rownumber, valueFlag, varValue);
+        rownumber ++;
+    }
     threadLine->setText(QString::number(globalObj.value("ThreadNum").toString().trimmed().toInt()-1));
+
+    nodesTable->setColumnCount(2);
+    QStringList header;
+    header << "IP地址/主机名" << "启动核数";
+    nodesTable->setHorizontalHeaderLabels(header);
+    nodesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //nodesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    nodesTable->verticalHeader()->setVisible(false);
+
+    nodesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    nodesTable->setSelectionMode(QAbstractItemView::SingleSelection);     //select signal row every time
+    nodesTable->setStyleSheet("selection-background-color:lightblue;");   //setting selected background
 }
 
 void optimizeTab::setAlgComboItem(QString name){
@@ -581,45 +639,66 @@ void optimizeTab::setAlgComboItem(QString name){
 }
 
 void optimizeTab::setFourthTabLayout(){
-    QHBoxLayout *hlayout1 = new QHBoxLayout();
-    QVBoxLayout *vlayout1 = new QVBoxLayout();
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    QVBoxLayout *vlayout = new QVBoxLayout();
+    QHBoxLayout *hlayoutTemp = new QHBoxLayout();
+    QVBoxLayout *vlayoutTemp = new QVBoxLayout();
+    QGroupBox *lgroup = new QGroupBox(QString("算法参数设置"));
+    QGroupBox *rgroup = new QGroupBox(QString("分布式并行"));
+
     //algorithm name
     algLabel->setFixedWidth(80);
-    hlayout1->addWidget(algLabel);
-    hlayout1->addWidget(algCombo);
-    vlayout1->addLayout(hlayout1);
+    hlayoutTemp->addWidget(algLabel);
+    hlayoutTemp->addWidget(algCombo);
+    vlayout->addLayout(hlayoutTemp);
 
-    QGroupBox *algGroup = new QGroupBox();
-    QHBoxLayout *hlayout2 = new QHBoxLayout();
-    QVBoxLayout *vlayout2 = new QVBoxLayout();
-    //generation setting
-    generationLabel->setFixedWidth(80);
-    hlayout2->addWidget(generationLabel);
-    hlayout2->addWidget(generationLine);
-    vlayout2->addLayout(hlayout2);
-    vlayout2->addSpacing(50);
-    //popsize setting
-    hlayout2 = new QHBoxLayout();
-    popsizeLabel->setFixedWidth(80);
-    hlayout2->addWidget(popsizeLabel);
-    hlayout2->addWidget(popsizeLine);
-    vlayout2->addLayout(hlayout2);
-    vlayout2->addSpacing(50);
+    //new hlayoutTemp
+    hlayoutTemp = new QHBoxLayout();
+    hlayoutTemp->addWidget(algTable);
+    lgroup->setLayout(hlayoutTemp);
+
     //thread number
-    hlayout2 = new QHBoxLayout();
+    //new hlayoutTemp
+    hlayoutTemp = new QHBoxLayout();
     threadLabel->setFixedWidth(80);
-    hlayout2->addWidget(threadLabel);
-    hlayout2->addWidget(threadLine);
-    vlayout2->addLayout(hlayout2);
-    algGroup->setLayout(vlayout2);
+    hlayoutTemp->addWidget(threadLabel);
+    hlayoutTemp->addWidget(threadLine);
 
+    singleGroup->setLayout(hlayoutTemp);
 
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    vlayout->addLayout(vlayout1);
-    vlayout->addSpacing(50);
-    vlayout->addWidget(algGroup);
-    vlayout->setContentsMargins(20, 50, 20, 50);
+    //new hlayoutTemp
+    hlayoutTemp = new QHBoxLayout();
+    hlayoutTemp->addWidget(nodeLabel);
+    hlayoutTemp->addWidget(nodeEdit);
+    hlayoutTemp->addWidget(coreLabel);
+    hlayoutTemp->addWidget(coreEdit);
+    hlayoutTemp->addWidget(addButton);
+    vlayoutTemp->addLayout(hlayoutTemp);
 
+    //new hlayoutTemp
+    hlayoutTemp = new QHBoxLayout();
+    hlayoutTemp->addWidget(nodesTable);
+    hlayoutTemp->addWidget(delButton);
+    vlayoutTemp->addLayout(hlayoutTemp);
+    multiGroup->setLayout(vlayoutTemp);
+
+    singleGroup->setEnabled(true);
+    multiGroup->setEnabled(false);
+    //new vlayoutTemp
+    vlayoutTemp = new QVBoxLayout();
+    vlayoutTemp->addWidget(singleComp);
+    vlayoutTemp->addWidget(singleGroup);
+    vlayoutTemp->addWidget(multiComp);
+    vlayoutTemp->addWidget(multiGroup);
+
+    rgroup->setLayout(vlayoutTemp);
+    hlayout->addWidget(lgroup);
+    hlayout->addWidget(rgroup);
+
+    vlayout->addSpacing(20);
+    vlayout->addLayout(hlayout);
+
+    vlayout->setContentsMargins(2, 50, 2, 50);
     fourthTab->setLayout(vlayout);
 }
 //!
@@ -632,7 +711,7 @@ void optimizeTab::insert2table(QTableWidget *table, const int &row, const int &c
 }
 
 QJsonObject optimizeTab::saveInJsonObj(){
-    QJsonObject saveObj, saveFreObj, saveFarObj, saveGainObj, saveAxialObj, saveLossObj, varObj, saveGlobalObj, saveAlgorithmObj;
+    QJsonObject saveObj, saveFreObj, saveFarObj, saveGainObj, saveAxialObj, saveLossObj, varObj, saveGlobalObj, saveAlgorithmObj, saveNodeAndThreadObj;
     //Frequency Setting json object
     saveFreObj.insert("FreStart", QString("[%1]").arg(freStartEdit->text().trimmed()));
     saveFreObj.insert("FreEnd", QString("[%1]").arg(freEndEdit->text().trimmed()));
@@ -765,8 +844,28 @@ QJsonObject optimizeTab::saveInJsonObj(){
     saveGlobalObj.insert("ThreadNum", QString::number(threadLine->text().trimmed().toInt()+1));
     saveGlobalObj.insert("ALGORITHM_NAME", algName);
     saveGlobalObj.insert("PROBLEM_NAME", atnName);
-    saveAlgorithmObj.insert("generation", generationLine->text().trimmed());
-    saveAlgorithmObj.insert("popsize", popsizeLine->text().trimmed());
+
+    QString algKey, algValue, algNote;
+    for(int i = 0; i < algTable->rowCount(); i++){
+        algKey = algTable->item(i, keyFlag)->whatsThis().trimmed();
+        algNote = algTable->item(i, keyFlag)->text().trimmed();
+        algValue = QString("%1").arg(algTable->item(i, valueFlag)->text().trimmed());
+        QJsonObject itemobj;
+        itemobj.insert(algKey, algValue);
+        itemobj.insert("note", algNote);
+        saveAlgorithmObj.insert(algKey, itemobj);
+    }
+
+    for(int i = 0; i < nodesTable->rowCount(); ++ i){
+        QString nodeOrIp, core, strUID;
+        QJsonObject ncitemobj;
+        strUID = QUuid::createUuid().toString();
+        nodeOrIp = nodesTable->item(i, nodeFlag)->text().trimmed();
+        core = nodesTable->item(i, coreFlag)->text().trimmed();
+        ncitemobj.insert("node", nodeOrIp);
+        ncitemobj.insert("threads", core);
+        saveNodeAndThreadObj.insert(strUID, ncitemobj);
+    }
 
     saveObj.insert("FreSetting", saveFreObj);
     saveObj.insert("ThetaPhiStep", saveFarObj);
@@ -776,6 +875,7 @@ QJsonObject optimizeTab::saveInJsonObj(){
     saveObj.insert("variables", varObj);
     saveObj.insert("global", saveGlobalObj);
     saveObj.insert("algorithm", saveAlgorithmObj);
+    saveObj.insert("NodeAndThread", saveNodeAndThreadObj);
     return saveObj;
 }
 
@@ -858,6 +958,53 @@ void optimizeTab::slot_algName(const int index){
     getConfInfo();
 }
 
+void optimizeTab::slot_singleCheckBoxStateChange(const int state){
+    //state: enum explain{Qt::Unchecked=0, Qt::PartiallyChecked, Qt::Checked}
+    //so usually using 0(unchecked), 2(checked);
+    //qDebug() << state;
+    if(state == 0){
+        singleGroup->setEnabled(false);
+        multiComp->setCheckState(Qt::Checked);
+    }
+    else if(state == 2){
+        //set another checkBox(multiCheckBox unChecked)
+        singleGroup->setEnabled(true);
+        multiComp->setCheckState(Qt::Unchecked);
+    }
+}
+
+void optimizeTab::slot_multiCheckBoxStateChange(const int state){
+    if(state == 0){
+        //set another checkBox(multiCheckBox Checked)
+        multiGroup->setEnabled(false);
+        singleComp->setCheckState(Qt::Checked);
+    }
+    else if(state == 2){
+        //set another checkBox(multiCheckBox unChecked)
+        multiGroup->setEnabled(true);
+        singleComp->setCheckState(Qt::Unchecked);
+    }
+}
+
+void optimizeTab::slot_addNodeButton(){
+    QString nodeinfo, coreinfo;
+    int rowIndex = nodesTable->rowCount();
+    //qDebug() << rowIndex;
+    nodesTable->insertRow(rowIndex);
+    nodeinfo = nodeEdit->text().trimmed();
+    coreinfo = coreEdit->text().trimmed();
+    insert2table(nodesTable, rowIndex, nodeFlag, nodeinfo);
+    insert2table(nodesTable, rowIndex, coreFlag, coreinfo);
+}
+
+void optimizeTab::slot_delNodeButton(){
+    int selectRow = nodesTable->currentRow();
+    //qDebug() << selectRow;
+    if(selectRow != -1)
+        nodesTable->removeRow(selectRow);
+}
+
+
 void optimizeTab::slot_saveAllButton(bool){
     bool isOK = true;
     QJsonObject newObj = saveInJsonObj();
@@ -869,6 +1016,7 @@ void optimizeTab::slot_saveAllButton(bool){
     QJsonObject varsObj = parseJson::getSubJsonObj(newObj, "variables");
     QJsonObject globalObj = parseJson::getSubJsonObj(newObj, "global");
     QJsonObject algorithmObj = parseJson::getSubJsonObj(newObj, "algorithm");
+    QJsonObject nodeAndThreadObj = parseJson::getSubJsonObj(newObj, "NodeAndThread");
     if(freObj.isEmpty() || farObj.isEmpty() || gainObj.isEmpty() || axialObj.isEmpty() ||
             lossObj.isEmpty() || varsObj.isEmpty() || globalObj.isEmpty() || algorithmObj.isEmpty())
         isOK = false;
@@ -879,12 +1027,20 @@ void optimizeTab::slot_saveAllButton(bool){
         obj.insert("AxialratioSetting", axialObj);
         obj.insert("VSWRSetting", lossObj);
         obj.insert("variables", varsObj);
+
+        //start obj
+        QJsonObject startObj;
+        startObj.insert("NodeAndThread", nodeAndThreadObj);
+
         QString jsonPath = QString("%1/%2_conf.json").arg(sysParam["CurrentOptimizePath"]).arg(atnName);
         QString globalJsonPath = QString("%1/global_conf.json").arg(sysParam["CurrentOptimizePath"]);
         QString algorithmJsonPath = QString("%1/algorithm_conf.json").arg(sysParam["CurrentOptimizePath"]);
+        QString startJsonPath = QString("%1/start.json").arg(sysParam["CurrentOptimizePath"]);
+
         if(! (parseJson::write(jsonPath, obj)
               && parseJson::write(globalJsonPath, globalObj)
-              && parseJson::write(algorithmJsonPath, algorithmObj)) )
+              && parseJson::write(algorithmJsonPath, algorithmObj)
+              && parseJson::write(startJsonPath, startObj)) )
             isOK = false;
     }
     if(isOK){
